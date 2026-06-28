@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Orange rounded background -->
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+  <!-- Gift box icon (white) -->
+  <g stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Box body -->
+    <rect x="6.5" y="16" width="19" height="11" rx="1.5"/>
+    <!-- Lid -->
+    <rect x="5.5" y="12" width="21" height="4" rx="1"/>
+    <!-- Vertical ribbon -->
+    <line x1="16" y1="12" x2="16" y2="27"/>
+    <!-- Bow left loop -->
+    <path d="M16 12 C14 9 10 8.5 9.5 10.5 C9 12 12 12.5 16 12Z"/>
+    <!-- Bow right loop -->
+    <path d="M16 12 C18 9 22 8.5 22.5 10.5 C23 12 20 12.5 16 12Z"/>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+.next/
+node_modules/
+.env.local
+*.tsbuildinfo
+
+.vercel
+
+# Claude Code session data
+.claude/

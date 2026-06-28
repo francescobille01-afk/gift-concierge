@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    font-family: var(--font-jakarta), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Animations ── */
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(45px, -35px) scale(1.12); }
+  66%       { transform: translate(-30px, 25px) scale(0.92); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400% center; }
+  100% { background-position: 400% center; }
+}
+@keyframes dotBounce {
+  0%, 60%, 100% { transform: translateY(0);    opacity: 0.35; }
+  30%            { transform: translateY(-6px); opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes loadingBar {
+  0%   { width: 5%;  margin-left: 0%;   }
+  50%  { width: 55%; margin-left: 25%;  }
+  100% { width: 5%;  margin-left: 95%;  }
+}
+
+.animate-blob          { animation: blob 9s ease-in-out infinite; }
+.animate-blob-slow     { animation: blob 13s ease-in-out infinite; }
+.delay-2000            { animation-delay: 2s; }
+.delay-3500            { animation-delay: 3.5s; }
+.delay-4000            { animation-delay: 4s; }
+.animate-fade-in-up    { animation: fadeInUp 0.65s ease both; }
+.delay-100             { animation-delay: 0.1s; }
+.delay-200             { animation-delay: 0.2s; }
+.delay-300             { animation-delay: 0.3s; }
+.delay-400             { animation-delay: 0.4s; }
+.animate-shimmer       { animation: shimmer 4s linear infinite; background-size: 200% auto; }
+.animate-slide-in-left { animation: slideInLeft 0.3s ease both; }
+.animate-fade-in       { animation: fadeIn 0.2s ease both; }
+.animate-loading-bar   { animation: loadingBar 1.8s ease-in-out infinite; position: relative; }
+
+.dot-1 { animation: dotBounce 1.3s ease-in-out infinite 0s; }
+.dot-2 { animation: dotBounce 1.3s ease-in-out infinite 0.18s; }
+.dot-3 { animation: dotBounce 1.3s ease-in-out infinite 0.36s; }
+
+/* ── Gradient text shimmer ── */
+.gradient-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f97316 0%,
+    #fdba74 25%,
+    #fbbf24 50%,
+    #fdba74 75%,
+    #f97316 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 5s linear infinite;
+}
+
+/* ── Range slider ── */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 9999px;
+  background: #E2E8F0;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #F97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15), 0 2px 6px rgba(0,0,0,0.12);
+  transition: box-shadow 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 7px rgba(249, 115, 22, 0.2), 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #CBD5E1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ── Select arrow reset ── */
+select { background-image: none; }
+
+/* ── Shared form utilities ── */
+@layer components {
+  .form-label {
+    @apply block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5;
+  }
+  .form-input {
+    @apply w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
+           focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-transparent
+           transition-all duration-150 bg-white placeholder-slate-300
+           hover:border-slate-300;
+  }
+  .form-select {
+    @apply w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
+           focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-transparent
+           transition-all duration-150 bg-white appearance-none cursor-pointer
+           hover:border-slate-300;
+  }
+}
+
+/* ── Safe area (mobile) ── */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 12px); }
