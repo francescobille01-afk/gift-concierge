@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Show, UserButton, SignInButton, useAuth, useSignIn } from "@clerk/nextjs";
+import { SignedIn, UserButton, SignInButton, useAuth, useSignIn } from "@clerk/nextjs";
 import type { GiftSuggestion, ChatResponse, UserLocale, ChatMessage } from "@/lib/types";
 
 /* ─── Design tokens ─────────────────────────────────────────── */
@@ -1236,9 +1236,9 @@ export default function Home() {
             </div>
 
             {/* My profile */}
-            <Show when="signed-in">
+            <SignedIn>
               <UserButton showName />
-            </Show>
+            </SignedIn>
             {isGuest && (
               <SignInButton mode="modal">
                 <button style={{ padding:"8px 16px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label2, font:`600 13.5px ${BODY}`, cursor:"pointer" }}>
@@ -1445,7 +1445,7 @@ export default function Home() {
                         <span style={{ width:7, height:7, borderRadius:"50%", background:C.maroon }}/> {tr.curatedTag}
                       </div>
                       <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:30, lineHeight:1.12, color:C.ink, margin:"0 0 8px", letterSpacing:"-.02em" }}>
-                        {tr.headline(sorted.length, g.recipientName, g.occasion ? (tr.occ[g.occasion] ?? g.occFallback) : tr.occFallback)}
+                        {tr.headline(sorted.length, g.recipientName, g.occasion ? (tr.occ[g.occasion] ?? tr.occFallback) : tr.occFallback)}
                       </h2>
                       <p style={{ fontSize:15.5, color:C.muted, margin:0, maxWidth:520 }}>
                         {tr.sub(fmtBudget(g.budget, sym), lang.country)}
