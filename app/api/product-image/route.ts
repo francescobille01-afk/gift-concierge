@@ -3,26 +3,43 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * GET /api/product-image?q={imageSearchQuery}
  *
- * Redirects to an Unsplash photo matching the search query.
- * Uses the Unsplash Source URL — no API key required, always works.
- *
- * Claude provides a specific imageSearchQuery per gift (e.g. "tatcha skincare mist bottle beauty")
- * so each card gets a visually relevant, distinct photo.
+ * Fallback used only when a gift has no real product photo (or the real
+ * photo URL fails to load). Generates a simple branded SVG placeholder
+ * locally — no external network call, so it can never itself be "broken".
  */
+function hashHue(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+
 export async function GET(req: NextRequest) {
-  const query = req.nextUrl.searchParams.get("q") ?? "gift product";
+  const query = req.nextUrl.searchParams.get("q") ?? "gift";
+  const hue = hashHue(query);
+  const c1 = `hsl(${hue},38%,82%)`;
+  const c2 = `hsl(${(hue + 28) % 360},42%,68%)`;
 
-  // Clean and encode the query for Unsplash
-  const cleaned = query
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .trim()
-    .replace(/\s+/g, ",");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${c1}"/>
+        <stop offset="100%" stop-color="${c2}"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="400" fill="url(#g)"/>
+    <g transform="translate(300,200)" opacity="0.55">
+      <rect x="-38" y="-14" width="76" height="58" rx="6" fill="#5e2e2e"/>
+      <rect x="-44" y="-30" width="88" height="20" rx="6" fill="#5e2e2e"/>
+      <rect x="-6" y="-30" width="12" height="74" fill="#c9a26b"/>
+      <path d="M -6 -30 C -30 -52, -50 -34, -28 -22 Z" fill="#c9a26b"/>
+      <path d="M 6 -30 C 30 -52, 50 -34, 28 -22 Z" fill="#c9a26b"/>
+    </g>
+  </svg>`;
 
-  // Unsplash Source — returns a featured photo matching the keywords.
-  // Each unique keyword string consistently returns a different photo,
-  // so distinct gifts get distinct images.
-  const url = `https://source.unsplash.com/featured/600x400/?${encodeURIComponent(cleaned)}`;
-
-  return NextResponse.redirect(url, { status: 302 });
+  return new NextResponse(svg, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
 }

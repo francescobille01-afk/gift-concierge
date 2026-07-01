@@ -1,3 +1,4 @@
+import {ClerkProvider} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -29,7 +30,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <ClerkProvider>
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

@@ -18,10 +18,14 @@ export interface GiftSuggestion {
   link?: string;
   /** Short keyword phrase for fetching a product photo, e.g. "tatcha skincare mist beauty" */
   imageSearchQuery?: string;
+  /** Real product photo URL found via web search — the actual product, not a stock photo */
+  imageUrl?: string;
+  /** Real link to the brand's/retailer's official product page, found via web search */
+  officialLink?: string;
+  /** Real Amazon product link on the buyer's local Amazon store (e.g. amazon.it), found via web search */
+  amazonLink?: string;
   /** Product category label shown on the card, e.g. "Skincare", "Tech", "Kitchen" */
   category?: string;
-  /** How well this gift matches the recipient, 80–99 */
-  matchScore?: number;
 }
 
 export type ReactionType = "love_it" | "already_owned" | "not_their_style" | null;

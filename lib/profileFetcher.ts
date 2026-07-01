@@ -15,91 +15,104 @@ function extractUsername(url: string): string {
   return m?.[1] ?? "";
 }
 
+// NOTE (2026-07-01): switched from apify/instagram-profile-scraper to apify/instagram-scraper.
+// The old actor only ever returned bio + follower counts — no post content at all, so every
+// "captions / hashtags / locations" section below was silently empty on every run. This actor
+// actually reads posts. We make two small calls: one for profile bio/followers ("details"),
+// one for the last ~12 posts with real captions/hashtags/locations ("posts"). Cost is roughly
+// $0.003 (details) + ~$0.03 (12 posts) = ~3.5 cents per lookup on the free plan.
 async function fetchInstagramViaApify(rawUrl: string): Promise<string> {
   if (!APIFY_TOKEN) return "(Apify token not set — Instagram not read)";
 
   const username = extractUsername(rawUrl);
   if (!username) return "(Could not extract Instagram username from URL)";
 
-  const endpoint =
-    `https://api.apify.com/v2/acts/apify~instagram-profile-scraper/run-sync-get-dataset-items` +
-    `?token=${APIFY_TOKEN}&timeout=90`;
+  const profileUrl = `https://www.instagram.com/${username}/`;
+  const base =
+    `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items` +
+    `?token=${APIFY_TOKEN}&timeout=55`;
 
-  const res = await fetch(endpoint, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ usernames: [username], resultsLimit: 12 }),
-    signal:  AbortSignal.timeout(90_000),
-  });
+  const runInput = (resultsType: "details" | "posts", resultsLimit: number) =>
+    fetch(base, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ directUrls: [profileUrl], resultsType, resultsLimit }),
+      signal:  AbortSignal.timeout(55_000),
+    }).catch((err) => {
+      // Return a fake failed Response-like so Promise.all doesn't reject the whole pair
+      return { ok: false, status: 0, _err: err } as unknown as Response;
+    });
 
-  if (!res.ok) {
-    return `(Apify Instagram scraper error: HTTP ${res.status})`;
+  const [detailsRes, postsRes] = await Promise.all([
+    runInput("details", 1),
+    runInput("posts", 12),
+  ]);
+
+  if (!detailsRes.ok && !postsRes.ok) {
+    return `(Apify Instagram scraper error: HTTP ${detailsRes.status}/${postsRes.status})`;
   }
 
-  const data = await res.json() as Record<string, unknown>[];
-  if (!data?.length) return "(No Instagram data returned by Apify)";
+  const lines: string[] = [`=== INSTAGRAM: @${username} ===`];
 
-  const p = data[0] as {
-    fullName?:      string;
-    biography?:     string;
-    followersCount?:number;
-    followsCount?:  number;
-    postsCount?:    number;
-    isVerified?:    boolean;
-    latestPosts?:   {
+  // Profile info: bio, followers, post count
+  if (detailsRes.ok) {
+    const detailsData = await detailsRes.json() as Record<string, unknown>[];
+    const p = detailsData?.[0] as {
+      fullName?:       string;
+      biography?:      string;
+      followersCount?: number;
+      postsCount?:     number;
+    } | undefined;
+    if (p?.fullName)       lines.push(`Name: ${p.fullName}`);
+    if (p?.biography)      lines.push(`Bio: ${p.biography}`);
+    if (p?.followersCount) lines.push(`Followers: ${p.followersCount.toLocaleString()}`);
+    if (p?.postsCount)     lines.push(`Total posts: ${p.postsCount}`);
+  }
+
+  // Real posts: captions, hashtags, locations, likes
+  if (postsRes.ok) {
+    const posts = await postsRes.json() as {
       caption?:      string;
       hashtags?:     string[];
       locationName?: string;
       likesCount?:   number;
     }[];
-  };
 
-  const lines: string[] = [`=== INSTAGRAM: @${username} ===`];
+    const captions = posts
+      .map(post => post.caption)
+      .filter((c): c is string => Boolean(c))
+      .slice(0, 15);
+    if (captions.length) {
+      lines.push(`\nRecent post captions:\n- ${captions.join("\n- ")}`);
+    }
 
-  if (p.fullName)       lines.push(`Name: ${p.fullName}`);
-  if (p.biography)      lines.push(`Bio: ${p.biography}`);
-  if (p.followersCount) lines.push(`Followers: ${p.followersCount.toLocaleString()}`);
-  if (p.postsCount)     lines.push(`Total posts: ${p.postsCount}`);
+    const hashtags = [
+      ...new Set(posts.flatMap(post => post.hashtags ?? [])),
+    ].slice(0, 40);
+    if (hashtags.length) {
+      lines.push(`\nHashtags used: #${hashtags.join(", #")}`);
+    }
 
-  const posts = p.latestPosts ?? [];
+    const locations = [
+      ...new Set(
+        posts.map(post => post.locationName).filter((l): l is string => Boolean(l))
+      ),
+    ].slice(0, 15);
+    if (locations.length) {
+      lines.push(`\nLocations tagged: ${locations.join(", ")}`);
+    }
 
-  // Captions from recent posts
-  const captions = posts
-    .map(post => post.caption)
-    .filter((c): c is string => Boolean(c))
-    .slice(0, 15);
-  if (captions.length) {
-    lines.push(`\nRecent post captions:\n- ${captions.join("\n- ")}`);
+    const topPosts = [...posts]
+      .sort((a, b) => (b.likesCount ?? 0) - (a.likesCount ?? 0))
+      .slice(0, 5)
+      .map(post => post.caption)
+      .filter((c): c is string => Boolean(c));
+    if (topPosts.length) {
+      lines.push(`\nMost-liked post captions:\n- ${topPosts.join("\n- ")}`);
+    }
   }
 
-  // All hashtags used (deduplicated)
-  const hashtags = [
-    ...new Set(posts.flatMap(post => post.hashtags ?? [])),
-  ].slice(0, 40);
-  if (hashtags.length) {
-    lines.push(`\nHashtags used: #${hashtags.join(", #")}`);
-  }
-
-  // Locations tagged
-  const locations = [
-    ...new Set(
-      posts.map(post => post.locationName).filter((l): l is string => Boolean(l))
-    ),
-  ].slice(0, 15);
-  if (locations.length) {
-    lines.push(`\nLocations tagged: ${locations.join(", ")}`);
-  }
-
-  // Most liked posts (top interests signal)
-  const topPosts = [...posts]
-    .sort((a, b) => (b.likesCount ?? 0) - (a.likesCount ?? 0))
-    .slice(0, 5)
-    .map(post => post.caption)
-    .filter((c): c is string => Boolean(c));
-  if (topPosts.length) {
-    lines.push(`\nMost-liked post captions:\n- ${topPosts.join("\n- ")}`);
-  }
-
+  if (lines.length === 1) return "(No Instagram data returned by Apify)";
   return lines.join("\n");
 }
 

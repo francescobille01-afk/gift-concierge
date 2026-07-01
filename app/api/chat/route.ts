@@ -4,14 +4,19 @@ import type { ChatRequest, ChatResponse, GiftSuggestion, UserLocale } from "@/li
 import { searchCatalog } from "@/lib/giftCatalog";
 import { fetchProfiles } from "@/lib/profileFetcher";
 
-// Allow up to 60 seconds — needed when Apify is fetching social profiles (takes 20-45s)
+// Allow up to 120 seconds — Apify social profile fetch (20-45s) plus multiple web_search calls per gift
 // IMPORTANT: must be declared AFTER imports so Next.js static analysis picks it up
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 // Strip any accidental BOM character that some editors/tools prepend to env var values
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY?.replace(/^﻿/, "") });
 
-const tools: Anthropic.Tool[] = [
+const tools: Anthropic.Messages.ToolUnion[] = [
+  {
+    type: "web_search_20250305",
+    name: "web_search",
+    max_uses: 8,
+  },
   {
     name: "search_seed_catalog",
     description:
@@ -38,7 +43,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: "propose_gifts",
     description:
-      "Present a curated list of gift suggestions to the user. Call this after searching the catalog to surface your top picks.",
+      "Present a curated list of 8 gift suggestions to the user. Call this after searching the catalog and web-searching each product for real image and links.",
     input_schema: {
       type: "object",
       properties: {
@@ -52,12 +57,12 @@ const tools: Anthropic.Tool[] = [
               description: { type: "string" },
               priceRange: { type: "string", description: "e.g. '€25–€45'" },
               reason: { type: "string", description: "Why this suits the recipient — must cite a specific signal (brand they like, activity they do, social post detail, wishlist item, style observed)" },
-              link: { type: "string" },
-              imageSearchQuery: { type: "string", description: "2–5 keywords for finding a product photo, e.g. 'tatcha luminous skin mist bottle' or 'le creuset cast iron pan blue'. Be specific: include brand name + product type + a visual descriptor." },
+              imageUrl: { type: "string", description: "A direct, real image URL (ending in .jpg/.png/.webp etc, or a CDN image URL) of the ACTUAL product, taken from the web_search results for this product's official page or Amazon listing. Never invent a URL — only use one you actually saw in search results." },
+              officialLink: { type: "string", description: "The real URL of the brand's or retailer's official product page for this exact item, found via web_search. Omit if you could not find a real one." },
+              amazonLink: { type: "string", description: "The real URL of this exact product on the buyer's local Amazon store (matching their amazonDomain), found via web_search. Omit if no real Amazon listing was found." },
               category: { type: "string", description: "Short product category label for the card, e.g. 'Skincare', 'Kitchen', 'Tech', 'Wellness', 'Fashion', 'Books', 'Coffee', 'Outdoor'. One or two words max." },
-              matchScore: { type: "number", description: "Integer 80–99 indicating how well this gift matches the recipient based on their profile, interests, style, and social signals. Be honest — reserve 95+ for near-perfect matches." },
             },
-            required: ["id", "title", "description", "priceRange", "reason", "imageSearchQuery"],
+            required: ["id", "title", "description", "priceRange", "reason"],
           },
         },
       },
@@ -136,7 +141,13 @@ ${profileSection}
 
 YOUR TASK:
 1. Call \`search_seed_catalog\` first to get relevant starting ideas from the curated catalog.
-2. Then call \`propose_gifts\` with 4–5 final suggestions.
+2. For EACH product you plan to suggest, call \`web_search\` to find:
+   a. The product's listing on ${loc.amazonDomain} — real URL. Amazon listings always contain a CDN product image URL in the format "m.media-amazon.com/images/I/..." — extract this as \`imageUrl\`. It is the clearest, most recognisable product photo available.
+   b. If the product is not on Amazon, search for the brand's official product page and extract its main product photo URL instead.
+3. Then call \`propose_gifts\` with exactly 8 final suggestions, filling \`imageUrl\` (the direct CDN image URL you found, not the page URL), \`officialLink\`, and \`amazonLink\` from what you actually found via web_search.
+
+▸ IMAGES ARE CRITICAL: \`imageUrl\` must be a direct image file URL (ending in .jpg, .jpeg, .png, .webp, or a CDN path like m.media-amazon.com/images/...). It must show the actual product, not a category icon or stock photo. If you found an Amazon listing, the image is always there — extract it.
+▸ NEVER fabricate a URL. Every link and image URL must come directly from a web_search result you actually retrieved. If you cannot find a real Amazon listing on ${loc.amazonDomain}, omit \`amazonLink\` rather than guessing.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULES FOR WORLD-CLASS GIFT SUGGESTIONS
@@ -151,11 +162,11 @@ RULES FOR WORLD-CLASS GIFT SUGGESTIONS
 
 ▸ IF NOTES MENTION A WISH — make it your #1 suggestion. Find the exact item or the premium version of it.
 
-▸ BUDGET PRECISION: Express all prices in ${loc.currency}. Stay WITHIN the stated range.
-  Under ${loc.currencySymbol}50 → premium consumables, small branded accessories, subscriptions
-  ${loc.currencySymbol}50–150 → mid-range branded goods, curated experiences, quality tools
-  ${loc.currencySymbol}150+ → premium / luxury items, meaningful keepsakes
-  ✗ Never suggest a ${loc.currencySymbol}25 item for a ${loc.currencySymbol}150 budget. Use the full range.
+▸ BUDGET IS A HARD CONSTRAINT, NOT A SUGGESTION: The buyer's budget is ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}.
+  ✗ ABSOLUTELY FORBIDDEN: any suggestion whose priceRange falls even partly outside ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}. A ${loc.currencySymbol}180 item is NOT acceptable for a ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax} budget, even if it's a great match otherwise — find a cheaper alternative instead.
+  ✓ Both the low AND high end of each suggestion's priceRange must sit inside ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}. Before calling propose_gifts, check every single priceRange against this range and discard/replace any that don't fit.
+  EXCEPTION — only if budgetMax is ${loc.currencySymbol}2000 (meaning the user selected an open-ended "${loc.currencySymbol}500+" budget): treat this as "${loc.currencySymbol}500 and up", so higher-priced premium/luxury items are fine and there is no upper ceiling.
+  Use the full range you're given — don't cluster every suggestion near the bottom of the range either.
 
 ▸ STYLE MATCH IS NON-NEGOTIABLE: A minimalist does not want maximalist clutter. A quirky personality does not want boring basics. A classic dresser does not want streetwear. Map the stated style + social aesthetic → pick products that live in that world.
 
@@ -194,6 +205,18 @@ STEP D — SELECT COMPLETELY NEW GIFTS THAT:
 3. Avoid the entire style of rejected categories.
 4. Surprise — find the item in the loved-pattern that the user hasn't thought of yet.
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFINEMENT BY 1–10 RATINGS — when the user gives a rated list of previous suggestions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The user may rate each previous suggestion from 1 (not for them) to 10 (perfect). Treat this as the strongest signal you have — stronger than the original intake answers. Do NOT re-ask any intake questions; the recipient profile is unchanged, only your gift selection should change.
+
+• Items rated 8–10: treat as near-perfect — stay extremely close to their price tier, category, and aesthetic. Find sibling/adjacent products in that same world.
+• Items rated 5–7: directionally fine but not exciting — keep the general category/price tier but vary the specific item or aesthetic.
+• Items rated 1–4: a clear miss — avoid that entire category and that price tier positioning (too cheap/expensive/wrong vibe) in your new picks.
+• Weight your new suggestions toward whatever pattern emerges across the high-rated items (shared brand tier, category, aesthetic, practicality vs indulgence).
+• Give 4–5 NEW suggestions — do not just repeat the same items, and do not repeat anything rated 1–4.
+
 Keep your text replies short and warm. Get to proposals fast — the user is here for gift ideas, not conversation.`;
 }
 
@@ -203,11 +226,12 @@ export async function POST(req: NextRequest) {
     const { recipient, messages, reactions } = body;
 
     // Fetch social / web profiles on the FIRST message only (no need to re-fetch every turn)
-    // Cap at 45s so the function never times out before Claude can respond
+    // Cap at 60s so the function never times out before Claude can respond
+    // (the Instagram posts scrape can take ~30-45s on its own)
     let profileContext: string | undefined;
     if (messages.length <= 1 && recipient.socialUrls?.length) {
       const timeout = new Promise<string>((resolve) =>
-        setTimeout(() => resolve("(Social profile fetch timed out — proceeding without it)"), 45_000)
+        setTimeout(() => resolve("(Social profile fetch timed out — proceeding without it)"), 60_000)
       );
       profileContext = await Promise.race([fetchProfiles(recipient.socialUrls), timeout]);
     }
@@ -236,14 +260,31 @@ export async function POST(req: NextRequest) {
     let finalText = "";
     let finalSuggestions: GiftSuggestion[] = [];
 
+    // Prune web_search_tool_result content from older assistant messages to avoid
+    // hitting the 200k context window limit (each search result is ~2–5k tokens).
+    // We keep the last 4 messages intact; older ones have search payloads stripped.
+    function pruneContext(msgs: Anthropic.MessageParam[]): Anthropic.MessageParam[] {
+      const KEEP = 4;
+      return msgs.map((msg, idx) => {
+        if (idx >= msgs.length - KEEP || msg.role !== "assistant") return msg;
+        if (!Array.isArray(msg.content)) return msg;
+        const pruned = (msg.content as Anthropic.ContentBlock[]).map(b =>
+          b.type === "web_search_tool_result"
+            ? ({ type: "text", text: "[search results omitted to save context]" } as Anthropic.TextBlock)
+            : b
+        );
+        return { ...msg, content: pruned };
+      });
+    }
+
     // Agentic loop — run until stop_reason is "end_turn"
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 20; i++) {
       const response = await client.messages.create({
-        model: "claude-haiku-4-5",
-        max_tokens: 2048,
+        model: "claude-sonnet-4-6",
+        max_tokens: 4096,
         system: buildSystemPrompt(recipient, profileContext, body.locale),
         tools,
-        messages: currentMessages,
+        messages: pruneContext(currentMessages),
       });
 
       if (response.stop_reason === "end_turn") {

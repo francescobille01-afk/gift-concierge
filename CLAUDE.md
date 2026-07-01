@@ -52,7 +52,11 @@ Tags are matched case-insensitively. The `"any"` occasion tag matches all occasi
 
 ## Communication Style
 
-The user is not a developer or technician. Always use plain, simple language when giving instructions or explanations. Avoid jargon, acronyms, and technical terms unless absolutely necessary — and if you must use one, explain it in plain words right after. Prefer short sentences and step-by-step instructions over dense paragraphs.
+The user is not a developer or technician.
+- Use plain, simple language. No jargon. If a technical term is unavoidable, explain it in one plain phrase immediately after.
+- Keep every response short. One or two sentences is ideal. Never write long paragraphs or bullet lists when a single sentence will do.
+- When giving the user an action to take, state it in one line. Example: "Refresh the browser." Not a numbered list with explanations.
+- Summaries and status updates must be two sentences max.
 
 ## Spending & Cost Approval
 
