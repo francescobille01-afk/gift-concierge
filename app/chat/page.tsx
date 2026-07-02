@@ -1392,7 +1392,10 @@ function ChatPageInner() {
               {suggestions.map((s) => {
                 const tier = priceTier(s.priceRange);
                 const isChosen = chosen === s.id;
-                const imgSrc = `/api/product-image?q=${encodeURIComponent(s.imageSearchQuery ?? s.title)}`;
+                const productLink = s.officialLink ?? s.amazonLink ?? s.link;
+                const imgSrc = productLink
+                  ? `/api/product-image?url=${encodeURIComponent(productLink)}&q=${encodeURIComponent(s.title)}`
+                  : `/api/product-image?q=${encodeURIComponent(s.title)}`;
 
                 return (
                   <div key={s.id} className={`flex flex-col bg-white rounded-2xl overflow-hidden border transition-all duration-300 ${
