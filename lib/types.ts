@@ -61,6 +61,8 @@ export interface ChatRequest {
   messages: ChatMessage[];
   reactions: Record<string, ReactionType>;
   locale?: UserLocale;
+  /** Current suggestions shown to user — used to exclude them from refinement results */
+  currentSuggestions?: GiftSuggestion[];
 }
 
 export interface ChatResponse {

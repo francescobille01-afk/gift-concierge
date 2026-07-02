@@ -768,7 +768,7 @@ export default function Home() {
   const [history,     setHistory]     = useState<HistoryEntry[]>([]);
   const [viewedEntry, setViewedEntry] = useState<HistoryEntry | null>(null);
   const [convo,       setConvo]       = useState<ChatMessage[]>([]);
-  const [ratings,     setRatings]     = useState<Record<string, number>>({});
+  const [thumbs,      setThumbs]      = useState<Record<string, "up"|"down">>({});
   const [refining,    setRefining]    = useState(false);
   const [errorMsg,    setErrorMsg]    = useState<string | null>(null);
   /* Contact form */
@@ -849,7 +849,7 @@ export default function Home() {
   }
   function advance() { if (step < 5) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest(); }
   function goBack()  { setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1); }
-  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("match"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setRatings({}); setConvo([]); setErrorMsg(null); }
+  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("match"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
   function toggle(field: "vibe", val: string) {
     setG(prev => ({ ...prev, [field]: prev[field].includes(val) ? prev[field].filter(x => x !== val) : [...prev[field], val] }));
   }
@@ -915,7 +915,7 @@ export default function Home() {
       if (newGifts.length === 0) {
         setErrorMsg("Something went wrong while finding gifts — please try again.");
       } else {
-        setRatings({});
+        setThumbs({});
         setConvo([
           { role:"user", content: firstMessage },
           { role:"assistant", content: data.message ?? "" },
@@ -929,16 +929,18 @@ export default function Home() {
     setScreen("results");
   }
 
-  /* ── Refine using per-gift 1–10 ratings, continuing the same conversation ── */
+  /* ── Refine using 👍/👎 thumbs feedback ── */
   async function refineRequest() {
-    if (Object.keys(ratings).length === 0 || refining) return;
+    if (Object.keys(thumbs).length === 0 || refining) return;
     setRefining(true); setErrorMsg(null);
     const { recipient, locale } = buildRecipientAndLocale();
-    const ratingLines = gifts
-      .filter(gf => ratings[gf.id] != null)
-      .map(gf => `- "${gf.title}": ${ratings[gf.id]}/10`)
+
+    const allTitles = gifts.map(gf => `"${gf.title}"`).join(", ");
+    const thumbLines = gifts
+      .filter(gf => thumbs[gf.id] != null)
+      .map(gf => `- "${gf.title}": ${thumbs[gf.id] === "up" ? "👍 liked" : "👎 disliked"}`)
       .join("\n");
-    const refineMessage = `Here's how I'd rate the suggestions you just gave me, from 1 (not for them) to 10 (perfect):\n${ratingLines}\n\nPlease refine and give me a new set of suggestions based on these ratings — don't ask me the intake questions again.`;
+    const refineMessage = `Here is my feedback on your suggestions:\n${thumbLines}\n\nIMPORTANT: Do NOT suggest any of these gifts again (they've already been shown): ${allTitles}.\n\nPlease give me a completely new set of suggestions based on this feedback — don't ask me the intake questions again.`;
     try {
       const res = await fetch("/api/chat", {
         method:"POST",
@@ -952,7 +954,7 @@ export default function Home() {
         setErrorMsg("Something went wrong while refining — your previous suggestions are still here, please try again.");
       } else {
         setGifts(newGifts);
-        setRatings({});
+        setThumbs({});
         setConvo(prev => [
           ...prev,
           { role:"user", content: refineMessage },
@@ -992,8 +994,7 @@ export default function Home() {
     const officialLink = gift.officialLink || gift.link;
     const amazonLink   = gift.amazonLink;
     const fav    = isFav(gift.id);
-    const committedRating = ratings[gift.id];
-    const [liveRating, setLiveRating] = useState(committedRating ?? 5);
+    const thumb  = thumbs[gift.id];
     return (
       <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:18, overflow:"hidden", boxShadow:"0 4px 18px rgba(124,63,63,.06)", display:"flex", flexDirection:"column" }}>
         <div style={{ height:170, background:"linear-gradient(140deg,#f0e3d2,#dcc09e)", position:"relative", overflow:"hidden", display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -1020,19 +1021,17 @@ export default function Home() {
 
           {showRating && (
             <div style={{ marginBottom:14, background:"#fbf6ef", borderRadius:11, padding:"10px 12px" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:11.5, color:C.muted3, marginBottom:6 }}>
-                <span>Rate this gift</span>
-                <span style={{ fontWeight:700, color: C.maroon }}>{liveRating}/10</span>
+              <div style={{ fontSize:11, color:C.muted3, marginBottom:8, textAlign:"center" as const }}>
+                👍 👎 Rate to help Gifty refine your results
               </div>
-              <input
-                type="range" min={1} max={10} step={1}
-                value={liveRating}
-                onChange={e => setLiveRating(Number(e.target.value))}
-                onMouseUp={e => setRatings(prev => ({ ...prev, [gift.id]: Number((e.target as HTMLInputElement).value) }))}
-                onTouchEnd={e => setRatings(prev => ({ ...prev, [gift.id]: Number((e.target as HTMLInputElement).value) }))}
-                onKeyUp={e => setRatings(prev => ({ ...prev, [gift.id]: Number((e.target as HTMLInputElement).value) }))}
-                style={{ width:"100%", accentColor:C.maroon }}
-              />
+              <div style={{ display:"flex", gap:8 }}>
+                {(["up","down"] as const).map(dir => (
+                  <button key={dir} onClick={() => setThumbs(prev => prev[gift.id] === dir ? { ...prev, [gift.id]: undefined as unknown as "up"|"down" } : { ...prev, [gift.id]: dir })}
+                    style={{ flex:1, padding:"7px 0", borderRadius:9, border:`1.5px solid ${thumb === dir ? C.maroon : C.bord3}`, background: thumb === dir ? C.maroon : "#fff", color: thumb === dir ? "#fff" : C.muted2, fontSize:18, cursor:"pointer", transition:"all .15s" }}>
+                    {dir === "up" ? "👍" : "👎"}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -1482,17 +1481,17 @@ export default function Home() {
                     <div style={{ textAlign:"center", marginTop:34 }}>
                       <button
                         onClick={refineRequest}
-                        disabled={Object.keys(ratings).length === 0 || refining}
+                        disabled={Object.keys(thumbs).length === 0 || refining}
                         style={{
-                          padding:"14px 26px", borderRadius:12, cursor: Object.keys(ratings).length === 0 || refining ? "default" : "pointer", font:`600 15px ${BODY}`,
-                          ...(Object.keys(ratings).length === 0 || refining
+                          padding:"14px 26px", borderRadius:12, cursor: Object.keys(thumbs).length === 0 || refining ? "default" : "pointer", font:`600 15px ${BODY}`,
+                          ...(Object.keys(thumbs).length === 0 || refining
                             ? { border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.muted2 }
                             : { border:"none", background:C.maroon, color:"#fff", boxShadow:"0 6px 18px rgba(124,63,63,.28)" }),
                         }}>
                         {refining ? "…" : tr.refine}
                       </button>
                       <p style={{ fontSize:12.5, color:C.muted2, marginTop:10 }}>
-                        Rate a few gifts above, then refine for a new set based on your ratings.
+                        👍 👎 Rate a few gifts above, then click Refine for a new set.
                       </p>
                     </div>
                   )}

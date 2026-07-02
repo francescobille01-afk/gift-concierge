@@ -1472,15 +1472,17 @@ function ChatPageInner() {
                       {/* ── Links ── */}
                       <div className="flex items-center justify-between pt-3 border-t border-slate-50">
                         <div className="flex items-center gap-3">
-                          <a href={`https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`}
+                          {(s.officialLink || s.link) && (
+                            <a href={s.officialLink ?? s.link}
+                              target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-slate-400 hover:text-orange-500 transition-colors">
+                              🔗 {strings.view_product ?? "View"}
+                            </a>
+                          )}
+                          <a href={s.amazonLink ?? `https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`}
                             target="_blank" rel="noopener noreferrer"
                             className="text-xs text-slate-400 hover:text-[#FF9900] transition-colors">
-                            📦 {strings.search_amazon}
-                          </a>
-                          <a href={`https://www.google.com/search?q=${encodeURIComponent(s.title + " buy " + locale.countryName)}`}
-                            target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-slate-400 hover:text-amber-500 transition-colors">
-                            🔍 {strings.search_google}
+                            📦 Amazon
                           </a>
                         </div>
                         {isChosen ? (
