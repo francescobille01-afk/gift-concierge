@@ -1476,7 +1476,7 @@ function ChatPageInner() {
                             <a href={s.officialLink ?? s.link}
                               target="_blank" rel="noopener noreferrer"
                               className="text-xs text-slate-400 hover:text-orange-500 transition-colors">
-                              🔗 {strings.view_product ?? "View"}
+                              🔗 View
                             </a>
                           )}
                           <a href={s.amazonLink ?? `https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`}
