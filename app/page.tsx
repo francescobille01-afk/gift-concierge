@@ -988,8 +988,12 @@ export default function Home() {
   /* ── Gift card component ── */
   function GiftCard({ gift, showRating = false }: { gift: GiftSuggestion; showRating?: boolean }) {
     const imgQ      = gift.imageSearchQuery ?? gift.title;
-    const fallbackImg = `/api/product-image?q=${encodeURIComponent(imgQ)}`;
-    const [imgSrc, setImgSrc] = useState(gift.imageUrl || fallbackImg);
+    const productLink = gift.officialLink ?? gift.amazonLink ?? gift.link;
+    const ogImg = productLink
+      ? `/api/product-image?url=${encodeURIComponent(productLink)}&q=${encodeURIComponent(imgQ)}`
+      : `/api/product-image?q=${encodeURIComponent(imgQ)}`;
+    const fallbackImg = ogImg;
+    const [imgSrc, setImgSrc] = useState(gift.imageUrl || ogImg);
     const fallbackLink = `https://www.google.com/search?q=${encodeURIComponent(gift.title)}`;
     const officialLink = gift.officialLink || gift.link;
     const amazonLink   = gift.amazonLink;
