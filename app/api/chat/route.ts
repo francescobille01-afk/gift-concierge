@@ -144,10 +144,10 @@ YOUR TASK:
 2. For EACH product you plan to suggest, call \`web_search\` to find:
    a. The product's listing on ${loc.amazonDomain} — real URL. Amazon listings always contain a CDN product image URL in the format "m.media-amazon.com/images/I/..." — extract this as \`imageUrl\`. It is the clearest, most recognisable product photo available.
    b. If the product is not on Amazon, search for the brand's official product page and extract its main product photo URL instead.
-3. Then call \`propose_gifts\` with exactly 8 final suggestions, filling \`imageUrl\` (the direct CDN image URL you found, not the page URL), \`officialLink\`, and \`amazonLink\` from what you actually found via web_search.
+3. Then call \`propose_gifts\` with exactly 8 final suggestions, filling \`amazonLink\` from what you actually found via web_search.
 
-▸ IMAGES ARE CRITICAL: \`imageUrl\` must be a direct image file URL (ending in .jpg, .jpeg, .png, .webp, or a CDN path like m.media-amazon.com/images/...). It must show the actual product, not a category icon or stock photo. If you found an Amazon listing, the image is always there — extract it.
-▸ NEVER fabricate a URL. Every link and image URL must come directly from a web_search result you actually retrieved. If you cannot find a real Amazon listing on ${loc.amazonDomain}, omit \`amazonLink\` rather than guessing.
+▸ AMAZON IS MANDATORY: Every suggestion MUST have a real \`amazonLink\` on ${loc.amazonDomain}. If you cannot find the product on ${loc.amazonDomain}, do NOT suggest it — find an alternative that IS available on Amazon.
+▸ NEVER fabricate a URL. Every \`amazonLink\` must come directly from a web_search result you actually retrieved.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULES FOR WORLD-CLASS GIFT SUGGESTIONS

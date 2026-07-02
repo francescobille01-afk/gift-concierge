@@ -1062,16 +1062,10 @@ export default function Home() {
               );
             })()}
             <div style={{ display:"flex", gap:8 }}>
-              <a href={officialLink || fallbackLink} target="_blank" rel="noopener noreferrer"
+              <a href={addAffiliateTag(amazonLink || fallbackLink)} target="_blank" rel="noopener noreferrer"
                 style={{ flex:1, textAlign:"center" as const, padding:"9px 12px", borderRadius:10, border:"none", background:C.maroon, color:"#fff", font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
-                {tr.viewGift}
+                🛒 Buy on Amazon
               </a>
-              {amazonLink && (
-                <a href={addAffiliateTag(amazonLink)} target="_blank" rel="noopener noreferrer"
-                  style={{ flex:1, textAlign:"center" as const, padding:"9px 12px", borderRadius:10, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label2, font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
-                  Amazon
-                </a>
-              )}
             </div>
           </div>
         </div>

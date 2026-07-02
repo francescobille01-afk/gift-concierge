@@ -1479,17 +1479,10 @@ function ChatPageInner() {
                       {/* ── Links ── */}
                       <div className="flex items-center justify-between pt-3 border-t border-slate-50">
                         <div className="flex items-center gap-3">
-                          {(s.officialLink || s.link) && (
-                            <a href={s.officialLink ?? s.link}
-                              target="_blank" rel="noopener noreferrer"
-                              className="text-xs text-slate-400 hover:text-orange-500 transition-colors">
-                              🔗 View
-                            </a>
-                          )}
                           <a href={addAffiliateTag(s.amazonLink ?? `https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`)}
                             target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-slate-400 hover:text-[#FF9900] transition-colors">
-                            📦 Amazon
+                            className="text-xs font-semibold text-slate-500 hover:text-[#FF9900] transition-colors">
+                            🛒 Buy on Amazon
                           </a>
                         </div>
                         {isChosen ? (
