@@ -29,6 +29,16 @@ const C = {
 const DISPLAY = "'Bricolage Grotesque', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
+const AMAZON_TAG = "gifty0de-21";
+function addAffiliateTag(url: string): string {
+  if (!url || !url.includes("amazon.")) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("tag", AMAZON_TAG);
+    return u.toString();
+  } catch { return url; }
+}
+
 /* ─── Style helpers ─────────────────────────────────────────── */
 function chipSt(active: boolean): React.CSSProperties {
   return active
@@ -1057,7 +1067,7 @@ export default function Home() {
                 {tr.viewGift}
               </a>
               {amazonLink && (
-                <a href={amazonLink} target="_blank" rel="noopener noreferrer"
+                <a href={addAffiliateTag(amazonLink)} target="_blank" rel="noopener noreferrer"
                   style={{ flex:1, textAlign:"center" as const, padding:"9px 12px", borderRadius:10, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label2, font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
                   Amazon
                 </a>

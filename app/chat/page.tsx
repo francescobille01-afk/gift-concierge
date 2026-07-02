@@ -18,6 +18,13 @@ import { saveSession, loadSession, listSessions, deleteSession } from "@/lib/ses
 
 /* ─────────────────────────── Data ─────────────────────────────── */
 
+const AMAZON_TAG = "gifty0de-21";
+function addAffiliateTag(url: string): string {
+  if (!url || !url.includes("amazon.")) return url;
+  try { const u = new URL(url); u.searchParams.set("tag", AMAZON_TAG); return u.toString(); }
+  catch { return url; }
+}
+
 const OCCASIONS = [
   { label: "Birthday",        emoji: "🎂" },
   { label: "Christmas",       emoji: "🎄" },
@@ -1479,7 +1486,7 @@ function ChatPageInner() {
                               🔗 View
                             </a>
                           )}
-                          <a href={s.amazonLink ?? `https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`}
+                          <a href={addAffiliateTag(s.amazonLink ?? `https://www.${locale.amazonDomain}/s?k=${encodeURIComponent(s.title)}`)}
                             target="_blank" rel="noopener noreferrer"
                             className="text-xs text-slate-400 hover:text-[#FF9900] transition-colors">
                             📦 Amazon
