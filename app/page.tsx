@@ -115,6 +115,10 @@ interface Tr {
   rel: string[];
   intr: string[];
   vib: string[];
+  signInTitle: string; signInSub: string;
+  continueGoogle: string; continueEmail: string; continueGuest: string;
+  orWord: string; termsNote: string; waitMsg: string;
+  checkEmail: string; codeSent: string; verifyCode: string; verifying: string;
 }
 
 const TR: Record<TKey, Tr> = {
@@ -161,6 +165,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Parent","Sibling","Friend","Best friend","Child","Grandparent","Colleague","Someone else"],
     intr:["Cooking","Travel","Fitness","Reading","Gaming","Music","Art & Design","Tech","Fashion","Outdoors","Coffee","Wellness","Home","Photography"],
     vib:["Cozy","Adventurous","Luxe","Minimalist","Playful","Sentimental","Practical","Trendy"],
+    signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
+    continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
+    orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
+    checkEmail:"Check your email", codeSent:"We sent a 6-digit code to", verifyCode:"Verify code", verifying:"Verifying…",
   },
   it: {
     nav:["Home","Cronologia","Preferiti","Contattaci"],
@@ -205,6 +213,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Genitore","Fratello/Sorella","Amico/a","Migliore amico/a","Figlio/a","Nonno/a","Collega","Qualcun altro"],
     intr:["Cucina","Viaggi","Fitness","Lettura","Gaming","Musica","Arte & Design","Tech","Moda","Outdoor","Caffè","Benessere","Casa","Fotografia"],
     vib:["Accogliente","Avventuroso","Lusso","Minimalista","Giocoso","Sentimentale","Pratico","Trendy"],
+    signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
+    continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
+    orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
+    checkEmail:"Controlla la tua email", codeSent:"Abbiamo inviato un codice a 6 cifre a", verifyCode:"Verifica codice", verifying:"Verifica in corso…",
   },
   fr: {
     nav:["Accueil","Historique","Favoris","Contact"],
@@ -249,6 +261,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Partenaire","Parent","Frère/Sœur","Ami(e)","Meilleur(e) ami(e)","Enfant","Grand-parent","Collègue","Quelqu'un d'autre"],
     intr:["Cuisine","Voyage","Fitness","Lecture","Jeux vidéo","Musique","Art & Design","Tech","Mode","Plein air","Café","Bien-être","Maison","Photographie"],
     vib:["Cosy","Aventurier","Luxe","Minimaliste","Ludique","Sentimental","Pratique","Tendance"],
+    signInTitle:"Bienvenue sur Gifty", signInSub:"Connectez-vous pour sauvegarder vos recherches, favoris et historique.",
+    continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
+    orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
+    checkEmail:"Vérifiez votre email", codeSent:"Nous avons envoyé un code à 6 chiffres à", verifyCode:"Vérifier le code", verifying:"Vérification…",
   },
   de: {
     nav:["Start","Verlauf","Favoriten","Kontakt"],
@@ -293,6 +309,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Elternteil","Geschwister","Freund/in","Beste/r Freund/in","Kind","Großelternteil","Kollege","Jemand anderes"],
     intr:["Kochen","Reisen","Fitness","Lesen","Gaming","Musik","Kunst & Design","Tech","Mode","Outdoor","Kaffee","Wellness","Zuhause","Fotografie"],
     vib:["Gemütlich","Abenteuerlich","Luxuriös","Minimalistisch","Verspielt","Sentimental","Praktisch","Trendy"],
+    signInTitle:"Willkommen bei Gifty", signInSub:"Melde dich an, um deine Suchanfragen, Favoriten und den Verlauf zu speichern.",
+    continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
+    orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
+    checkEmail:"Prüfe deine E-Mail", codeSent:"Wir haben einen 6-stelligen Code gesendet an", verifyCode:"Code bestätigen", verifying:"Wird überprüft…",
   },
   es: {
     nav:["Inicio","Historial","Favoritos","Contacto"],
@@ -337,6 +357,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Pareja","Padre/Madre","Hermano/a","Amigo/a","Mejor amigo/a","Hijo/a","Abuelo/a","Colega","Alguien más"],
     intr:["Cocina","Viajes","Fitness","Lectura","Videojuegos","Música","Arte y Diseño","Tech","Moda","Aire libre","Café","Bienestar","Hogar","Fotografía"],
     vib:["Acogedor","Aventurero","Lujo","Minimalista","Divertido","Sentimental","Práctico","Moderno"],
+    signInTitle:"Bienvenido a Gifty", signInSub:"Inicia sesión para guardar tus búsquedas, favoritos e historial.",
+    continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
+    orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
+    checkEmail:"Revisa tu email", codeSent:"Enviamos un código de 6 dígitos a", verifyCode:"Verificar código", verifying:"Verificando…",
   },
   pt: {
     nav:["Início","Histórico","Favoritos","Contato"],
@@ -381,6 +405,10 @@ const TR: Record<TKey, Tr> = {
     rel:["Parceiro/a","Pai / Mãe","Irmão/ã","Amigo/a","Melhor amigo/a","Filho/a","Avô / Avó","Colega","Outra pessoa"],
     intr:["Culinária","Viagens","Fitness","Leitura","Gaming","Música","Arte & Design","Tech","Moda","Ao ar livre","Café","Bem-estar","Casa","Fotografia"],
     vib:["Acolhedor","Aventureiro","Luxo","Minimalista","Divertido","Sentimental","Prático","Moderno"],
+    signInTitle:"Bem-vindo ao Gifty", signInSub:"Inicia sessão para guardar as tuas pesquisas, favoritos e histórico.",
+    continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
+    orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
+    checkEmail:"Verifica o teu email", codeSent:"Enviámos um código de 6 dígitos para", verifyCode:"Verificar código", verifying:"A verificar…",
   },
 };
 
@@ -540,10 +568,11 @@ function InterestsStep({ g, setG, tr }: { g: Gathered; setG: React.Dispatch<Reac
 
 /* ═══════════════════════════ COMPONENT ══════════════════════════ */
 /* ─── Custom sign-in page ────────────────────────────────────── */
-function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
+function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
   onGuest: () => void;
   langIdx: number;
   setLangIdx: (i: number) => void;
+  tr: Tr;
 }) {
   const { signIn, isLoaded, setActive } = useSignIn();
   const [email, setEmail]   = useState("");
@@ -623,13 +652,13 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
         {/* headline */}
         <div style={{ marginTop:80 }}>
           <h1 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:42, lineHeight:1.06, letterSpacing:"-.025em", margin:"0 0 20px", color:"#f8eee0" }}>
-            Il regalo perfetto,<br/>trovato per te.
+            {tr.h1a}<br/>{tr.h1b}
           </h1>
           <p style={{ fontSize:16, lineHeight:1.6, color:"#e3cfb9", margin:"0 0 32px" }}>
-            Rispondi a qualche domanda veloce e Gifty — il tuo concierge personale — troverà il regalo perfetto per te.
+            {tr.intro}
           </p>
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {["Gratis · Nessun account · ~2 minuti","Ogni budget, ogni occasione","Legge i social pubblici per indizi veri"].map(txt => (
+            {[tr.bFree, tr.bBudget, tr.bSocial].map(txt => (
               <div key={txt} style={{ display:"flex", alignItems:"center", gap:12, fontSize:14.5, color:"#f0e3d2" }}>
                 <span style={{ width:22, height:22, borderRadius:"50%", background:"rgba(201,162,107,.25)", border:"1px solid rgba(201,162,107,.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f0d9a8", flexShrink:0, fontSize:11 }}>✓</span>
                 {txt}
@@ -646,7 +675,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
                 <span key={i} style={{ width:28, height:28, borderRadius:"50%", background:bg, border:"2.5px solid #5e2e2e", marginLeft:i ? -9 : 0 }}/>
               ))}
             </div>
-            <span>Amato da <strong style={{ color:"#fff" }}>42,000+</strong> gifter premurosi</span>
+            <span>{tr.proofPre} <strong style={{ color:"#fff" }}>42,000+</strong> {tr.proofPost}</span>
           </div>
           <div style={{ marginTop:14, fontSize:12.5, color:"#e8d5c4", background:"rgba(0,0,0,.18)", border:"1px solid rgba(255,255,255,.1)", borderRadius:999, padding:"6px 14px", display:"inline-flex", alignItems:"center", gap:6 }}>
             {lang.flag} {lang.code} · {lang.currency} ({lang.sym}) · {lang.country}
@@ -678,16 +707,16 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
 
           {stage === "form" ? (
             <>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:28, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>Welcome to Gifty</h2>
+              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:28, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>{tr.signInTitle}</h2>
               <p style={{ fontSize:14.5, color:C.label, textAlign:"center", margin:"0 0 32px", lineHeight:1.5 }}>
-                Sign in to save your gift hunts, favorites and<br/>history across devices.
+                {tr.signInSub}
               </p>
 
               {/* Social buttons */}
               <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:20 }}>
                 <button style={socialBtn("#fff", C.ink)} onClick={() => handleSocial("oauth_google")} disabled={busy}>
                   <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                  Continue with Google
+                  {tr.continueGoogle}
                 </button>
 
               </div>
@@ -695,7 +724,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
               {/* Divider */}
               <div style={{ display:"flex", alignItems:"center", gap:12, margin:"4px 0 20px" }}>
                 <span style={{ flex:1, height:1, background:C.bord3 }}/>
-                <span style={{ fontSize:11, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" as const, color:C.muted2 }}>or</span>
+                <span style={{ fontSize:11, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" as const, color:C.muted2 }}>{tr.orWord}</span>
                 <span style={{ flex:1, height:1, background:C.bord3 }}/>
               </div>
 
@@ -710,27 +739,27 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
                 onClick={handleEmail} disabled={busy || !email}
                 style={{ ...socialBtn(email ? C.goldS : C.bord3, email ? C.label2 : C.muted2), marginTop:10, cursor: email && !busy ? "pointer" : "not-allowed" }}
               >
-                {busy ? "Please wait…" : "Continue with email"}
+                {busy ? tr.waitMsg : tr.continueEmail}
               </button>
 
               {err && <p style={{ color:"#c0392b", fontSize:13, textAlign:"center", margin:"12px 0 0" }}>{err}</p>}
 
               <div style={{ textAlign:"center", marginTop:20 }}>
                 <button onClick={onGuest} style={{ background:"none", border:"none", cursor:"pointer", color:C.maroon, font:`600 14px ${BODY}`, textDecoration:"underline" }}>
-                  Continue as guest
+                  {tr.continueGuest}
                 </button>
               </div>
 
               <p style={{ fontSize:12, color:C.muted2, textAlign:"center", margin:"16px 0 0", lineHeight:1.5 }}>
-                By continuing you agree to our Terms &amp; Privacy Policy.
+                {tr.termsNote}
               </p>
             </>
           ) : (
             /* OTP stage */
             <>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:26, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>Check your email</h2>
+              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:26, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>{tr.checkEmail}</h2>
               <p style={{ fontSize:14.5, color:C.label, textAlign:"center", margin:"0 0 28px", lineHeight:1.5 }}>
-                We sent a 6-digit code to <strong>{email}</strong>
+                {tr.codeSent} <strong>{email}</strong>
               </p>
               <input
                 type="text" placeholder="123456" value={otp} maxLength={6}
@@ -742,7 +771,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx }: {
                 onClick={handleOtp} disabled={busy || otp.length < 6}
                 style={{ ...socialBtn(otp.length === 6 ? C.maroon : C.bord3, otp.length === 6 ? "#fff" : C.muted2), marginTop:10 }}
               >
-                {busy ? "Verifying…" : "Verify code"}
+                {busy ? tr.verifying : tr.verifyCode}
               </button>
               {err && <p style={{ color:"#c0392b", fontSize:13, textAlign:"center", margin:"12px 0 0" }}>{err}</p>}
               <div style={{ textAlign:"center", marginTop:16 }}>
@@ -1082,7 +1111,7 @@ export default function Home() {
         <style suppressHydrationWarning>{`
           @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
         `}</style>
-        <CustomSignIn onGuest={() => setIsGuest(true)} langIdx={langIdx} setLangIdx={setLangIdx} />
+        <CustomSignIn onGuest={() => setIsGuest(true)} langIdx={langIdx} setLangIdx={setLangIdx} tr={tr} />
       </>
     );
   }

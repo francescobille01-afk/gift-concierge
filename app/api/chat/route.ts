@@ -15,7 +15,7 @@ const tools: Anthropic.Messages.ToolUnion[] = [
   {
     type: "web_search_20250305",
     name: "web_search",
-    max_uses: 8,
+    max_uses: 9,
   },
   {
     name: "search_seed_catalog",
@@ -43,7 +43,7 @@ const tools: Anthropic.Messages.ToolUnion[] = [
   {
     name: "propose_gifts",
     description:
-      "Present a curated list of 8 gift suggestions to the user. Call this after searching the catalog and web-searching each product for real image and links.",
+      "Present a curated list of 9 gift suggestions to the user. Call this after searching the catalog and web-searching each product for real image and links.",
     input_schema: {
       type: "object",
       properties: {
@@ -139,14 +139,22 @@ RECIPIENT PROFILE:
 - Additional context: ${recipient.notes || "none"}
 ${profileSection}
 
-YOUR TASK:
-1. Call \`search_seed_catalog\` first to get relevant starting ideas from the curated catalog.
-2. For EACH product you plan to suggest, call \`web_search\` to find:
-   a. The product's listing on ${loc.amazonDomain} — real URL. Amazon listings always contain a CDN product image URL in the format "m.media-amazon.com/images/I/..." — extract this as \`imageUrl\`. It is the clearest, most recognisable product photo available.
-   b. If the product is not on Amazon, search for the brand's official product page and extract its main product photo URL instead.
-3. Then call \`propose_gifts\` with exactly 8 final suggestions, filling \`amazonLink\` from what you actually found via web_search.
+YOUR TASK — follow these phases in order:
 
-▸ AMAZON IS MANDATORY: Every suggestion MUST have a real \`amazonLink\` on ${loc.amazonDomain}. If you cannot find the product on ${loc.amazonDomain}, do NOT suggest it — find an alternative that IS available on Amazon.
+PHASE 1 — SYNTHESISE (no searches yet, pure reasoning):
+Using ALL available data — recipient profile, occasion, budget, interests, notes, AND social profile signals — decide exactly 9 specific products you will suggest. Be fully committed: Brand + model + size/variant/colour already decided. Each product must be the result of intersecting ALL signals together (e.g. "she posts about specialty coffee + minimalist aesthetic + €50 budget + birthday = Fellow Stagg EKG kettle"), not just one signal in isolation. At this stage you must also have a runner-up product ready for each slot in case the Amazon search fails.
+
+PHASE 2 — AMAZON LOOKUP (one targeted search per product):
+For each of your 9 decided products, call \`web_search\` with a precise query: the exact product name + "${loc.amazonDomain}". Example: \`"Fellow Stagg EKG kettle" site:${loc.amazonDomain}\`. This is a confirmation search, not a discovery search — you already know what you want, you just need the real URL and image.
+- If the search confirms the product is on ${loc.amazonDomain}: extract the real product URL and the CDN image URL (format: "m.media-amazon.com/images/I/...").
+- If the product is NOT found on ${loc.amazonDomain}: immediately use your pre-decided runner-up for that slot and search for that instead. Do NOT waste a search on a failed product — swap and move on.
+
+PHASE 3 — PROPOSE:
+Call \`propose_gifts\` with exactly 9 final suggestions. Every suggestion must have a real \`amazonLink\` from Phase 2. Never fabricate a URL.
+
+Also call \`search_seed_catalog\` at any point to get supplementary inspiration from the curated catalog — but your primary selection must come from your Phase 1 synthesis.
+
+▸ AMAZON IS MANDATORY: Only propose products you found on ${loc.amazonDomain} in Phase 2.
 ▸ NEVER fabricate a URL. Every \`amazonLink\` must come directly from a web_search result you actually retrieved.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -174,7 +182,7 @@ RULES FOR WORLD-CLASS GIFT SUGGESTIONS
   ✗ FORBIDDEN: "Perfect for anyone who loves skincare" / "Great for someone who enjoys cooking"
   ✓ REQUIRED: "Matches their K-beauty obsession and preference for lightweight textures" / "They've been to 3 Michelin-star restaurants this year — this would slot right into that world"
 
-▸ VARIETY: Your 4–5 suggestions must span different product categories. Do not suggest 3 moisturisers. Give the user real choice.
+▸ VARIETY: Your 9 suggestions must span at least 6 different product categories. Do not suggest 3 moisturisers. Give the user real choice.
 
 ▸ INTERNAL QUALITY CHECK before calling propose_gifts:
   For each suggestion, ask: "Would a stranger know this gift was picked specifically for this person, or does it look like it came from a generic 'Top 10 gifts' listicle?" If it looks generic, replace it.
@@ -215,7 +223,7 @@ The user may rate each previous suggestion from 1 (not for them) to 10 (perfect)
 • Items rated 5–7: directionally fine but not exciting — keep the general category/price tier but vary the specific item or aesthetic.
 • Items rated 1–4: a clear miss — avoid that entire category and that price tier positioning (too cheap/expensive/wrong vibe) in your new picks.
 • Weight your new suggestions toward whatever pattern emerges across the high-rated items (shared brand tier, category, aesthetic, practicality vs indulgence).
-• Give 4–5 NEW suggestions — do not just repeat the same items, and do not repeat anything rated 1–4.
+• Give 9 NEW suggestions — do not just repeat the same items, and do not repeat anything rated 1–4.
 
 Keep your text replies short and warm. Get to proposals fast — the user is here for gift ideas, not conversation.`;
 }
@@ -280,7 +288,7 @@ export async function POST(req: NextRequest) {
     // Agentic loop — run until stop_reason is "end_turn"
     for (let i = 0; i < 20; i++) {
       const response = await client.messages.create({
-        model: "claude-sonnet-4-6",
+        model: "claude-haiku-4-5",
         max_tokens: 4096,
         system: buildSystemPrompt(recipient, profileContext, body.locale),
         tools,
