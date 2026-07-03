@@ -155,6 +155,7 @@ Call \`propose_gifts\` with exactly 9 final suggestions. Every suggestion must h
 Also call \`search_seed_catalog\` at any point to get supplementary inspiration from the curated catalog — but your primary selection must come from your Phase 1 synthesis.
 
 ▸ AMAZON IS MANDATORY: Only propose products you found on ${loc.amazonDomain} in Phase 2.
+▸ AMAZON LOCALISATION: Search and link to ${loc.amazonDomain} only. Use the product title and description as they appear on ${loc.amazonDomain} — in the local language of ${loc.countryName}. If the listing title is in ${loc.language === "it" ? "Italian" : loc.language === "fr" ? "French" : loc.language === "de" ? "German" : loc.language === "es" ? "Spanish" : loc.language === "pt" ? "Portuguese" : "English"}, use that title.
 ▸ NEVER fabricate a URL. Every \`amazonLink\` must come directly from a web_search result you actually retrieved.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

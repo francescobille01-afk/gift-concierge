@@ -115,6 +115,7 @@ interface Tr {
   rel: string[];
   intr: string[];
   vib: string[];
+  buyOnAmazon: string;
   signInTitle: string; signInSub: string;
   continueGoogle: string; continueEmail: string; continueGuest: string;
   orWord: string; termsNote: string; waitMsg: string;
@@ -165,6 +166,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Parent","Sibling","Friend","Best friend","Child","Grandparent","Colleague","Someone else"],
     intr:["Cooking","Travel","Fitness","Reading","Gaming","Music","Art & Design","Tech","Fashion","Outdoors","Coffee","Wellness","Home","Photography"],
     vib:["Cozy","Adventurous","Luxe","Minimalist","Playful","Sentimental","Practical","Trendy"],
+    buyOnAmazon:"Buy on Amazon",
     signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
     continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
@@ -213,6 +215,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Genitore","Fratello/Sorella","Amico/a","Migliore amico/a","Figlio/a","Nonno/a","Collega","Qualcun altro"],
     intr:["Cucina","Viaggi","Fitness","Lettura","Gaming","Musica","Arte & Design","Tech","Moda","Outdoor","Caffè","Benessere","Casa","Fotografia"],
     vib:["Accogliente","Avventuroso","Lusso","Minimalista","Giocoso","Sentimentale","Pratico","Trendy"],
+    buyOnAmazon:"Acquista su Amazon",
     signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
     continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
@@ -261,6 +264,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Partenaire","Parent","Frère/Sœur","Ami(e)","Meilleur(e) ami(e)","Enfant","Grand-parent","Collègue","Quelqu'un d'autre"],
     intr:["Cuisine","Voyage","Fitness","Lecture","Jeux vidéo","Musique","Art & Design","Tech","Mode","Plein air","Café","Bien-être","Maison","Photographie"],
     vib:["Cosy","Aventurier","Luxe","Minimaliste","Ludique","Sentimental","Pratique","Tendance"],
+    buyOnAmazon:"Acheter sur Amazon",
     signInTitle:"Bienvenue sur Gifty", signInSub:"Connectez-vous pour sauvegarder vos recherches, favoris et historique.",
     continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
@@ -309,6 +313,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Partner","Elternteil","Geschwister","Freund/in","Beste/r Freund/in","Kind","Großelternteil","Kollege","Jemand anderes"],
     intr:["Kochen","Reisen","Fitness","Lesen","Gaming","Musik","Kunst & Design","Tech","Mode","Outdoor","Kaffee","Wellness","Zuhause","Fotografie"],
     vib:["Gemütlich","Abenteuerlich","Luxuriös","Minimalistisch","Verspielt","Sentimental","Praktisch","Trendy"],
+    buyOnAmazon:"Bei Amazon kaufen",
     signInTitle:"Willkommen bei Gifty", signInSub:"Melde dich an, um deine Suchanfragen, Favoriten und den Verlauf zu speichern.",
     continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
@@ -357,6 +362,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Pareja","Padre/Madre","Hermano/a","Amigo/a","Mejor amigo/a","Hijo/a","Abuelo/a","Colega","Alguien más"],
     intr:["Cocina","Viajes","Fitness","Lectura","Videojuegos","Música","Arte y Diseño","Tech","Moda","Aire libre","Café","Bienestar","Hogar","Fotografía"],
     vib:["Acogedor","Aventurero","Lujo","Minimalista","Divertido","Sentimental","Práctico","Moderno"],
+    buyOnAmazon:"Comprar en Amazon",
     signInTitle:"Bienvenido a Gifty", signInSub:"Inicia sesión para guardar tus búsquedas, favoritos e historial.",
     continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
@@ -405,6 +411,7 @@ const TR: Record<TKey, Tr> = {
     rel:["Parceiro/a","Pai / Mãe","Irmão/ã","Amigo/a","Melhor amigo/a","Filho/a","Avô / Avó","Colega","Outra pessoa"],
     intr:["Culinária","Viagens","Fitness","Leitura","Gaming","Música","Arte & Design","Tech","Moda","Ao ar livre","Café","Bem-estar","Casa","Fotografia"],
     vib:["Acolhedor","Aventureiro","Luxo","Minimalista","Divertido","Sentimental","Prático","Moderno"],
+    buyOnAmazon:"Comprar na Amazon",
     signInTitle:"Bem-vindo ao Gifty", signInSub:"Inicia sessão para guardar as tuas pesquisas, favoritos e histórico.",
     continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
@@ -1058,21 +1065,6 @@ export default function Home() {
         <div style={{ padding:"16px 17px 17px", display:"flex", flexDirection:"column", flex:1 }}>
           <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:17.5, lineHeight:1.22, color:C.ink, marginBottom:14 }}>{gift.title}</div>
 
-          {showRating && (
-            <div style={{ marginBottom:14, background:"#fbf6ef", borderRadius:11, padding:"10px 12px" }}>
-              <div style={{ fontSize:11, color:C.muted3, marginBottom:8, textAlign:"center" as const }}>
-                👍 👎 Rate to help Gifty refine your results
-              </div>
-              <div style={{ display:"flex", gap:8 }}>
-                {(["up","down"] as const).map(dir => (
-                  <button key={dir} onClick={() => setThumbs(prev => prev[gift.id] === dir ? { ...prev, [gift.id]: undefined as unknown as "up"|"down" } : { ...prev, [gift.id]: dir })}
-                    style={{ flex:1, padding:"7px 0", borderRadius:9, border:`1.5px solid ${thumb === dir ? C.maroon : C.bord3}`, background: thumb === dir ? C.maroon : "#fff", color: thumb === dir ? "#fff" : C.muted2, fontSize:18, cursor:"pointer", transition:"all .15s" }}>
-                    {dir === "up" ? "👍" : "👎"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div style={{ marginTop:"auto" }}>
             {(() => {
@@ -1089,7 +1081,7 @@ export default function Home() {
             <div style={{ display:"flex", gap:8 }}>
               <a href={addAffiliateTag(amazonLink || fallbackLink)} target="_blank" rel="noopener noreferrer"
                 style={{ flex:1, textAlign:"center" as const, padding:"9px 12px", borderRadius:10, border:"none", background:C.maroon, color:"#fff", font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
-                🛒 Buy on Amazon
+                🛒 {tr.buyOnAmazon}
               </a>
             </div>
           </div>
@@ -1510,24 +1502,6 @@ export default function Home() {
                     {sorted.map(gift => <GiftCard key={gift.id} gift={gift} showRating={!viewedEntry} />)}
                   </div>
 
-                  {!viewedEntry && (
-                    <div style={{ textAlign:"center", marginTop:34 }}>
-                      <button
-                        onClick={refineRequest}
-                        disabled={Object.keys(thumbs).length === 0 || refining}
-                        style={{
-                          padding:"14px 26px", borderRadius:12, cursor: Object.keys(thumbs).length === 0 || refining ? "default" : "pointer", font:`600 15px ${BODY}`,
-                          ...(Object.keys(thumbs).length === 0 || refining
-                            ? { border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.muted2 }
-                            : { border:"none", background:C.maroon, color:"#fff", boxShadow:"0 6px 18px rgba(124,63,63,.28)" }),
-                        }}>
-                        {refining ? "…" : tr.refine}
-                      </button>
-                      <p style={{ fontSize:12.5, color:C.muted2, marginTop:10 }}>
-                        👍 👎 Rate a few gifts above, then click Refine for a new set.
-                      </p>
-                    </div>
-                  )}
                 </div>
               )}
               </>
