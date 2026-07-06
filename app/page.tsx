@@ -1099,6 +1099,60 @@ export default function Home() {
   const showFavorites = view === "favorites";
   const showContact   = view === "contact";
 
+  /* ── Loading screen ── */
+  if (!authLoaded) {
+    return (
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#f8f5f0", fontFamily:BODY }}>
+        <style suppressHydrationWarning>{`
+          @keyframes openGift {
+            0% { transform: scale(1) rotateX(0deg); }
+            50% { transform: scale(1.05) rotateX(10deg); }
+            100% { transform: scale(1) rotateX(0deg); }
+          }
+          @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+          }
+          .gc-gift-box {
+            animation: openGift 2s ease-in-out infinite;
+            perspective: 1000px;
+          }
+          .gc-confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+          }
+          ${Array.from({length: 12}, (_, i) => `
+            .gc-confetti-${i} {
+              animation: fall ${1.5 + i * 0.15}s ease-out infinite;
+              animation-delay: ${i * 0.1}s;
+              left: ${50 + (Math.random() - 0.5) * 100}px;
+            }
+          `).join('')}
+        `}</style>
+        <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", gap:20 }}>
+          <div style={{ position:"relative", width:80, height:80 }}>
+            {/* Gift box */}
+            <div className="gc-gift-box" style={{ width:80, height:80, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 24px rgba(124,63,63,.3)" }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4a2a16" strokeWidth="2">
+                <path d="M20 7h-3.2a2.6 2.6 0 1 0-4.8 0 2.6 2.6 0 1 0-4.8 0H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/>
+              </svg>
+            </div>
+            {/* Confetti */}
+            {Array.from({length: 12}, (_, i) => (
+              <div key={i} className={`gc-confetti gc-confetti-${i}`} style={{
+                background: [C.maroon, "#d8b98c", "#c9a26b", "#e3c089"][i % 4]
+              }}/>
+            ))}
+          </div>
+          <p style={{ fontSize:14, color:"#8b6f47", textAlign:"center" }}>Initializing Gifty…</p>
+        </div>
+      </div>
+    );
+  }
+
   /* ── Sign-in gate ── */
   if (authLoaded && !isSignedIn && !isGuest) {
     return (
