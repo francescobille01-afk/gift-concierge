@@ -26,7 +26,7 @@ const C = {
   bord4:  "#e6d8c8",
   bord5:  "#e0d0bd",
 };
-const DISPLAY = "'Space Grotesk', sans-serif";
+const DISPLAY = "'Outfit', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
 const AMAZON_TAG = "gifty0de-21";
@@ -1104,7 +1104,7 @@ export default function Home() {
     return (
       <>
         <style suppressHydrationWarning>{`
-          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
         `}</style>
         <CustomSignIn onGuest={() => setIsGuest(true)} langIdx={langIdx} setLangIdx={setLangIdx} tr={tr} />
       </>
