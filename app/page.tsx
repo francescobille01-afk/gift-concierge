@@ -26,7 +26,7 @@ const C = {
   bord4:  "#e6d8c8",
   bord5:  "#e0d0bd",
 };
-const DISPLAY = "'Bricolage Grotesque', sans-serif";
+const DISPLAY = "'Space Grotesk', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
 const AMAZON_TAG = "gifty0de-21";
@@ -649,13 +649,13 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
       {/* ── LEFT PANEL ── */}
       <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", padding:"40px 44px", position:"relative", overflow:"hidden" }}>
         {/* logo */}
-        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:"auto" }}>
-          <div style={{ width:38, height:38, borderRadius:10, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <GiftSVG size={20} fill="#f8eee0" />
+        <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:"auto" }}>
+          <div style={{ width:60, height:60, borderRadius:14, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <GiftSVG size={32} fill="#f8eee0" />
           </div>
           <div>
-            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
-            <span style={{ fontSize:9, fontWeight:600, letterSpacing:".16em", textTransform:"uppercase" as const, color:"rgba(248,238,224,.55)" }}>Personal Concierge</span>
+            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:32, color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
+            <span style={{ fontSize:11, fontWeight:500, letterSpacing:".04em", color:"rgba(248,238,224,.65)" }}>AI Gift Concierge</span>
           </div>
         </div>
 
@@ -1104,7 +1104,7 @@ export default function Home() {
     return (
       <>
         <style suppressHydrationWarning>{`
-          @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
         `}</style>
         <CustomSignIn onGuest={() => setIsGuest(true)} langIdx={langIdx} setLangIdx={setLangIdx} tr={tr} />
       </>
@@ -1156,7 +1156,7 @@ export default function Home() {
             </div>
             <div>
               <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:52, letterSpacing:"-.02em", display:"block", lineHeight:1 }}>Gifty</span>
-              <span style={{ fontSize:13, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>Your Personal AI Gift Concierge</span>
+              <span style={{ fontSize:14, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>AI Gift Concierge</span>
             </div>
           </div>
 
