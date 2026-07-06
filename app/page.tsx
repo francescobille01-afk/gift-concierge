@@ -1104,50 +1104,72 @@ export default function Home() {
     return (
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#f8f5f0", fontFamily:BODY }}>
         <style suppressHydrationWarning>{`
-          @keyframes openGift {
-            0% { transform: scale(1) rotateX(0deg); }
-            50% { transform: scale(1.05) rotateX(10deg); }
-            100% { transform: scale(1) rotateX(0deg); }
+          @keyframes openLid {
+            0%, 100% { transform: rotateX(0deg); }
+            50% { transform: rotateX(80deg); }
           }
-          @keyframes fall {
-            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+          @keyframes burst {
+            0% {
+              transform: translate(0, 0) scale(1);
+              opacity: 1;
+            }
+            100% {
+              opacity: 0;
+            }
           }
-          .gc-gift-box {
-            animation: openGift 2s ease-in-out infinite;
+          .gc-box-base {
+            animation: openLid 1.8s ease-in-out infinite;
+            transform-origin: top center;
             perspective: 1000px;
           }
-          .gc-confetti {
+          .gc-confetti-burst {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             pointer-events: none;
+            top: 50%;
+            left: 50%;
+            margin-left: -5px;
+            margin-top: -5px;
           }
-          ${Array.from({length: 12}, (_, i) => `
-            .gc-confetti-${i} {
-              animation: fall ${1.5 + i * 0.15}s ease-out infinite;
-              animation-delay: ${i * 0.1}s;
-              left: ${50 + (Math.random() - 0.5) * 100}px;
-            }
-          `).join('')}
+          ${Array.from({length: 20}, (_, i) => {
+            const angle = (360 / 20) * i;
+            const distance = 150;
+            const rad = (angle * Math.PI) / 180;
+            const x = Math.cos(rad) * distance;
+            const y = Math.sin(rad) * distance;
+            return `
+              .gc-confetti-${i} {
+                animation: burst 1.5s ease-out infinite;
+                animation-delay: ${0.2 + (i * 0.03)}s;
+                --tx: ${x}px;
+                --ty: ${y}px;
+              }
+              @keyframes burst-${i} {
+                0% { transform: translate(0, 0) scale(1); opacity: 1; }
+                100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+              }
+              .gc-confetti-${i} { animation: burst-${i} 1.5s ease-out infinite; animation-delay: ${0.2 + (i * 0.03)}s; }
+            `;
+          }).join('')}
         `}</style>
-        <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", gap:20 }}>
-          <div style={{ position:"relative", width:80, height:80 }}>
+        <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", gap:28 }}>
+          <div style={{ position:"relative", width:90, height:90 }}>
             {/* Gift box */}
-            <div className="gc-gift-box" style={{ width:80, height:80, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 24px rgba(124,63,63,.3)" }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4a2a16" strokeWidth="2">
+            <div className="gc-box-base" style={{ width:90, height:90, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 12px 28px rgba(124,63,63,.35)" }}>
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4a2a16" strokeWidth="2">
                 <path d="M20 7h-3.2a2.6 2.6 0 1 0-4.8 0 2.6 2.6 0 1 0-4.8 0H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/>
               </svg>
             </div>
-            {/* Confetti */}
-            {Array.from({length: 12}, (_, i) => (
-              <div key={i} className={`gc-confetti gc-confetti-${i}`} style={{
+            {/* Confetti bursting out */}
+            {Array.from({length: 20}, (_, i) => (
+              <div key={i} className={`gc-confetti-burst gc-confetti-${i}`} style={{
                 background: [C.maroon, "#d8b98c", "#c9a26b", "#e3c089"][i % 4]
               }}/>
             ))}
           </div>
-          <p style={{ fontSize:14, color:"#8b6f47", textAlign:"center" }}>Initializing Gifty…</p>
+          <p style={{ fontSize:15, color:"#8b6f47", textAlign:"center", fontWeight:500 }}>Refreshing page…</p>
         </div>
       </div>
     );
