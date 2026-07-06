@@ -228,6 +228,17 @@ export async function POST(req: NextRequest) {
     let finalText = "";
     let finalSuggestions: GiftSuggestion[] = [];
 
+    // Built once per request — identical on every loop iteration below, so we
+    // cache it (system prompt + tools) instead of paying full price to resend
+    // the same unchanged instructions on every iteration of the agentic loop.
+    const systemPrompt = buildSystemPrompt(recipient, body.locale);
+    const cachedSystem: Anthropic.Messages.TextBlockParam[] = [
+      { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+    ];
+    const cachedTools: Anthropic.Messages.ToolUnion[] = tools.map((tool, idx) =>
+      idx === tools.length - 1 ? { ...tool, cache_control: { type: "ephemeral" } } : tool
+    );
+
     // Prune web_search_tool_result content from older assistant messages to avoid
     // hitting the 200k context window limit (each search result is ~2–5k tokens).
     // We keep the last 4 messages intact; older ones have search payloads stripped.
@@ -250,8 +261,8 @@ export async function POST(req: NextRequest) {
       const response = await client.messages.create({
         model: "claude-haiku-4-5",
         max_tokens: 4096,
-        system: buildSystemPrompt(recipient, body.locale),
-        tools,
+        system: cachedSystem,
+        tools: cachedTools,
         messages: pruneContext(currentMessages),
       });
 
