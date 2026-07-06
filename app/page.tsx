@@ -647,7 +647,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
   return (
     <div style={{ display:"flex", minHeight:"100vh", fontFamily: BODY }}>
       {/* ── LEFT PANEL ── */}
-      <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", padding:"40px 44px", position:"relative", overflow:"hidden" }}>
+      <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"52px 46px", position:"relative", overflow:"hidden" }}>
         {/* logo */}
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <div style={{ width:90, height:90, borderRadius:24, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
@@ -660,7 +660,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
         </div>
 
         {/* headline */}
-        <div style={{ marginTop:48, marginBottom:"auto" }}>
+        <div>
           <h1 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:42, lineHeight:1.06, letterSpacing:"-.025em", margin:"0 0 20px", color:"#f8eee0" }}>
             {tr.h1a}<br/>{tr.h1b}
           </h1>
@@ -678,7 +678,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
         </div>
 
         {/* social proof */}
-        <div style={{ marginTop:"auto", paddingTop:32, borderTop:"1px solid rgba(255,255,255,.12)" }}>
+        <div style={{ paddingTop:32, borderTop:"1px solid rgba(255,255,255,.12)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, fontSize:13.5, color:"#d8c4b0" }}>
             <div style={{ display:"flex" }}>
               {(["#c9a26b","#e8d5c4","#a8694a"] as const).map((bg, i) => (
