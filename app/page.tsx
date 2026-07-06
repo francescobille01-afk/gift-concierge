@@ -653,7 +653,10 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
           <div style={{ width:38, height:38, borderRadius:10, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
             <GiftSVG size={20} fill="#f8eee0" />
           </div>
-          <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color:"#f8eee0" }}>Gifty</span>
+          <div>
+            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
+            <span style={{ fontSize:9, fontWeight:600, letterSpacing:".16em", textTransform:"uppercase" as const, color:"rgba(248,238,224,.55)" }}>Personal Concierge</span>
+          </div>
         </div>
 
         {/* headline */}
@@ -1153,7 +1156,7 @@ export default function Home() {
             </div>
             <div>
               <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:27, letterSpacing:"-.01em", display:"block", lineHeight:1 }}>Gifty</span>
-              <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".16em", textTransform:"uppercase" as const, color:"#d8b98c" }}>Gift Concierge</span>
+              <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".16em", textTransform:"uppercase" as const, color:"#d8b98c" }}>Personal Concierge</span>
             </div>
           </div>
 
