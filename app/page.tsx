@@ -128,7 +128,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Reads their public socials for real clues",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
-    stepNames:["Who are we gifting?","The occasion","The recipient","Their interests","Vibe & budget","A few details"],
+    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Their vibe","A few details"],
     conciergeLabel:"GIFTY · YOUR CONCIERGE",
     msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they?`,`What is ${n} into? Pick everything that fits.`,"How would you describe them — and what's your budget?",`Last thing: anything else I should know about ${n}?`],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
@@ -174,7 +174,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Legge i social pubblici per indizi veri",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
-    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario","I suoi interessi","Stile e budget","Qualche dettaglio"],
+    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Il suo stile","Qualche dettaglio"],
     conciergeLabel:"GIFTY · IL TUO CONCIERGE",
     msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Come lo descriveresti — e qual è il tuo budget?",`Ultima cosa: altro che dovrei sapere su ${n}?`],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
@@ -220,7 +220,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Lit leurs réseaux publics pour de vrais indices",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
-    stepNames:["Pour qui ?","L'occasion","Le destinataire","Ses centres d'intérêt","Style et budget","Quelques détails"],
+    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Son style","Quelques détails"],
     conciergeLabel:"GIFTY · VOTRE CONCIERGE",
     msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Comment le décririez-vous — et quel est votre budget ?",`Dernière chose : autre chose à savoir sur ${n} ?`],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
@@ -266,7 +266,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Liest öffentliche Profile für echte Hinweise",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
-    stepNames:["Für wen?","Der Anlass","Die Person","Interessen","Stil & Budget","Ein paar Details"],
+    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Stil","Ein paar Details"],
     conciergeLabel:"GIFTY · DEIN CONCIERGE",
     msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Wie würdest du sie beschreiben — und was ist dein Budget?",`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
@@ -312,7 +312,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Lee sus redes públicas para pistas reales",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
-    stepNames:["¿Para quién?","La ocasión","El destinatario","Sus intereses","Estilo y presupuesto","Algunos detalles"],
+    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Su estilo","Algunos detalles"],
     conciergeLabel:"GIFTY · TU CONCIERGE",
     msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"¿Cómo lo describirías — y cuál es tu presupuesto?",`Última cosa: ¿algo más que deba saber sobre ${n}?`],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
@@ -358,7 +358,7 @@ const TR: Record<TKey, Tr> = {
     bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Lê as redes públicas para pistas reais",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
-    stepNames:["Para quem?","A ocasião","O destinatário","Os interesses","Estilo e orçamento","Alguns detalhes"],
+    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","O seu estilo","Alguns detalhes"],
     conciergeLabel:"GIFTY · O SEU CONCIERGE",
     msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Como você o descreveria — e qual é o seu orçamento?",`Última coisa: algo mais que eu deva saber sobre ${n}?`],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
@@ -1402,22 +1402,7 @@ export default function Home() {
                         <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:C.muted2, marginTop:7 }}>
                           {tr.ticks.map(t => <span key={t}>{t}</span>)}
                         </div>
-                      </div>
-                    )}
-
-                    {/* Step 3 — Interests */}
-                    {step === 3 && <InterestsStep g={g} setG={setG} tr={tr} />}
-
-                    {/* Step 4 — Vibe & Budget */}
-                    {step === 4 && (
-                      <div>
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.vibeTitle}</div>
-                        <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:32 }}>
-                          {tr.vib.map(v => (
-                            <button key={v} onClick={() => toggle("vibe", v)} style={chipSt(g.vibe.includes(v))}>{v}</button>
-                          ))}
-                        </div>
-                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:12 }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", margin:"26px 0 12px" }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.budgetTitle}</span>
                           <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:22, color:C.maroon }}>{fmtBudget(g.budget, sym)}</span>
                         </div>
@@ -1431,6 +1416,21 @@ export default function Home() {
                             <span key={v} style={{ position:"absolute", left:`${((v-10)/490)*100}%`, transform:"translateX(-50%)", fontSize:12, color:C.muted2, whiteSpace:"nowrap" as const }}>
                               {v === 500 ? `${sym}500+` : `${sym}${v}`}
                             </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3 — Interests */}
+                    {step === 3 && <InterestsStep g={g} setG={setG} tr={tr} />}
+
+                    {/* Step 4 — Vibe */}
+                    {step === 4 && (
+                      <div>
+                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.vibeTitle}</div>
+                        <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:32 }}>
+                          {tr.vib.map(v => (
+                            <button key={v} onClick={() => toggle("vibe", v)} style={chipSt(g.vibe.includes(v))}>{v}</button>
                           ))}
                         </div>
                       </div>
