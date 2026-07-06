@@ -710,8 +710,8 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
         <div style={{ width:"100%", maxWidth:420 }}>
           {/* icon */}
           <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
-            <div style={{ width:60, height:60, borderRadius:16, background:C.maroon, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 8px 24px rgba(124,63,63,.28)` }}>
-              <GiftSVG size={28} fill="#f8eee0" />
+            <div style={{ width:68, height:68, borderRadius:18, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 24px rgba(124,63,63,.28)" }}>
+              <GiftSVG size={38} fill="#4a2a16" />
             </div>
           </div>
 
