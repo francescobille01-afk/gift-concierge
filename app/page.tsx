@@ -86,7 +86,7 @@ interface Tr {
   msgs: (n: string) => string[];
   namePlaceholder: string; nameHelp: string;
   relTitle: string; ageQ: string;
-  ticks: string[]; yrs: string;
+  yrs: string;
   otherLabel: string; customPlaceholder: string;
   pickAtLeast: string; selectedWord: string;
   vibeTitle: string; budgetTitle: string;
@@ -133,7 +133,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they?`,`What is ${n} into? Pick everything that fits.`,"How would you describe them — and what's your budget?",`Last thing: anything else I should know about ${n}?`],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
     relTitle:"Your relationship", ageQ:"Roughly how old are they?",
-    ticks:["Baby","Teen","Adult","Senior"], yrs:"yrs",
+    yrs:"yrs",
     otherLabel:"Other…", customPlaceholder:"e.g. Formula 1, yoga, wine, vintage cars…",
     pickAtLeast:"Pick at least one", selectedWord:"selected",
     vibeTitle:"Their vibe", budgetTitle:"Budget",
@@ -179,7 +179,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Come lo descriveresti — e qual è il tuo budget?",`Ultima cosa: altro che dovrei sapere su ${n}?`],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
     relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
-    ticks:["Neonato","Teen","Adulto","Senior"], yrs:"anni",
+    yrs:"anni",
     otherLabel:"Altro…", customPlaceholder:"es. Formula 1, yoga, vino, auto d'epoca…",
     pickAtLeast:"Scegline almeno uno", selectedWord:"selezionati",
     vibeTitle:"Il suo stile", budgetTitle:"Budget",
@@ -225,7 +225,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Comment le décririez-vous — et quel est votre budget ?",`Dernière chose : autre chose à savoir sur ${n} ?`],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
     relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?",
-    ticks:["Bébé","Ado","Adulte","Senior"], yrs:"ans",
+    yrs:"ans",
     otherLabel:"Autre…", customPlaceholder:"ex. Formule 1, yoga, vin, voitures vintage…",
     pickAtLeast:"Choisissez-en au moins un", selectedWord:"sélectionné(s)",
     vibeTitle:"Son style", budgetTitle:"Budget",
@@ -271,7 +271,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Wie würdest du sie beschreiben — und was ist dein Budget?",`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
     relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?",
-    ticks:["Baby","Teen","Erwachsen","Senior"], yrs:"J.",
+    yrs:"J.",
     otherLabel:"Anderes…", customPlaceholder:"z.B. Formel 1, Yoga, Wein, Oldtimer…",
     pickAtLeast:"Wähle mindestens eins", selectedWord:"ausgewählt",
     vibeTitle:"Ihr Vibe", budgetTitle:"Budget",
@@ -317,7 +317,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"¿Cómo lo describirías — y cuál es tu presupuesto?",`Última cosa: ¿algo más que deba saber sobre ${n}?`],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
     relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?",
-    ticks:["Bebé","Adolesc.","Adulto","Senior"], yrs:"años",
+    yrs:"años",
     otherLabel:"Otro…", customPlaceholder:"ej. Fórmula 1, yoga, vino, coches clásicos…",
     pickAtLeast:"Elige al menos uno", selectedWord:"seleccionados",
     vibeTitle:"Su vibra", budgetTitle:"Presupuesto",
@@ -363,7 +363,7 @@ const TR: Record<TKey, Tr> = {
     msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Como você o descreveria — e qual é o seu orçamento?",`Última coisa: algo mais que eu deva saber sobre ${n}?`],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
     relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?",
-    ticks:["Bebé","Teen","Adulto","Sénior"], yrs:"anos",
+    yrs:"anos",
     otherLabel:"Outro…", customPlaceholder:"ex. Fórmula 1, yoga, vinho, carros vintage…",
     pickAtLeast:"Escolha pelo menos um", selectedWord:"selecionados",
     vibeTitle:"O seu estilo", budgetTitle:"Orçamento",
@@ -1391,17 +1391,18 @@ export default function Home() {
                             <button key={i} onClick={() => setG(p => ({ ...p, relationship: r }))} style={chipSt(g.relationship === r)}>{r}</button>
                           ))}
                         </div>
-                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:12 }}>
+                        <div style={{ marginBottom:12 }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.ageQ}</span>
-                          <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:22, color:C.maroon }}>{fmtAge(g.age)} {tr.yrs}</span>
                         </div>
-                        <input type="range" min={1} max={90} step={1} value={g.age}
-                          onChange={e => setG(p => ({ ...p, age: +e.target.value }))}
-                          style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${((g.age-1)/89)*100}%,#e3d4c2 ${((g.age-1)/89)*100}%)` }}
+                        <input type="number" min={1} max={99} step={1} value={g.age}
+                          onChange={e => {
+                            const v = e.target.value === "" ? 0 : Math.max(1, Math.min(99, +e.target.value));
+                            setG(p => ({ ...p, age: v }));
+                          }}
+                          placeholder={tr.yrs}
+                          style={{ width:120, padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:DISPLAY, fontWeight:600, fontSize:18, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
                         />
-                        <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:C.muted2, marginTop:7 }}>
-                          {tr.ticks.map(t => <span key={t}>{t}</span>)}
-                        </div>
+                        <span style={{ marginLeft:10, fontSize:14, color:C.muted2 }}>{tr.yrs}</span>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", margin:"26px 0 12px" }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.budgetTitle}</span>
                           <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:22, color:C.maroon }}>{fmtBudget(g.budget, sym)}</span>
