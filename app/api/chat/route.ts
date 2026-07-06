@@ -100,6 +100,15 @@ RECIPIENT PROFILE:
 - Budget: ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}
 - Additional context: ${recipient.notes || "none"}
 
+INFER THE GIFT'S TONE FROM THE RELATIONSHIP (no separate question was asked — derive it yourself):
+▸ Partner/spouse → romantic, playful-intimate, or a luxury "wow" piece — lean into emotional/sensory gifts.
+▸ Best friend/friend → fun, likeable, a bit premium — something that shows you know them well, not overly sentimental.
+▸ Parent/grandparent → warm and affectionate, practical, or a shared experience — avoid anything trendy/gimmicky.
+▸ Sibling/child → playful, personal, can be a bit cheeky or nostalgic.
+▸ Colleague/boss → elegant, professional, safe and tasteful — avoid anything too personal or intimate.
+▸ Someone else/unspecified → keep it universally likeable, safe, and high quality.
+Let this tone guide product selection and the "reason" you give — do not mention that you inferred it.
+
 YOUR TASK — follow these phases in order:
 
 PHASE 1 — SYNTHESISE (no searches yet, pure reasoning):

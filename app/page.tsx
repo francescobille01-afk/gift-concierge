@@ -89,7 +89,7 @@ interface Tr {
   yrs: string;
   otherLabel: string; customPlaceholder: string;
   pickAtLeast: string; selectedWord: string;
-  vibeTitle: string; budgetTitle: string;
+  budgetTitle: string;
   detailsPlaceholder: string;
   promptChips: string[];
   back: string; continue: string; findGifts: string;
@@ -112,7 +112,6 @@ interface Tr {
   occ: Record<string, string>; occFallback: string;
   rel: string[];
   intr: string[];
-  vib: string[];
   buyOnAmazon: string;
   signInTitle: string; signInSub: string;
   continueGoogle: string; continueEmail: string; continueGuest: string;
@@ -128,15 +127,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Reads their public socials for real clues",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
-    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Their vibe","A few details"],
+    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","A few details"],
     conciergeLabel:"GIFTY · YOUR CONCIERGE",
-    msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they?`,`What is ${n} into? Pick everything that fits.`,"How would you describe them — and what's your budget?",`Last thing: anything else I should know about ${n}?`],
+    msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they, and what's your budget?`,`What is ${n} into? Pick everything that fits.`,`Last thing: anything else I should know about ${n}?`],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
     relTitle:"Your relationship", ageQ:"Roughly how old are they?",
     yrs:"yrs",
     otherLabel:"Other…", customPlaceholder:"e.g. Formula 1, yoga, wine, vintage cars…",
     pickAtLeast:"Pick at least one", selectedWord:"selected",
-    vibeTitle:"Their vibe", budgetTitle:"Budget",
+    budgetTitle:"Budget",
     detailsPlaceholder:"e.g. She just moved into her first apartment and loves hosting dinner parties. Already has plenty of candles…",
     promptChips:["They already have…","Loves a particular brand","Inside joke gift"],
     back:"Back", continue:"Continue →", findGifts:"Find my gifts ✨",
@@ -160,7 +159,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"this occasion",
     rel:["Partner","Parent","Sibling","Friend","Best friend","Child","Grandparent","Colleague","Someone else"],
     intr:["Cooking","Travel","Fitness","Reading","Gaming","Music","Art & Design","Tech","Fashion","Outdoors","Coffee","Wellness","Home","Photography"],
-    vib:["Cozy","Adventurous","Luxe","Minimalist","Playful","Sentimental","Practical","Trendy"],
     buyOnAmazon:"Buy on Amazon",
     signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
     continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
@@ -174,15 +172,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Legge i social pubblici per indizi veri",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
-    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Il suo stile","Qualche dettaglio"],
+    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Qualche dettaglio"],
     conciergeLabel:"GIFTY · IL TUO CONCIERGE",
-    msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Come lo descriveresti — e qual è il tuo budget?",`Ultima cosa: altro che dovrei sapere su ${n}?`],
+    msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,`Ultima cosa: altro che dovrei sapere su ${n}?`],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
     relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
     yrs:"anni",
     otherLabel:"Altro…", customPlaceholder:"es. Formula 1, yoga, vino, auto d'epoca…",
     pickAtLeast:"Scegline almeno uno", selectedWord:"selezionati",
-    vibeTitle:"Il suo stile", budgetTitle:"Budget",
+    budgetTitle:"Budget",
     detailsPlaceholder:"es. Si è appena trasferita nel suo primo appartamento e ama organizzare cene. Ha già tante candele…",
     promptChips:["Ha già…","Ama un marchio in particolare","Regalo scherzo"],
     back:"Indietro", continue:"Continua →", findGifts:"Trova i regali ✨",
@@ -206,7 +204,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"questa occasione",
     rel:["Partner","Genitore","Fratello/Sorella","Amico/a","Migliore amico/a","Figlio/a","Nonno/a","Collega","Qualcun altro"],
     intr:["Cucina","Viaggi","Fitness","Lettura","Gaming","Musica","Arte & Design","Tech","Moda","Outdoor","Caffè","Benessere","Casa","Fotografia"],
-    vib:["Accogliente","Avventuroso","Lusso","Minimalista","Giocoso","Sentimentale","Pratico","Trendy"],
     buyOnAmazon:"Acquista su Amazon",
     signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
     continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
@@ -220,15 +217,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Lit leurs réseaux publics pour de vrais indices",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
-    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Son style","Quelques détails"],
+    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Quelques détails"],
     conciergeLabel:"GIFTY · VOTRE CONCIERGE",
-    msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Comment le décririez-vous — et quel est votre budget ?",`Dernière chose : autre chose à savoir sur ${n} ?`],
+    msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ, et quel est votre budget ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,`Dernière chose : autre chose à savoir sur ${n} ?`],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
     relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?",
     yrs:"ans",
     otherLabel:"Autre…", customPlaceholder:"ex. Formule 1, yoga, vin, voitures vintage…",
     pickAtLeast:"Choisissez-en au moins un", selectedWord:"sélectionné(s)",
-    vibeTitle:"Son style", budgetTitle:"Budget",
+    budgetTitle:"Budget",
     detailsPlaceholder:"ex. Elle vient d'emménager dans son premier appartement et adore recevoir. Elle a déjà plein de bougies…",
     promptChips:["Il a déjà…","Aime une marque en particulier","Cadeau private joke"],
     back:"Retour", continue:"Continuer →", findGifts:"Trouver mes cadeaux ✨",
@@ -252,7 +249,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"cette occasion",
     rel:["Partenaire","Parent","Frère/Sœur","Ami(e)","Meilleur(e) ami(e)","Enfant","Grand-parent","Collègue","Quelqu'un d'autre"],
     intr:["Cuisine","Voyage","Fitness","Lecture","Jeux vidéo","Musique","Art & Design","Tech","Mode","Plein air","Café","Bien-être","Maison","Photographie"],
-    vib:["Cosy","Aventurier","Luxe","Minimaliste","Ludique","Sentimental","Pratique","Tendance"],
     buyOnAmazon:"Acheter sur Amazon",
     signInTitle:"Bienvenue sur Gifty", signInSub:"Connectez-vous pour sauvegarder vos recherches, favoris et historique.",
     continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
@@ -266,15 +262,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Liest öffentliche Profile für echte Hinweise",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
-    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Stil","Ein paar Details"],
+    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Ein paar Details"],
     conciergeLabel:"GIFTY · DEIN CONCIERGE",
-    msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Wie würdest du sie beschreiben — und was ist dein Budget?",`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
+    msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr, und was ist dein Budget?`,`Worauf steht ${n}? Wähle alles, was passt.`,`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
     relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?",
     yrs:"J.",
     otherLabel:"Anderes…", customPlaceholder:"z.B. Formel 1, Yoga, Wein, Oldtimer…",
     pickAtLeast:"Wähle mindestens eins", selectedWord:"ausgewählt",
-    vibeTitle:"Ihr Vibe", budgetTitle:"Budget",
+    budgetTitle:"Budget",
     detailsPlaceholder:"z.B. Sie ist gerade in ihre erste Wohnung gezogen und liebt es, Dinnerpartys zu geben. Hat schon viele Kerzen…",
     promptChips:["Hat schon…","Liebt eine bestimmte Marke","Insider-Geschenk"],
     back:"Zurück", continue:"Weiter →", findGifts:"Geschenke finden ✨",
@@ -298,7 +294,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"diesen Anlass",
     rel:["Partner","Elternteil","Geschwister","Freund/in","Beste/r Freund/in","Kind","Großelternteil","Kollege","Jemand anderes"],
     intr:["Kochen","Reisen","Fitness","Lesen","Gaming","Musik","Kunst & Design","Tech","Mode","Outdoor","Kaffee","Wellness","Zuhause","Fotografie"],
-    vib:["Gemütlich","Abenteuerlich","Luxuriös","Minimalistisch","Verspielt","Sentimental","Praktisch","Trendy"],
     buyOnAmazon:"Bei Amazon kaufen",
     signInTitle:"Willkommen bei Gifty", signInSub:"Melde dich an, um deine Suchanfragen, Favoriten und den Verlauf zu speichern.",
     continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
@@ -312,15 +307,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Lee sus redes públicas para pistas reales",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
-    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Su estilo","Algunos detalles"],
+    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Algunos detalles"],
     conciergeLabel:"GIFTY · TU CONCIERGE",
-    msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"¿Cómo lo describirías — y cuál es tu presupuesto?",`Última cosa: ¿algo más que deba saber sobre ${n}?`],
+    msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos, y cuál es tu presupuesto?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,`Última cosa: ¿algo más que deba saber sobre ${n}?`],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
     relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?",
     yrs:"años",
     otherLabel:"Otro…", customPlaceholder:"ej. Fórmula 1, yoga, vino, coches clásicos…",
     pickAtLeast:"Elige al menos uno", selectedWord:"seleccionados",
-    vibeTitle:"Su vibra", budgetTitle:"Presupuesto",
+    budgetTitle:"Presupuesto",
     detailsPlaceholder:"ej. Acaba de mudarse a su primer apartamento y le encanta organizar cenas. Ya tiene muchas velas…",
     promptChips:["Ya tiene…","Le encanta una marca","Regalo de broma interna"],
     back:"Atrás", continue:"Continuar →", findGifts:"Buscar regalos ✨",
@@ -344,7 +339,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"esta ocasión",
     rel:["Pareja","Padre/Madre","Hermano/a","Amigo/a","Mejor amigo/a","Hijo/a","Abuelo/a","Colega","Alguien más"],
     intr:["Cocina","Viajes","Fitness","Lectura","Videojuegos","Música","Arte y Diseño","Tech","Moda","Aire libre","Café","Bienestar","Hogar","Fotografía"],
-    vib:["Acogedor","Aventurero","Lujo","Minimalista","Divertido","Sentimental","Práctico","Moderno"],
     buyOnAmazon:"Comprar en Amazon",
     signInTitle:"Bienvenido a Gifty", signInSub:"Inicia sesión para guardar tus búsquedas, favoritos e historial.",
     continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
@@ -358,15 +352,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Lê as redes públicas para pistas reais",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
-    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","O seu estilo","Alguns detalhes"],
+    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","Alguns detalhes"],
     conciergeLabel:"GIFTY · O SEU CONCIERGE",
-    msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Como você o descreveria — e qual é o seu orçamento?",`Última coisa: algo mais que eu deva saber sobre ${n}?`],
+    msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos, e qual é o seu orçamento?`,`Do que ${n} gosta? Escolha tudo o que combina.`,`Última coisa: algo mais que eu deva saber sobre ${n}?`],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
     relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?",
     yrs:"anos",
     otherLabel:"Outro…", customPlaceholder:"ex. Fórmula 1, yoga, vinho, carros vintage…",
     pickAtLeast:"Escolha pelo menos um", selectedWord:"selecionados",
-    vibeTitle:"O seu estilo", budgetTitle:"Orçamento",
+    budgetTitle:"Orçamento",
     detailsPlaceholder:"ex. Acabou de mudar para o seu primeiro apartamento e adora receber convidados. Já tem muitas velas…",
     promptChips:["Já tem…","Adora uma marca específica","Presente de piada interna"],
     back:"Voltar", continue:"Continuar →", findGifts:"Encontrar presentes ✨",
@@ -390,7 +384,6 @@ const TR: Record<TKey, Tr> = {
     occFallback:"esta ocasião",
     rel:["Parceiro/a","Pai / Mãe","Irmão/ã","Amigo/a","Melhor amigo/a","Filho/a","Avô / Avó","Colega","Outra pessoa"],
     intr:["Culinária","Viagens","Fitness","Leitura","Gaming","Música","Arte & Design","Tech","Moda","Ao ar livre","Café","Bem-estar","Casa","Fotografia"],
-    vib:["Acolhedor","Aventureiro","Luxo","Minimalista","Divertido","Sentimental","Prático","Moderno"],
     buyOnAmazon:"Comprar na Amazon",
     signInTitle:"Bem-vindo ao Gifty", signInSub:"Inicia sessão para guardar as tuas pesquisas, favoritos e histórico.",
     continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
@@ -449,14 +442,13 @@ interface Gathered {
   interests: string[];
   customInterest: string;
   showOther: boolean;
-  vibe: string[];
   budget: number;
   details: string;
 }
 
 const EMPTY: Gathered = {
   recipientName:"", occasion:null, relationship:"", age:30,
-  interests:[], customInterest:"", showOther:false, vibe:[], budget:75, details:"",
+  interests:[], customInterest:"", showOther:false, budget:75, details:"",
 };
 
 /* ─── Helpers ────────────────────────────────────────────────── */
@@ -503,7 +495,6 @@ function buildFirstMessage(g: Gathered, sym: string, tr: Tr): string {
     `Age: ${fmtAge(g.age)} years old.`,
     allInterests.length ? `Interests: ${allInterests.join(", ")}.` : "",
     autoHints ? `Interest context:\n${autoHints}` : "",
-    g.vibe.length ? `Their personality vibe: ${g.vibe.join(", ")}.` : "",
     g.details ? `Extra details: ${g.details}` : "",
     `Budget: ${sym}${budgetMin}–${sym}${budgetMax}. Stay within range.`,
     g.recipientName ? `The recipient's name is ${g.recipientName} — use the name to infer their likely gender and tailor suggestions accordingly.` : "",
@@ -512,23 +503,37 @@ function buildFirstMessage(g: Gathered, sym: string, tr: Tr): string {
 }
 
 /* ─── InterestsStep ──────────────────────────────────────────── */
+const MAX_INTERESTS = 3;
+
 function InterestsStep({ g, setG, tr }: { g: Gathered; setG: React.Dispatch<React.SetStateAction<Gathered>>; tr: Tr }) {
-  function toggleInterest(i: string) {
-    setG(p => ({
-      ...p,
-      interests: p.interests.includes(i) ? p.interests.filter(x => x !== i) : [...p.interests, i],
-    }));
-  }
   const count = g.interests.length + (g.customInterest.trim() ? 1 : 0);
+  const atMax = count >= MAX_INTERESTS;
+
+  function toggleInterest(i: string) {
+    setG(p => {
+      if (p.interests.includes(i)) return { ...p, interests: p.interests.filter(x => x !== i) };
+      const customCount = p.customInterest.trim() ? 1 : 0;
+      if (p.interests.length + customCount >= MAX_INTERESTS) return p;
+      return { ...p, interests: [...p.interests, i] };
+    });
+  }
   return (
     <div>
       <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
-        {tr.intr.map(i => (
-          <button key={i} onClick={() => toggleInterest(i)} style={chipSt(g.interests.includes(i))}>{i}</button>
-        ))}
+        {tr.intr.map(i => {
+          const selected = g.interests.includes(i);
+          const disabled = !selected && atMax;
+          return (
+            <button key={i} onClick={() => toggleInterest(i)} disabled={disabled}
+              style={{ ...chipSt(selected), opacity: disabled ? 0.4 : 1, cursor: disabled ? "not-allowed" : "pointer" }}>
+              {i}
+            </button>
+          );
+        })}
         <button
+          disabled={!g.showOther && atMax}
           onClick={() => { setG(p => ({ ...p, showOther: !p.showOther, customInterest: p.showOther ? "" : p.customInterest })); }}
-          style={chipSt(g.showOther || g.customInterest.trim().length > 0)}>
+          style={{ ...chipSt(g.showOther || g.customInterest.trim().length > 0), opacity: (!g.showOther && atMax) ? 0.4 : 1, cursor: (!g.showOther && atMax) ? "not-allowed" : "pointer" }}>
           {tr.otherLabel}
         </button>
       </div>
@@ -545,7 +550,7 @@ function InterestsStep({ g, setG, tr }: { g: Gathered; setG: React.Dispatch<Reac
         </div>
       )}
       <div style={{ marginTop:14, fontSize:13, color:C.muted2 }}>
-        {count > 0 ? `${count} ${tr.selectedWord}` : tr.pickAtLeast}
+        {count > 0 ? `${count}/${MAX_INTERESTS} ${tr.selectedWord}` : tr.pickAtLeast}
       </div>
     </div>
   );
@@ -881,16 +886,11 @@ export default function Home() {
     if (step === 1) return !!g.occasion;
     if (step === 2) return !!g.relationship;
     if (step === 3) return g.interests.length > 0 || g.customInterest.trim().length > 0;
-    if (step === 4) return g.vibe.length > 0;
     return true;
   }
-  function advance() { if (step < 5) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest(); }
+  function advance() { if (step < 4) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest(); }
   function goBack()  { setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1); }
   function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("match"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
-  function toggle(field: "vibe", val: string) {
-    setG(prev => ({ ...prev, [field]: prev[field].includes(val) ? prev[field].filter(x => x !== val) : [...prev[field], val] }));
-  }
-
   /* ── API call ── */
   function buildRecipientAndLocale() {
     const budgetMax = g.budget >= 500 ? 2000 : g.budget;
@@ -911,7 +911,7 @@ export default function Home() {
       occasion: occLabel,
       interests: [...g.interests, ...(g.customInterest.trim() ? [g.customInterest.trim()] : [])].join(", "),
       budgetMin, budgetMax,
-      notes: [g.vibe.length ? `Vibe: ${g.vibe.join(", ")}.` : "", g.details].filter(Boolean).join(" "),
+      notes: g.details,
     };
     return { recipient, locale };
   }
@@ -1335,7 +1335,7 @@ export default function Home() {
                   {/* Progress */}
                   <div style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
-                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 6</span>
+                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 5</span>
                       <span style={{ fontSize:13, color:C.muted2 }}>{tr.stepNames[step]}</span>
                     </div>
                     <div style={{ height:6, background:C.bord3, borderRadius:999, overflow:"hidden" }}>
@@ -1425,20 +1425,8 @@ export default function Home() {
                     {/* Step 3 — Interests */}
                     {step === 3 && <InterestsStep g={g} setG={setG} tr={tr} />}
 
-                    {/* Step 4 — Vibe */}
+                    {/* Step 4 — Details */}
                     {step === 4 && (
-                      <div>
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.vibeTitle}</div>
-                        <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:32 }}>
-                          {tr.vib.map(v => (
-                            <button key={v} onClick={() => toggle("vibe", v)} style={chipSt(g.vibe.includes(v))}>{v}</button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Step 5 — Details */}
-                    {step === 5 && (
                       <div>
                         <textarea
                           value={g.details}
