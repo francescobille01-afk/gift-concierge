@@ -2,9 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import type { ChatRequest, ChatResponse, GiftSuggestion, UserLocale } from "@/lib/types";
 import { searchCatalog } from "@/lib/giftCatalog";
-import { fetchProfiles } from "@/lib/profileFetcher";
 
-// Allow up to 120 seconds — Apify social profile fetch (20-45s) plus multiple web_search calls per gift
+// Allow up to 120 seconds for multiple web_search calls per gift
 // IMPORTANT: must be declared AFTER imports so Next.js static analysis picks it up
 export const maxDuration = 120;
 
@@ -71,7 +70,7 @@ const tools: Anthropic.Messages.ToolUnion[] = [
   },
 ];
 
-function buildSystemPrompt(recipient: ChatRequest["recipient"], profileContext?: string, locale?: UserLocale): string {
+function buildSystemPrompt(recipient: ChatRequest["recipient"], locale?: UserLocale): string {
   const loc = locale ?? { countryCode: "US", countryName: "United States", currency: "USD", currencySymbol: "$", amazonDomain: "amazon.com", language: "en" };
 
   const localeSection = `
@@ -90,43 +89,6 @@ CRITICAL LOCALISATION RULES:
 `;
 
 
-  const profileSection = profileContext
-    ? `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ SOCIAL PROFILE DATA — YOUR PRIMARY GIFT-SELECTION SOURCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${profileContext}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-THIS DATA IS GOLD. It is real evidence of what this person actually buys, wears, eats, and aspires to.
-You MUST use it as the dominant source for every single suggestion. The recipient profile fields (age, relation, budget) are secondary context only.
-
-MANDATORY ANALYSIS — complete all 3 steps internally before touching the gift catalog:
-
-STEP 1 — SIGNAL INVENTORY (list every signal you find):
-• Brands mentioned, tagged, or hashtagged → classify: luxury / mid-market / budget + category
-• Price tolerance: Loro Piana / La Mer / Rolex = luxury expectations; Zara / H&M = practical mindset
-• Aesthetic code: dominant visual/style keywords from hashtags, captions, bio (#minimalism, #darkacademia, #streetwear, #coastal, #cottagecore, #luxury, etc.) — THIS IS THE SINGLE MOST IMPORTANT SIGNAL
-• Activity fingerprint: repeated behaviours — restaurant check-ins, gym posts, hiking, coffee shop photos → each is a gift category
-• Aspiration signals: "I need this" / "obsessed" / "want this" captions = near-explicit gift targets
-• Wishlist / Amazon / Pinterest data: treat as direct evidence of desired items
-• Location/lifestyle cues: city, travel habits, home aesthetic
-
-STEP 2 — TASTE PROFILE (synthesise before selecting):
-• Price comfort zone (floor and ceiling within the stated budget)
-• Primary aesthetic in one phrase (e.g. "warm minimalist", "luxury streetwear", "adventure-ready", "refined maximalist")
-• Gift love language: experience vs object? Practical vs indulgent? Branded vs artisanal?
-• Top 3 product categories with the strongest evidence
-
-STEP 3 — SELECTION RULE (non-negotiable):
-▸ Every suggestion MUST cite a specific signal from Step 1 in its "reason" field.
-▸ "reason" must name the actual evidence: a brand they post, a hashtag they use, an activity they repeat, a wish they expressed.
-▸ If you cannot connect a gift to a specific signal, do NOT suggest it.
-▸ Generic gifts (basic candles, photo frames, plain notebooks) are FORBIDDEN when social data is present.
-▸ Do not tell the user you read their profile.
-`
-    : "";
-
   return `You are an elite personal gift concierge — the AI equivalent of a world-class personal shopper who knows every brand, trend, and product category across all markets.
 ${localeSection}
 RECIPIENT PROFILE:
@@ -137,12 +99,11 @@ RECIPIENT PROFILE:
 - Interests & hobbies: ${recipient.interests || "not specified"}
 - Budget: ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}
 - Additional context: ${recipient.notes || "none"}
-${profileSection}
 
 YOUR TASK — follow these phases in order:
 
 PHASE 1 — SYNTHESISE (no searches yet, pure reasoning):
-Using ALL available data — recipient profile, occasion, budget, interests, notes, AND social profile signals — decide exactly 9 specific products you will suggest. Be fully committed: Brand + model + size/variant/colour already decided. Each product must be the result of intersecting ALL signals together (e.g. "she posts about specialty coffee + minimalist aesthetic + €50 budget + birthday = Fellow Stagg EKG kettle"), not just one signal in isolation. At this stage you must also have a runner-up product ready for each slot in case the Amazon search fails.
+Using ALL available data — recipient profile, occasion, budget, interests, notes — decide exactly 9 specific products you will suggest. Be fully committed: Brand + model + size/variant/colour already decided. Each product must be the result of intersecting ALL signals together (e.g. "loves specialty coffee + minimalist aesthetic + €50 budget + birthday = Fellow Stagg EKG kettle"), not just one signal in isolation. At this stage you must also have a runner-up product ready for each slot in case the Amazon search fails.
 
 PHASE 2 — AMAZON LOOKUP (one targeted search per product):
 For each of your 9 decided products, call \`web_search\` with a precise query: the exact product name + "${loc.amazonDomain}". Example: \`"Fellow Stagg EKG kettle" site:${loc.amazonDomain}\`. This is a confirmation search, not a discovery search — you already know what you want, you just need the real URL and image.
@@ -234,17 +195,6 @@ export async function POST(req: NextRequest) {
     const body: ChatRequest = await req.json();
     const { recipient, messages, reactions } = body;
 
-    // Fetch social / web profiles on the FIRST message only (no need to re-fetch every turn)
-    // Cap at 60s so the function never times out before Claude can respond
-    // (the Instagram posts scrape can take ~30-45s on its own)
-    let profileContext: string | undefined;
-    if (messages.length <= 1 && recipient.socialUrls?.length) {
-      const timeout = new Promise<string>((resolve) =>
-        setTimeout(() => resolve("(Social profile fetch timed out — proceeding without it)"), 60_000)
-      );
-      profileContext = await Promise.race([fetchProfiles(recipient.socialUrls), timeout]);
-    }
-
     const reactionSummary = Object.entries(reactions)
       .filter(([, r]) => r !== null)
       .map(([id, r]) => `Gift ${id}: ${r}`)
@@ -291,7 +241,7 @@ export async function POST(req: NextRequest) {
       const response = await client.messages.create({
         model: "claude-haiku-4-5",
         max_tokens: 4096,
-        system: buildSystemPrompt(recipient, profileContext, body.locale),
+        system: buildSystemPrompt(recipient, body.locale),
         tools,
         messages: pruneContext(currentMessages),
       });

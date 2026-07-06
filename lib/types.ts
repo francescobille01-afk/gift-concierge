@@ -39,7 +39,6 @@ export interface RecipientProfile {
   budgetMin: number;
   budgetMax: number;
   notes: string;
-  socialUrls: string[];
 }
 
 export interface ChatMessage {

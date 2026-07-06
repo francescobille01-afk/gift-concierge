@@ -202,7 +202,6 @@ interface Gathered {
   style:          string;
   wishlistHint:   string;
   avoidTags:      string[];
-  socialUrl:      string;
 }
 
 const EMPTY: Gathered = {
@@ -210,7 +209,7 @@ const EMPTY: Gathered = {
   budgetMin: 25, budgetMax: 100,
   interests: [], interestDetail: "",
   style: "", wishlistHint: "",
-  avoidTags: [], socialUrl: "",
+  avoidTags: [],
 };
 
 /* ─────────────────────── Step definitions ──────────────────────── */
@@ -245,7 +244,7 @@ const INTEREST_EXAMPLES: Record<string, string> = {
 type StepId =
   | "name" | "occasion" | "relation" | "ageRange" | "budget"
   | "interests" | "interestDetail" | "style"
-  | "wishlistHint" | "avoid" | "social";
+  | "wishlistHint" | "avoid";
 
 interface Step {
   id:        StepId;
@@ -320,12 +319,6 @@ function buildSteps(lang: LangCode): Step[] {
       question:  (g) => s.q_avoid(g.name),
       inputType: "multiselect",
     },
-    {
-      id:        "social",
-      question:  (g) => s.q_social(g.name),
-      inputType: "url",
-      skippable: true,
-    },
   ];
 }
 
@@ -350,19 +343,11 @@ function gatheredToRecipient(g: Gathered): RecipientProfile {
     budgetMin:  g.budgetMin,
     budgetMax:  g.budgetMax,
     notes:      noteParts.filter(Boolean).join(" "),
-    socialUrls: g.socialUrl ? [g.socialUrl] : [],
   };
 }
 
-function buildLoadingStages(name: string, hasSocial: boolean, s: ReturnType<typeof t>) {
-  const social: { icon: string; text: string }[] = hasSocial ? [
-    { icon: "🔍", text: s.loading_social_profile   },
-    { icon: "📸", text: s.loading_social_posts      },
-    { icon: "📍", text: s.loading_social_locations  },
-    { icon: "🧠", text: s.loading_social_taste      },
-  ] : [];
+function buildLoadingStages(name: string, s: ReturnType<typeof t>) {
   return [
-    ...social,
     { icon: "🎯", text: s.loading_matching(name)    },
     { icon: "✨", text: s.loading_finalising         },
   ];
@@ -398,9 +383,6 @@ function buildFirstMessage(g: Gathered, currencySymbol = "$"): string {
     g.avoidTags.length
       ? `Hard constraints — avoid these: ${g.avoidTags.join(", ")}.`       : "",
     `Budget: ${currencySymbol}${g.budgetMin}–${currencySymbol}${g.budgetMax}. Stay within this range and use it fully — don't suggest cheap items for a generous budget.`,
-    g.socialUrl
-      ? `⚡ SOCIAL PROFILE PROVIDED: I have shared this person's social media profile in your system context. This is the most valuable signal you have — mine it deeply for brands, aesthetics, activities, and aspirations. Every suggestion must connect to something specific found there.`
-      : "",
     "Please propose 4–5 specific, real, named products with brand + model + variant. Each must feel tailored to this exact person, not a generic 'top gift' pick.",
   ];
   return lines.filter(Boolean).join("\n");
@@ -726,13 +708,6 @@ function ChatPageInner() {
     advance(allPicked.length ? displayLabels.join(", ") : "(none)", next);
   }
 
-  function answerUrl() {
-    const url = textInput.trim();
-    const next = { ...gathered, socialUrl: url };
-    setGathered(next);
-    advance(url || "(no link)", next);
-  }
-
   /* ─────────────── Launch real chat ─────────────── */
 
   async function startChat(g: Gathered) {
@@ -742,11 +717,9 @@ function ChatPageInner() {
     setLoadingStage(0);
 
     // Cycle through loading stages so the user knows what's happening
-    const hasSocial  = g.socialUrl.trim().length > 0;
-    const stageDelay = hasSocial ? 8000 : 4000; // social = slower
     const stageTimer = setInterval(
-      () => setLoadingStage(s => Math.min(s + 1, buildLoadingStages(g.name, hasSocial, strings).length - 1)),
-      stageDelay
+      () => setLoadingStage(s => Math.min(s + 1, buildLoadingStages(g.name, strings).length - 1)),
+      4000
     );
 
     const firstMsg = buildFirstMessage(g, locale.currencySymbol);
@@ -1123,23 +1096,7 @@ function ChatPageInner() {
       </div>
     );
 
-    if (step.inputType === "url") return (
-      <div className="mt-4 animate-fade-in-up space-y-2">
-        <div className="flex gap-2">
-          <input value={textInput} onChange={(e) => setTextInput(e.target.value)}
-            placeholder={strings.type_url_placeholder}
-            className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-200 bg-white"
-          />
-          <button onClick={answerUrl}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all">
-            {textInput.trim() ? strings.next_btn : strings.skip}
-          </button>
-        </div>
-        <p className="text-xs text-slate-400">
-          {strings.url_hint}
-        </p>
-      </div>
-    );
+    return null;
   }
 
   /* ───────────────────────── Progress dots ───────────────────────────── */
@@ -1231,8 +1188,7 @@ function ChatPageInner() {
 
           {/* Loading state between onboarding and chat */}
           {phase === "loading" && (() => {
-            const hasSocial = gathered.socialUrl.trim().length > 0;
-            const stages    = buildLoadingStages(gathered.name, hasSocial, strings);
+            const stages    = buildLoadingStages(gathered.name, strings);
             const stage     = stages[Math.min(loadingStage, stages.length - 1)];
             return (
               <div className="flex items-end gap-2.5 animate-fade-in pl-0">
@@ -1265,12 +1221,6 @@ function ChatPageInner() {
                     ))}
                   </div>
 
-                  {/* Time warning only when social media linked */}
-                  {hasSocial && (
-                    <p className="text-xs text-slate-400 border-t border-slate-50 pt-2">
-                      {strings.loading_social_wait}
-                    </p>
-                  )}
                 </div>
               </div>
             );

@@ -92,8 +92,6 @@ interface Tr {
   vibeTitle: string; budgetTitle: string;
   detailsPlaceholder: string;
   promptChips: string[];
-  socialLabel: string; optional: string;
-  socialPlaceholder: string; socialNote: string;
   back: string; continue: string; findGifts: string;
   loadingTitle: string; loadingLines: string[];
   curatedTag: string;
@@ -132,7 +130,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Step", ofWord:"of",
     stepNames:["Who are we gifting?","The occasion","The recipient","Their interests","Vibe & budget","A few details"],
     conciergeLabel:"GIFTY · YOUR CONCIERGE",
-    msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they?`,`What is ${n} into? Pick everything that fits.`,"How would you describe them — and what's your budget?",`Last thing: anything else I should know? Drop ${n}'s social or wishlist link and I'll dig for clues.`],
+    msgs:(n)=>["Lovely — let's find something special. Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they?`,`What is ${n} into? Pick everything that fits.`,"How would you describe them — and what's your budget?",`Last thing: anything else I should know about ${n}?`],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
     relTitle:"Your relationship", ageQ:"Roughly how old are they?",
     ticks:["Baby","Teen","Adult","Senior"], yrs:"yrs",
@@ -141,9 +139,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"Their vibe", budgetTitle:"Budget",
     detailsPlaceholder:"e.g. She just moved into her first apartment and loves hosting dinner parties. Already has plenty of candles…",
     promptChips:["They already have…","Loves a particular brand","Inside joke gift"],
-    socialLabel:"Their social or wishlist link", optional:"(optional)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · pinterest, Amazon wishlist…",
-    socialNote:"Gifty reads their public posts, captions and hashtags to find real, specific clues — every suggestion cites what it found.",
     back:"Back", continue:"Continue →", findGifts:"Find my gifts ✨",
     loadingTitle:"Gifty is curating…",
     loadingLines:["Reading their social profile…","Mining captions, hashtags & posts…","Matching to their interests & budget…","Ranking the best finds…"],
@@ -181,7 +176,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Passo", ofWord:"di",
     stepNames:["Per chi è il regalo?","L'occasione","Il destinatario","I suoi interessi","Stile e budget","Qualche dettaglio"],
     conciergeLabel:"GIFTY · IL TUO CONCIERGE",
-    msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Come lo descriveresti — e qual è il tuo budget?",`Ultima cosa: altro che dovrei sapere? Incolla il link social o la wishlist di ${n} e cerco indizi.`],
+    msgs:(n)=>["Che bello — troviamo qualcosa di speciale. Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Come lo descriveresti — e qual è il tuo budget?",`Ultima cosa: altro che dovrei sapere su ${n}?`],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
     relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
     ticks:["Neonato","Teen","Adulto","Senior"], yrs:"anni",
@@ -190,9 +185,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"Il suo stile", budgetTitle:"Budget",
     detailsPlaceholder:"es. Si è appena trasferita nel suo primo appartamento e ama organizzare cene. Ha già tante candele…",
     promptChips:["Ha già…","Ama un marchio in particolare","Regalo scherzo"],
-    socialLabel:"Link social o wishlist", optional:"(facoltativo)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · pinterest, wishlist Amazon…",
-    socialNote:"Gifty legge post, didascalie e hashtag pubblici per trovare indizi reali e specifici — ogni suggerimento cita ciò che ha trovato.",
     back:"Indietro", continue:"Continua →", findGifts:"Trova i regali ✨",
     loadingTitle:"Gifty sta selezionando…",
     loadingLines:["Leggo il profilo social…","Analizzo didascalie, hashtag e post…","Abbino a interessi e budget…","Ordino i risultati migliori…"],
@@ -230,7 +222,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Étape", ofWord:"sur",
     stepNames:["Pour qui ?","L'occasion","Le destinataire","Ses centres d'intérêt","Style et budget","Quelques détails"],
     conciergeLabel:"GIFTY · VOTRE CONCIERGE",
-    msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Comment le décririez-vous — et quel est votre budget ?",`Dernière chose : autre chose à savoir ? Collez le lien social ou la wishlist de ${n} et je cherche des indices.`],
+    msgs:(n)=>["Parfait — trouvons quelque chose de spécial. Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Comment le décririez-vous — et quel est votre budget ?",`Dernière chose : autre chose à savoir sur ${n} ?`],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
     relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?",
     ticks:["Bébé","Ado","Adulte","Senior"], yrs:"ans",
@@ -239,9 +231,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"Son style", budgetTitle:"Budget",
     detailsPlaceholder:"ex. Elle vient d'emménager dans son premier appartement et adore recevoir. Elle a déjà plein de bougies…",
     promptChips:["Il a déjà…","Aime une marque en particulier","Cadeau private joke"],
-    socialLabel:"Lien réseau social ou wishlist", optional:"(facultatif)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · pinterest, wishlist Amazon…",
-    socialNote:"Gifty lit les publications, légendes et hashtags publics pour trouver des indices réels et précis — chaque suggestion cite ce qu'elle a trouvé.",
     back:"Retour", continue:"Continuer →", findGifts:"Trouver mes cadeaux ✨",
     loadingTitle:"Gifty fait sa sélection…",
     loadingLines:["Lecture du profil social…","Analyse des légendes, hashtags et posts…","Mise en correspondance avec les goûts et le budget…","Classement des meilleures trouvailles…"],
@@ -279,7 +268,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Schritt", ofWord:"von",
     stepNames:["Für wen?","Der Anlass","Die Person","Interessen","Stil & Budget","Ein paar Details"],
     conciergeLabel:"GIFTY · DEIN CONCIERGE",
-    msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Wie würdest du sie beschreiben — und was ist dein Budget?",`Zum Schluss: noch etwas, das ich wissen sollte? Füge ${n}s Social- oder Wunschlisten-Link ein und ich suche nach Hinweisen.`],
+    msgs:(n)=>["Schön — finden wir etwas Besonderes. Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Wie würdest du sie beschreiben — und was ist dein Budget?",`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
     relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?",
     ticks:["Baby","Teen","Erwachsen","Senior"], yrs:"J.",
@@ -288,9 +277,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"Ihr Vibe", budgetTitle:"Budget",
     detailsPlaceholder:"z.B. Sie ist gerade in ihre erste Wohnung gezogen und liebt es, Dinnerpartys zu geben. Hat schon viele Kerzen…",
     promptChips:["Hat schon…","Liebt eine bestimmte Marke","Insider-Geschenk"],
-    socialLabel:"Social- oder Wunschlisten-Link", optional:"(optional)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · Pinterest, Amazon-Wunschliste…",
-    socialNote:"Gifty liest öffentliche Beiträge, Bildunterschriften und Hashtags, um echte, konkrete Hinweise zu finden — jeder Vorschlag nennt den Fund.",
     back:"Zurück", continue:"Weiter →", findGifts:"Geschenke finden ✨",
     loadingTitle:"Gifty kuratiert…",
     loadingLines:["Social-Profil wird gelesen…","Bildunterschriften, Hashtags & Posts werden ausgewertet…","Abgleich mit Interessen & Budget…","Beste Funde werden sortiert…"],
@@ -328,7 +314,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Paso", ofWord:"de",
     stepNames:["¿Para quién?","La ocasión","El destinatario","Sus intereses","Estilo y presupuesto","Algunos detalles"],
     conciergeLabel:"GIFTY · TU CONCIERGE",
-    msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"¿Cómo lo describirías — y cuál es tu presupuesto?",`Última cosa: ¿algo más que deba saber? Pega el enlace social o la lista de deseos de ${n} y buscaré pistas.`],
+    msgs:(n)=>["Genial — busquemos algo especial. ¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"¿Cómo lo describirías — y cuál es tu presupuesto?",`Última cosa: ¿algo más que deba saber sobre ${n}?`],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
     relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?",
     ticks:["Bebé","Adolesc.","Adulto","Senior"], yrs:"años",
@@ -337,9 +323,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"Su vibra", budgetTitle:"Presupuesto",
     detailsPlaceholder:"ej. Acaba de mudarse a su primer apartamento y le encanta organizar cenas. Ya tiene muchas velas…",
     promptChips:["Ya tiene…","Le encanta una marca","Regalo de broma interna"],
-    socialLabel:"Enlace social o lista de deseos", optional:"(opcional)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · pinterest, lista de Amazon…",
-    socialNote:"Gifty lee publicaciones, pies de foto y hashtags públicos para encontrar pistas reales y específicas — cada sugerencia cita lo que encontró.",
     back:"Atrás", continue:"Continuar →", findGifts:"Buscar regalos ✨",
     loadingTitle:"Gifty está seleccionando…",
     loadingLines:["Leyendo el perfil social…","Analizando pies de foto, hashtags y posts…","Comparando con intereses y presupuesto…","Ordenando los mejores hallazgos…"],
@@ -377,7 +360,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Passo", ofWord:"de",
     stepNames:["Para quem?","A ocasião","O destinatário","Os interesses","Estilo e orçamento","Alguns detalhes"],
     conciergeLabel:"GIFTY · O SEU CONCIERGE",
-    msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Como você o descreveria — e qual é o seu orçamento?",`Última coisa: algo mais que eu deva saber? Cole o link social ou a wishlist de ${n} e eu procuro pistas.`],
+    msgs:(n)=>["Que bom — vamos encontrar algo especial. Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Como você o descreveria — e qual é o seu orçamento?",`Última coisa: algo mais que eu deva saber sobre ${n}?`],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
     relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?",
     ticks:["Bebé","Teen","Adulto","Sénior"], yrs:"anos",
@@ -386,9 +369,6 @@ const TR: Record<TKey, Tr> = {
     vibeTitle:"O seu estilo", budgetTitle:"Orçamento",
     detailsPlaceholder:"ex. Acabou de mudar para o seu primeiro apartamento e adora receber convidados. Já tem muitas velas…",
     promptChips:["Já tem…","Adora uma marca específica","Presente de piada interna"],
-    socialLabel:"Link social ou wishlist", optional:"(opcional)",
-    socialPlaceholder:"instagram.com/… · tiktok.com/@… · pinterest, wishlist da Amazon…",
-    socialNote:"O Gifty lê publicações, legendas e hashtags públicos para encontrar pistas reais e específicas — cada sugestão cita o que encontrou.",
     back:"Voltar", continue:"Continuar →", findGifts:"Encontrar presentes ✨",
     loadingTitle:"Gifty está a selecionar…",
     loadingLines:["A ler o perfil social…","A analisar legendas, hashtags e posts…","A comparar com interesses e orçamento…","A ordenar as melhores descobertas…"],
@@ -472,12 +452,11 @@ interface Gathered {
   vibe: string[];
   budget: number;
   details: string;
-  socialUrl: string;
 }
 
 const EMPTY: Gathered = {
   recipientName:"", occasion:null, relationship:"", age:30,
-  interests:[], customInterest:"", showOther:false, vibe:[], budget:75, details:"", socialUrl:"",
+  interests:[], customInterest:"", showOther:false, vibe:[], budget:75, details:"",
 };
 
 /* ─── Helpers ────────────────────────────────────────────────── */
@@ -528,7 +507,6 @@ function buildFirstMessage(g: Gathered, sym: string, tr: Tr): string {
     g.details ? `Extra details: ${g.details}` : "",
     `Budget: ${sym}${budgetMin}–${sym}${budgetMax}. Stay within range.`,
     g.recipientName ? `The recipient's name is ${g.recipientName} — use the name to infer their likely gender and tailor suggestions accordingly.` : "",
-    g.socialUrl ? `⚡ SOCIAL PROFILE PROVIDED: Their social media / wishlist is in your system context. Mine it deeply — every suggestion must cite a specific signal found there.` : "",
     "Propose 4–6 specific, real, named products (brand + model + variant). Each must feel tailored to this exact person.",
   ].filter(Boolean).join("\n");
 }
@@ -924,7 +902,6 @@ export default function Home() {
       interests: [...g.interests, ...(g.customInterest.trim() ? [g.customInterest.trim()] : [])].join(", "),
       budgetMin, budgetMax,
       notes: [g.vibe.length ? `Vibe: ${g.vibe.join(", ")}.` : "", g.details].filter(Boolean).join(" "),
-      socialUrls: g.socialUrl ? [g.socialUrl] : [],
     };
     return { recipient, locale };
   }
@@ -1449,7 +1426,7 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Step 5 — Details + Social */}
+                    {/* Step 5 — Details */}
                     {step === 5 && (
                       <div>
                         <textarea
@@ -1466,23 +1443,6 @@ export default function Home() {
                               + {pc}
                             </button>
                           ))}
-                        </div>
-                        <div style={{ marginTop:20, paddingTop:20, borderTop:`1px solid ${C.border}` }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                            <span style={{ fontSize:13.5, fontWeight:600, color:C.label }}>{tr.socialLabel}</span>
-                            <span style={{ fontSize:12, color:C.muted2 }}>{tr.optional}</span>
-                          </div>
-                          <input
-                            type="url"
-                            value={g.socialUrl}
-                            onChange={e => setG(p => ({ ...p, socialUrl: e.target.value }))}
-                            placeholder={tr.socialPlaceholder}
-                            style={{ width:"100%", padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontSize:14, color:C.body, background:"#fff", boxSizing:"border-box" as const }}
-                          />
-                          <div style={{ marginTop:9, display:"flex", alignItems:"flex-start", gap:8, fontSize:12.5, color:C.muted, lineHeight:1.45 }}>
-                            <span style={{ flexShrink:0, color:C.gold }}>⚡</span>
-                            <span>{tr.socialNote}</span>
-                          </div>
                         </div>
                       </div>
                     )}

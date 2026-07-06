@@ -52,19 +52,13 @@ export interface Strings {
   q_style:          (name: string) => string;
   q_wishlist:       (name: string) => string;
   q_avoid:          (name: string) => string;
-  q_social:         (name: string) => string;
   /* Loading stages */
-  loading_social_profile:   string;
-  loading_social_posts:     string;
-  loading_social_locations: string;
-  loading_social_taste:     string;
   loading_matching:         (name: string) => string;
   loading_finalising:       string;
   /* Chat UI */
   skip:                 string;
   send:                 string;
   type_placeholder:     string;
-  type_url_placeholder: string;
   type_age_placeholder: string;
   other_placeholder:    string;
   continue_btn:         string;
@@ -96,12 +90,10 @@ export interface Strings {
   none_apply:         string;
   great_noted:        string;
   add_hint_first:     string;
-  url_hint:           string;
   chat_placeholder:   string;
   confirm_n_selected: (n: number) => string;
   hint_quality:          string;
   wishlist_placeholder:  string;
-  loading_social_wait: string;
   history_title:       string;
   history_empty:       string;
   history_footer:      string;
@@ -146,18 +138,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `Has ${n} mentioned anything they've been wanting lately? Even a vague hint is gold.\n\n(e.g. "she keeps saying she needs a good knife set", "he's obsessed with that Dyson fan")`,
     q_avoid:      (n) => `Any no-go zones for ${n}? Tap everything that applies — or skip.`,
-    q_social:     (n) =>
-      `Last one — do you have ${n}'s Instagram, Pinterest, TikTok, or Amazon wishlist link?\n\nI'll analyse it to understand their taste from real posts and behaviour. This makes the biggest difference.\n\n(Optional — press Skip if not.)`,
-    loading_social_profile:   "Reading their social profile…",
-    loading_social_posts:     "Analysing posts and interests…",
-    loading_social_locations: "Noting locations and hashtags…",
-    loading_social_taste:     "Building a picture of their taste…",
     loading_matching:     (n) => `Matching gifts to ${n}'s profile…`,
     loading_finalising:       "Finalising your top picks…",
     skip:                 "Skip",
     send:                 "Send",
     type_placeholder:     "Type here…",
-    type_url_placeholder: "Paste a link here…",
     type_age_placeholder: "e.g. 32",
     other_placeholder:    "Other (e.g. cars, Formula 1…)",
     continue_btn:         "Continue →",
@@ -184,12 +169,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "None apply",
     great_noted:        "Great, noted →",
     add_hint_first:     "Add a hint first",
-    url_hint:           "Instagram, Pinterest, Amazon wishlist, TikTok… or just press Skip.",
     chat_placeholder:   "Ask follow-up questions, refine suggestions…",
     confirm_n_selected: (n) => `Confirm (${n} selected)`,
     hint_quality:          "This single answer can completely change the quality of suggestions.",
     wishlist_placeholder:  'e.g. "she mentioned wanting AirPods" or "he keeps looking at a Kindle"…',
-    loading_social_wait: "Reading social profiles takes 20–45 seconds — hang tight!",
     history_title:       "Recent Searches",
     history_empty:       "No searches yet.",
     history_footer:      "Saved locally in your browser",
@@ -229,18 +212,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `${n} ha accennato a qualcosa che vorrebbe ultimamente? Anche un piccolo indizio è prezioso.\n\n(es. "dice sempre che ha bisogno di un buon set di coltelli", "è fissato con il Dyson")`,
     q_avoid:      (n) => `Ci sono cose da evitare per ${n}? Seleziona tutto quello che si applica — oppure salta.`,
-    q_social:     (n) =>
-      `Ultima domanda — hai il profilo Instagram, Pinterest, TikTok o la lista desideri Amazon di ${n}?\n\nLo analizzerò per capire i suoi gusti dai post reali. Fa un'enorme differenza.\n\n(Facoltativo — premi Salta se non ce l'hai.)`,
-    loading_social_profile:   "Lettura del profilo social in corso…",
-    loading_social_posts:     "Analisi dei post e degli interessi…",
-    loading_social_locations: "Raccolta di luoghi e hashtag…",
-    loading_social_taste:     "Analisi dello stile e dei gusti personali…",
     loading_matching:     (n) => `Abbinamento dei regali al profilo di ${n}…`,
     loading_finalising:       "Selezione delle migliori proposte…",
     skip:                 "Salta",
     send:                 "Invia",
     type_placeholder:     "Scrivi qui…",
-    type_url_placeholder: "Incolla un link qui…",
     type_age_placeholder: "es. 32",
     other_placeholder:    "Altro (es. auto, Formula 1…)",
     continue_btn:         "Continua →",
@@ -267,12 +243,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "Nessuno si applica",
     great_noted:        "Perfetto, annotato →",
     add_hint_first:     "Aggiungi prima un indizio",
-    url_hint:           "Instagram, Pinterest, lista desideri Amazon, TikTok… oppure premi Salta.",
     chat_placeholder:   "Fai domande, affina i suggerimenti…",
     confirm_n_selected: (n) => `Conferma (${n} selezionati)`,
     hint_quality:          "Questa singola risposta può cambiare completamente la qualità dei suggerimenti.",
     wishlist_placeholder:  'es. "dice sempre di voler gli AirPods", "è fissato con il Kindle"…',
-    loading_social_wait: "L'analisi dei profili social richiede 20–45 secondi — aspetta!",
     history_title:       "Ricerche Recenti",
     history_empty:       "Nessuna ricerca ancora.",
     history_footer:      "Salvato localmente nel tuo browser",
@@ -312,18 +286,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `${n} a-t-il/elle mentionné quelque chose qu'il/elle désire en ce moment ? Même une vague indication est précieuse.\n\n(ex. "elle dit toujours qu'elle a besoin d'un bon set de couteaux")`,
     q_avoid:      (n) => `Y a-t-il des choses à éviter pour ${n} ? Sélectionnez tout ce qui s'applique — ou ignorez.`,
-    q_social:     (n) =>
-      `Dernière question — avez-vous le profil Instagram, Pinterest, TikTok ou la liste de souhaits Amazon de ${n} ?\n\nJe l'analyserai pour comprendre ses goûts à partir de vrais posts. Cela fait une énorme différence.\n\n(Facultatif — appuyez sur Ignorer sinon.)`,
-    loading_social_profile:   "Lecture du profil social en cours…",
-    loading_social_posts:     "Analyse des publications et des intérêts…",
-    loading_social_locations: "Relevé des lieux et hashtags…",
-    loading_social_taste:     "Analyse du style et des goûts personnels…",
     loading_matching:     (n) => `Sélection des cadeaux pour le profil de ${n}…`,
     loading_finalising:       "Finalisation de vos meilleures options…",
     skip:                 "Ignorer",
     send:                 "Envoyer",
     type_placeholder:     "Écrivez ici…",
-    type_url_placeholder: "Collez un lien ici…",
     type_age_placeholder: "ex. 32",
     other_placeholder:    "Autre (ex. voitures, F1…)",
     continue_btn:         "Continuer →",
@@ -350,12 +317,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "Aucun ne s'applique",
     great_noted:        "Noté, merci →",
     add_hint_first:     "Ajoutez d'abord un indice",
-    url_hint:           "Instagram, Pinterest, liste de souhaits Amazon, TikTok… ou appuyez sur Ignorer.",
     chat_placeholder:   "Posez des questions, affinez les suggestions…",
     confirm_n_selected: (n) => `Confirmer (${n} sélectionné${n > 1 ? "s" : ""})`,
     hint_quality:          "Cette seule réponse peut complètement changer la qualité des suggestions.",
     wishlist_placeholder:  'ex. "elle parle toujours d\'AirPods", "il ne cesse de regarder un Kindle"…',
-    loading_social_wait: "L'analyse des profils sociaux prend 20 à 45 secondes — patience !",
     history_title:       "Recherches Récentes",
     history_empty:       "Aucune recherche pour l'instant.",
     history_footer:      "Sauvegardé localement dans votre navigateur",
@@ -395,18 +360,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `Hat ${n} zuletzt etwas erwähnt, das er/sie gerne hätte? Selbst ein kleiner Hinweis ist Gold wert.\n\n(z.B. "er sagt immer, er braucht ein gutes Messerset")`,
     q_avoid:      (n) => `Gibt es Dinge, die man für ${n} vermeiden sollte? Wähle alles Zutreffende — oder überspringe.`,
-    q_social:     (n) =>
-      `Letzte Frage — hast du den Instagram-, Pinterest-, TikTok- oder Amazon-Wunschlisten-Link von ${n}?\n\nIch analysiere ihn, um den Geschmack aus echten Posts zu verstehen. Das macht den größten Unterschied.\n\n(Optional — drücke Überspringen, wenn nicht.)`,
-    loading_social_profile:   "Soziales Profil wird gelesen…",
-    loading_social_posts:     "Beiträge und Interessen werden analysiert…",
-    loading_social_locations: "Standorte und Hashtags werden erfasst…",
-    loading_social_taste:     "Stil und persönliche Vorlieben werden analysiert…",
     loading_matching:     (n) => `Geschenke werden dem Profil von ${n} zugeordnet…`,
     loading_finalising:       "Die besten Vorschläge werden zusammengestellt…",
     skip:                 "Überspringen",
     send:                 "Senden",
     type_placeholder:     "Hier eingeben…",
-    type_url_placeholder: "Link hier einfügen…",
     type_age_placeholder: "z.B. 32",
     other_placeholder:    "Anderes (z.B. Autos, Formel 1…)",
     continue_btn:         "Weiter →",
@@ -433,12 +391,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "Keines trifft zu",
     great_noted:        "Super, notiert →",
     add_hint_first:     "Füge zuerst einen Hinweis hinzu",
-    url_hint:           "Instagram, Pinterest, Amazon-Wunschliste, TikTok… oder drücke Überspringen.",
     chat_placeholder:   "Stelle Folgefragen, verfeinere Vorschläge…",
     confirm_n_selected: (n) => `Bestätigen (${n} ausgewählt)`,
     hint_quality:          "Diese eine Antwort kann die Qualität der Vorschläge komplett verändern.",
     wishlist_placeholder:  'z.B. "sie spricht immer von AirPods", "er schaut immer wieder einen Kindle an"…',
-    loading_social_wait: "Das Lesen von Social-Profilen dauert 20–45 Sekunden — bleib dran!",
     history_title:       "Letzte Suchen",
     history_empty:       "Noch keine Suchen.",
     history_footer:      "Lokal in deinem Browser gespeichert",
@@ -478,18 +434,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `¿Ha mencionado ${n} algo que desee últimamente? Incluso una pista vaga es valiosa.\n\n(ej. "siempre dice que necesita un buen juego de cuchillos")`,
     q_avoid:      (n) => `¿Hay cosas que evitar para ${n}? Toca todo lo que aplique — u omite.`,
-    q_social:     (n) =>
-      `Última pregunta — ¿tienes el enlace de Instagram, Pinterest, TikTok o lista de deseos de Amazon de ${n}?\n\nLo analizaré para entender sus gustos desde publicaciones reales. Esto marca la mayor diferencia.\n\n(Opcional — pulsa Omitir si no.)`,
-    loading_social_profile:   "Leyendo perfil social…",
-    loading_social_posts:     "Analizando publicaciones e intereses…",
-    loading_social_locations: "Registrando lugares y hashtags…",
-    loading_social_taste:     "Analizando estilo y gustos personales…",
     loading_matching:     (n) => `Buscando regalos para el perfil de ${n}…`,
     loading_finalising:       "Finalizando las mejores opciones…",
     skip:                 "Omitir",
     send:                 "Enviar",
     type_placeholder:     "Escribe aquí…",
-    type_url_placeholder: "Pega un enlace aquí…",
     type_age_placeholder: "ej. 32",
     other_placeholder:    "Otro (ej. coches, Fórmula 1…)",
     continue_btn:         "Continuar →",
@@ -516,12 +465,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "Ninguno aplica",
     great_noted:        "Anotado →",
     add_hint_first:     "Añade primero una pista",
-    url_hint:           "Instagram, Pinterest, lista de deseos de Amazon, TikTok… o pulsa Omitir.",
     chat_placeholder:   "Haz preguntas, refina las sugerencias…",
     confirm_n_selected: (n) => `Confirmar (${n} seleccionado${n > 1 ? "s" : ""})`,
     hint_quality:          "Esta sola respuesta puede cambiar completamente la calidad de las sugerencias.",
     wishlist_placeholder:  'ej. "siempre habla de los AirPods", "siempre está mirando un Kindle"…',
-    loading_social_wait: "Leer perfiles sociales lleva 20–45 segundos — ¡espera!",
     history_title:       "Búsquedas Recientes",
     history_empty:       "Aún no hay búsquedas.",
     history_footer:      "Guardado localmente en tu navegador",
@@ -561,18 +508,11 @@ const translations: Record<LangCode, Strings> = {
     q_wishlist:   (n) =>
       `${n} mencionou algo que deseja ultimamente? Mesmo uma dica vaga é valiosa.\n\n(ex. "ela diz sempre que precisa de um bom conjunto de facas")`,
     q_avoid:      (n) => `Há coisas a evitar para ${n}? Toca em tudo o que se aplica — ou ignora.`,
-    q_social:     (n) =>
-      `Última pergunta — tens o link do Instagram, Pinterest, TikTok ou lista de desejos da Amazon de ${n}?\n\nVou analisá-lo para entender os gostos a partir de publicações reais. Isso faz uma enorme diferença.\n\n(Opcional — prime Ignorar se não tiveres.)`,
-    loading_social_profile:   "A ler o perfil social…",
-    loading_social_posts:     "A analisar publicações e interesses…",
-    loading_social_locations: "A registar locais e hashtags…",
-    loading_social_taste:     "A analisar estilo e gostos pessoais…",
     loading_matching:     (n) => `A combinar presentes com o perfil de ${n}…`,
     loading_finalising:       "A finalizar as melhores escolhas…",
     skip:                 "Ignorar",
     send:                 "Enviar",
     type_placeholder:     "Escreve aqui…",
-    type_url_placeholder: "Cola um link aqui…",
     type_age_placeholder: "ex. 32",
     other_placeholder:    "Outro (ex. carros, Fórmula 1…)",
     continue_btn:         "Continuar →",
@@ -599,12 +539,10 @@ const translations: Record<LangCode, Strings> = {
     none_apply:         "Nenhum se aplica",
     great_noted:        "Anotado →",
     add_hint_first:     "Adiciona primeiro uma dica",
-    url_hint:           "Instagram, Pinterest, lista de desejos da Amazon, TikTok… ou prime Ignorar.",
     chat_placeholder:   "Faz perguntas, refina as sugestões…",
     confirm_n_selected: (n) => `Confirmar (${n} selecionado${n > 1 ? "s" : ""})`,
     hint_quality:          "Esta única resposta pode mudar completamente a qualidade das sugestões.",
     wishlist_placeholder:  'ex. "ela fala sempre nos AirPods", "ele está sempre a olhar para um Kindle"…',
-    loading_social_wait: "A leitura de perfis sociais demora 20–45 segundos — aguenta!",
     history_title:       "Pesquisas Recentes",
     history_empty:       "Ainda sem pesquisas.",
     history_footer:      "Guardado localmente no teu navegador",
