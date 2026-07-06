@@ -1104,70 +1104,61 @@ export default function Home() {
     return (
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#f8f5f0", fontFamily:BODY }}>
         <style suppressHydrationWarning>{`
-          @keyframes openLid {
-            0%, 100% { transform: rotateX(0deg); }
-            50% { transform: rotateX(80deg); }
+          @keyframes lidFlip {
+            0%, 15% { transform: translateY(0) rotate(0deg); }
+            45%, 65% { transform: translateY(-38px) rotate(-18deg); }
+            85%, 100% { transform: translateY(0) rotate(0deg); }
           }
-          @keyframes burst {
-            0% {
-              transform: translate(0, 0) scale(1);
-              opacity: 1;
-            }
-            100% {
-              opacity: 0;
-            }
-          }
-          .gc-box-base {
-            animation: openLid 1.8s ease-in-out infinite;
-            transform-origin: top center;
-            perspective: 1000px;
+          .gc-lid {
+            animation: lidFlip 2.2s ease-in-out infinite;
+            transform-origin: left center;
           }
           .gc-confetti-burst {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+            border-radius: 2px;
             pointer-events: none;
-            top: 50%;
+            top: 38px;
             left: 50%;
-            margin-left: -5px;
-            margin-top: -5px;
+            opacity: 0;
           }
-          ${Array.from({length: 20}, (_, i) => {
-            const angle = (360 / 20) * i;
-            const distance = 150;
+          ${Array.from({length: 16}, (_, i) => {
+            const angle = -90 + (Math.random() - 0.5) * 160;
+            const distance = 55 + Math.random() * 40;
             const rad = (angle * Math.PI) / 180;
             const x = Math.cos(rad) * distance;
             const y = Math.sin(rad) * distance;
+            const rot = 180 + Math.random() * 360;
             return `
-              .gc-confetti-${i} {
-                animation: burst 1.5s ease-out infinite;
-                animation-delay: ${0.2 + (i * 0.03)}s;
-                --tx: ${x}px;
-                --ty: ${y}px;
-              }
               @keyframes burst-${i} {
-                0% { transform: translate(0, 0) scale(1); opacity: 1; }
-                100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+                0%, 40% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+                48% { opacity: 1; }
+                90% { transform: translate(${x}px, ${y}px) rotate(${rot}deg); opacity: 1; }
+                100% { transform: translate(${x}px, ${y * 1.15}px) rotate(${rot}deg); opacity: 0; }
               }
-              .gc-confetti-${i} { animation: burst-${i} 1.5s ease-out infinite; animation-delay: ${0.2 + (i * 0.03)}s; }
+              .gc-confetti-${i} { animation: burst-${i} 2.2s ease-out infinite; }
             `;
           }).join('')}
         `}</style>
         <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", gap:28 }}>
-          <div style={{ position:"relative", width:90, height:90 }}>
-            {/* Gift box */}
-            <div className="gc-box-base" style={{ width:90, height:90, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 12px 28px rgba(124,63,63,.35)" }}>
-              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4a2a16" strokeWidth="2">
-                <path d="M20 7h-3.2a2.6 2.6 0 1 0-4.8 0 2.6 2.6 0 1 0-4.8 0H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/>
-              </svg>
-            </div>
-            {/* Confetti bursting out */}
-            {Array.from({length: 20}, (_, i) => (
+          <div style={{ position:"relative", width:100, height:110 }}>
+            {/* Confetti bursting out from inside the box */}
+            {Array.from({length: 16}, (_, i) => (
               <div key={i} className={`gc-confetti-burst gc-confetti-${i}`} style={{
-                background: [C.maroon, "#d8b98c", "#c9a26b", "#e3c089"][i % 4]
+                width: 6 + (i % 3) * 2,
+                height: 6 + (i % 3) * 2,
+                background: [C.maroon, "#d8b98c", "#c9a26b", "#e3c089"][i % 4],
+                zIndex: 1,
               }}/>
             ))}
+            {/* Box base */}
+            <div style={{ position:"absolute", bottom:0, left:0, width:100, height:64, background:"linear-gradient(150deg,#c9a26b,#a8804f)", borderRadius:"6px 6px 12px 12px", boxShadow:"0 12px 28px rgba(124,63,63,.35)", zIndex:2 }}>
+              <div style={{ position:"absolute", top:0, left:"50%", width:14, height:"100%", background:"rgba(74,42,22,.25)", transform:"translateX(-50%)" }}/>
+            </div>
+            {/* Box lid */}
+            <div className="gc-lid" style={{ position:"absolute", top:38, left:0, width:100, height:30, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:8, boxShadow:"0 4px 10px rgba(124,63,63,.25)", zIndex:3 }}>
+              <div style={{ position:"absolute", top:-9, left:"50%", width:26, height:18, background:"linear-gradient(150deg,#e3c089,#c9a26b)", borderRadius:6, transform:"translateX(-50%)" }}/>
+              <div style={{ position:"absolute", top:0, left:"50%", width:14, height:"100%", background:"rgba(74,42,22,.2)", transform:"translateX(-50%)" }}/>
+            </div>
           </div>
           <p style={{ fontSize:15, color:"#8b6f47", textAlign:"center", fontWeight:500 }}>Refreshing page…</p>
         </div>
