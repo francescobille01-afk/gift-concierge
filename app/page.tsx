@@ -128,6 +128,7 @@ interface Tr {
   intr: string[];
   deepDive: Partial<Record<number, InterestDeepDiveConfig>>;
   buyOnAmazon: string;
+  saveFav: string; savedFav: string;
   signInTitle: string; signInSub: string;
   continueGoogle: string; continueEmail: string; continueGuest: string;
   orWord: string; termsNote: string; waitMsg: string;
@@ -181,6 +182,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Brand they love or gear they already have", brandPlaceholder: "Nike, Garmin, already has weights at home…",
     } },
     buyOnAmazon:"Buy on Amazon",
+    saveFav:"Save to favorites", savedFav:"Saved",
     signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
     continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
@@ -232,6 +234,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marca che ama o attrezzatura che ha già", brandPlaceholder: "Nike, Garmin, ha già i pesi in casa…",
     } },
     buyOnAmazon:"Acquista su Amazon",
+    saveFav:"Salva tra i preferiti", savedFav:"Salvato",
     signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
     continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
@@ -283,6 +286,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marque qu'il/elle aime ou équipement qu'il/elle a déjà", brandPlaceholder: "Nike, Garmin, a déjà des poids à la maison…",
     } },
     buyOnAmazon:"Acheter sur Amazon",
+    saveFav:"Enregistrer dans les favoris", savedFav:"Enregistré",
     signInTitle:"Bienvenue sur Gifty", signInSub:"Connectez-vous pour sauvegarder vos recherches, favoris et historique.",
     continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
@@ -334,6 +338,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marke, die er/sie liebt, oder Ausrüstung, die schon vorhanden ist", brandPlaceholder: "Nike, Garmin, hat schon Gewichte zuhause…",
     } },
     buyOnAmazon:"Bei Amazon kaufen",
+    saveFav:"Zu Favoriten hinzufügen", savedFav:"Gespeichert",
     signInTitle:"Willkommen bei Gifty", signInSub:"Melde dich an, um deine Suchanfragen, Favoriten und den Verlauf zu speichern.",
     continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
@@ -385,6 +390,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marca que le encanta o equipo que ya tiene", brandPlaceholder: "Nike, Garmin, ya tiene pesas en casa…",
     } },
     buyOnAmazon:"Comprar en Amazon",
+    saveFav:"Guardar en favoritos", savedFav:"Guardado",
     signInTitle:"Bienvenido a Gifty", signInSub:"Inicia sesión para guardar tus búsquedas, favoritos e historial.",
     continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
@@ -436,6 +442,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marca que adora ou equipamento que já tem", brandPlaceholder: "Nike, Garmin, já tem pesos em casa…",
     } },
     buyOnAmazon:"Comprar na Amazon",
+    saveFav:"Guardar nos favoritos", savedFav:"Guardado",
     signInTitle:"Bem-vindo ao Gifty", signInSub:"Inicia sessão para guardar as tuas pesquisas, favoritos e histórico.",
     continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
@@ -1194,9 +1201,9 @@ export default function Home() {
           {/* Heart / favorite button — top left */}
           <button
             onClick={() => toggleFav(gift)}
-            title={fav ? "Remove from favorites" : "Save to favorites"}
-            style={{ position:"absolute", top:10, left:10, zIndex:1, width:32, height:32, borderRadius:"50%", border:"none", background: fav ? C.maroon : "rgba(255,255,255,.9)", color: fav ? "#fff" : C.maroon, fontSize:15, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 8px rgba(124,63,63,.3)", transition:"all .15s" }}>
-            {fav ? "♥" : "♡"}
+            style={{ position:"absolute", top:10, left:10, zIndex:1, display:"flex", alignItems:"center", gap:6, padding:"7px 12px 7px 10px", borderRadius:999, border:"none", background: fav ? C.maroon : "rgba(255,255,255,.94)", color: fav ? "#fff" : C.maroon, fontSize:12.5, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 10px rgba(124,63,63,.25)", transition:"all .15s", whiteSpace:"nowrap" as const }}>
+            <span style={{ fontSize:14 }}>{fav ? "♥" : "♡"}</span>
+            {fav ? tr.savedFav : tr.saveFav}
           </button>
         </div>
         <div style={{ padding:"16px 17px 17px", display:"flex", flexDirection:"column", flex:1 }}>
