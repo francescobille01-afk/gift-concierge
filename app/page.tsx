@@ -650,12 +650,12 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
       <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", padding:"40px 44px", position:"relative", overflow:"hidden" }}>
         {/* logo */}
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ width:60, height:60, borderRadius:14, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <GiftSVG size={32} fill="#f8eee0" />
+          <div style={{ width:90, height:90, borderRadius:24, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
+            <GiftSVG size={52} fill="#4a2a16" />
           </div>
           <div>
-            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:32, color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
-            <span style={{ fontSize:11, fontWeight:500, letterSpacing:".04em", color:"rgba(248,238,224,.65)" }}>AI Gift Concierge</span>
+            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:52, letterSpacing:"-.02em", color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
+            <span style={{ fontSize:14, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>AI Gift Concierge</span>
           </div>
         </div>
 
