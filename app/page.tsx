@@ -1151,12 +1151,12 @@ export default function Home() {
 
           {/* Logo */}
           <div className="gc-fade" style={{ display:"flex", alignItems:"center", gap:14, position:"relative" }}>
-            <div style={{ width:52, height:52, borderRadius:15, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
-              <GiftSVG size={28} fill="#4a2a16" />
+            <div style={{ width:68, height:68, borderRadius:18, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
+              <GiftSVG size={38} fill="#4a2a16" />
             </div>
             <div>
-              <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:27, letterSpacing:"-.01em", display:"block", lineHeight:1 }}>Gifty</span>
-              <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".16em", textTransform:"uppercase" as const, color:"#d8b98c" }}>Personal Concierge</span>
+              <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:38, letterSpacing:"-.02em", display:"block", lineHeight:1 }}>Gifty</span>
+              <span style={{ fontSize:11, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>Your Personal AI Gift Concierge</span>
             </div>
           </div>
 
