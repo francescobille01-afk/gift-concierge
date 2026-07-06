@@ -661,6 +661,10 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
 
         {/* headline */}
         <div>
+          <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:16 }}>
+            <span style={{ width:26, height:1.5, background:"linear-gradient(90deg,#c9a26b,transparent)" }}/>
+            <span style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#d8b98c" }}>AI-Powered Gifting</span>
+          </div>
           <h1 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:42, lineHeight:1.06, letterSpacing:"-.025em", margin:"0 0 20px", color:"#f8eee0" }}>
             {tr.h1a}<br/>{tr.h1b}
           </h1>
