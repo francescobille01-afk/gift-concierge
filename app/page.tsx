@@ -649,7 +649,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
       {/* ── LEFT PANEL ── */}
       <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", padding:"40px 44px", position:"relative", overflow:"hidden" }}>
         {/* logo */}
-        <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:"auto" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <div style={{ width:60, height:60, borderRadius:14, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center" }}>
             <GiftSVG size={32} fill="#f8eee0" />
           </div>
@@ -660,7 +660,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
         </div>
 
         {/* headline */}
-        <div style={{ marginTop:80 }}>
+        <div style={{ marginTop:48, marginBottom:"auto" }}>
           <h1 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:42, lineHeight:1.06, letterSpacing:"-.025em", margin:"0 0 20px", color:"#f8eee0" }}>
             {tr.h1a}<br/>{tr.h1b}
           </h1>
