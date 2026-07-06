@@ -816,12 +816,22 @@ export default function Home() {
 
   /* ── Locale detection ── */
   useEffect(() => {
+    const saved = localStorage.getItem("gifty-lang-idx");
+    if (saved !== null) {
+      setLangIdx(Number(saved));
+      return;
+    }
     setLangIdx(detectLangIdx());
     fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(5000) })
       .then(r => r.json())
       .then(raw => setLangIdx(prev => buildLocaleFromIP(raw, prev)))
       .catch(() => {});
   }, []);
+
+  /* ── Persist language choice ── */
+  useEffect(() => {
+    localStorage.setItem("gifty-lang-idx", String(langIdx));
+  }, [langIdx]);
 
   /* ── Load from localStorage ── */
   useEffect(() => {
