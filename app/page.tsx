@@ -1704,7 +1704,6 @@ export default function Home() {
                           placeholder={tr.namePlaceholder}
                           style={{ width:"100%", padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
                         />
-                        <p style={{ marginTop:12, fontSize:13, color:C.muted2, lineHeight:1.5 }}>{tr.nameHelp}</p>
                       </div>
                     )}
 
