@@ -148,9 +148,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Reads their public socials for real clues",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
-    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Let's get specific","A few details"],
+    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Let's get specific"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they, and what's your budget?`,`What is ${n} into? Pick everything that fits.`,"Let's get a bit more specific — this makes a huge difference.",`Last thing: anything else I should know about ${n}?`],
+    msgs:(n)=>["Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they, and what's your budget?`,`What is ${n} into? Pick everything that fits.`,"Let's get a bit more specific — this makes a huge difference."],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
     relTitle:"Your relationship", ageQ:"Roughly how old are they?",
     yrs:"yrs",
@@ -280,9 +280,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Legge i social pubblici per indizi veri",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
-    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Entriamo nel dettaglio","Qualche dettaglio"],
+    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Entriamo nel dettaglio"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Per chi cerchiamo un regalo?",`Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}?`,"Entriamo un po' più nel dettaglio — fa una grande differenza.",`Ultima cosa: altro che dovrei sapere su ${n}?`],
+    msgs:(n)=>["Per chi cerchiamo un regalo?",`Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}?`,"Entriamo un po' più nel dettaglio — fa una grande differenza."],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
     relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
     yrs:"anni",
@@ -412,9 +412,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Lit leurs réseaux publics pour de vrais indices",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
-    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Entrons dans le détail","Quelques détails"],
+    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Entrons dans le détail"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ, et quel est votre budget ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Entrons un peu plus dans le détail — ça fait une grande différence.",`Dernière chose : autre chose à savoir sur ${n} ?`],
+    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ, et quel est votre budget ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Entrons un peu plus dans le détail — ça fait une grande différence."],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
     relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?",
     yrs:"ans",
@@ -464,9 +464,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Liest öffentliche Profile für echte Hinweise",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
-    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Ins Detail gehen","Ein paar Details"],
+    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Ins Detail gehen"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr, und was ist dein Budget?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Lass uns etwas genauer werden — das macht einen großen Unterschied.",`Zum Schluss: noch etwas, das ich über ${n} wissen sollte?`],
+    msgs:(n)=>["Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr, und was ist dein Budget?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Lass uns etwas genauer werden — das macht einen großen Unterschied."],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
     relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?",
     yrs:"J.",
@@ -516,9 +516,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Lee sus redes públicas para pistas reales",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
-    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Vamos al detalle","Algunos detalles"],
+    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Vamos al detalle"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos, y cuál es tu presupuesto?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"Vamos a entrar un poco más en detalle — marca una gran diferencia.",`Última cosa: ¿algo más que deba saber sobre ${n}?`],
+    msgs:(n)=>["¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos, y cuál es tu presupuesto?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"Vamos a entrar un poco más en detalle — marca una gran diferencia."],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
     relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?",
     yrs:"años",
@@ -568,9 +568,9 @@ const TR: Record<TKey, Tr> = {
     bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Lê as redes públicas para pistas reais",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
-    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","Vamos ao detalhe","Alguns detalhes"],
+    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","Vamos ao detalhe"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos, e qual é o seu orçamento?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Vamos entrar um pouco mais no detalhe — faz uma grande diferença.",`Última coisa: algo mais que eu deva saber sobre ${n}?`],
+    msgs:(n)=>["Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos, e qual é o seu orçamento?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
     relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?",
     yrs:"anos",
@@ -1211,11 +1211,12 @@ export default function Home() {
     });
   }
   function advance() {
-    if (step === 3 && !hasInterestDeepDive()) { setStep(5); setStepKey(k => k + 1); return; }
-    if (step < 5) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest();
+    // Step 4 (interest deep-dive) is the last step; if none of the chosen
+    // interests have a deep-dive config, step 3 is effectively the last one.
+    if (step === 3 && !hasInterestDeepDive()) { fireRequest(); return; }
+    if (step < 4) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest();
   }
   function goBack() {
-    if (step === 5 && !hasInterestDeepDive()) { setStep(3); setStepKey(k => k + 1); return; }
     setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1);
   }
   function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
@@ -1672,11 +1673,11 @@ export default function Home() {
                   {/* Progress */}
                   <div style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
-                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 6</span>
+                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 5</span>
                       <span style={{ fontSize:13, color:C.muted2 }}>{tr.stepNames[step]}</span>
                     </div>
                     <div style={{ height:6, background:C.bord3, borderRadius:999, overflow:"hidden" }}>
-                      <div style={{ height:"100%", background:"linear-gradient(90deg,#c9a26b,#7c3f3f)", borderRadius:999, width:`${((step+1)/6)*100}%`, transition:"width .45s cubic-bezier(.4,0,.2,1)" }}/>
+                      <div style={{ height:"100%", background:"linear-gradient(90deg,#c9a26b,#7c3f3f)", borderRadius:999, width:`${((step+1)/5)*100}%`, transition:"width .45s cubic-bezier(.4,0,.2,1)" }}/>
                     </div>
                   </div>
 
@@ -1762,29 +1763,8 @@ export default function Home() {
                     {/* Step 3 — Interests */}
                     {step === 3 && <InterestsStep g={g} setG={setG} tr={tr} />}
 
-                    {/* Step 4 — Interest deep-dive */}
+                    {/* Step 4 — Interest deep-dive (final step) */}
                     {step === 4 && <InterestDeepDiveStep g={g} setG={setG} tr={tr} />}
-
-                    {/* Step 5 — Details */}
-                    {step === 5 && (
-                      <div>
-                        <textarea
-                          value={g.details}
-                          onChange={e => setG(p => ({ ...p, details: e.target.value }))}
-                          placeholder={tr.detailsPlaceholder}
-                          style={{ width:"100%", minHeight:130, resize:"vertical", padding:"16px 18px", border:`1.5px solid ${C.bord3}`, borderRadius:14, background:"#fff", fontFamily:BODY, fontSize:16, lineHeight:1.5, color:C.body, boxSizing:"border-box" as const }}
-                        />
-                        <div style={{ marginTop:10, display:"flex", flexWrap:"wrap", gap:8 }}>
-                          {tr.promptChips.map(pc => (
-                            <button key={pc}
-                              onClick={() => setG(prev => ({ ...prev, details: prev.details ? prev.details + " " + pc + " " : pc + " " }))}
-                              style={{ padding:"7px 13px", borderRadius:999, border:"1px dashed #d6c3ad", background:"#fbf6ef", color:C.muted, font:`500 13px ${BODY}`, cursor:"pointer" }}>
-                              + {pc}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Nav */}
@@ -1796,7 +1776,7 @@ export default function Home() {
                     )}
                     <div style={{ flex:1 }}/>
                     <button onClick={advance} disabled={!canContinue()} style={canContinue() ? btnPrimary : btnDisabled}>
-                      {step === 5 ? tr.findGifts : tr.continue}
+                      {(step === 4 || (step === 3 && !hasInterestDeepDive())) ? tr.findGifts : tr.continue}
                     </button>
                   </div>
                 </div>
