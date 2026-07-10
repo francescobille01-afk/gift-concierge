@@ -30,10 +30,15 @@ const DISPLAY = "'Outfit', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
 const AMAZON_TAG = "gifty0de-21";
+// Testing phase: we only have an amazon.it affiliate link, so force every
+// Amazon URL onto that domain regardless of which Amazon TLD it came from.
 function addAffiliateTag(url: string): string {
   if (!url || !url.includes("amazon.")) return url;
   try {
     const u = new URL(url);
+    if (u.hostname !== "www.amazon.it" && u.hostname !== "amazon.it") {
+      u.hostname = "www.amazon.it";
+    }
     u.searchParams.set("tag", AMAZON_TAG);
     return u.toString();
   } catch { return url; }
@@ -922,7 +927,7 @@ export default function Home() {
   const [gifts,       setGifts]       = useState<GiftSuggestion[]>([]);
   const [sortBy,      setSortBy]      = useState<"match"|"price"|"priceHigh">("match");
   const [loadingLine, setLoadingLine] = useState(0);
-  const [langIdx,     setLangIdx]     = useState(0);
+  const [langIdx,     setLangIdx]     = useState(2); // default: Italian (testing phase — Amazon affiliate is IT-only)
   const [langMenuOpen,setLangMenuOpen]= useState(false);
   const [favorites,   setFavorites]   = useState<GiftSuggestion[]>([]);
   const [sessionFavs, setSessionFavs] = useState<GiftSuggestion[]>([]);
@@ -948,18 +953,19 @@ export default function Home() {
   const tr   = TR[lang.t as TKey] ?? TR.en;
   const sym  = lang.sym;
 
-  /* ── Locale detection ── */
+  /* ── Locale detection ──
+     Testing phase: default is always Italian (index 2) regardless of browser
+     language or IP — Amazon affiliate program is IT-only right now. The
+     language dropdown still works and manual choices are still remembered.
+     Auto-detect (detectLangIdx / buildLocaleFromIP) is left in place below,
+     unused for now, ready to re-enable once we expand beyond Italy. */
   useEffect(() => {
     const saved = localStorage.getItem("gifty-lang-idx");
     if (saved !== null) {
       setLangIdx(Number(saved));
       return;
     }
-    setLangIdx(detectLangIdx());
-    fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(5000) })
-      .then(r => r.json())
-      .then(raw => setLangIdx(prev => buildLocaleFromIP(raw, prev)))
-      .catch(() => {});
+    setLangIdx(2);
   }, []);
 
   /* ── Persist language choice ── */
@@ -1042,7 +1048,7 @@ export default function Home() {
       countryName: lang.country,
       currency: lang.currency,
       currencySymbol: lang.sym,
-      amazonDomain: lang.country === "United Kingdom" ? "amazon.co.uk" : lang.country === "Italia" ? "amazon.it" : "amazon.com",
+      amazonDomain: "amazon.it", // testing phase — only amazon.it affiliate link exists right now
       language: lang.t,
     };
     const recipient = {

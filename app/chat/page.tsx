@@ -102,7 +102,7 @@ function buildLocale(raw: {
     countryName:    raw.country_name ?? "Unknown",
     currency:       cur,
     currencySymbol: sym,
-    amazonDomain:   AMAZON_DOMAINS[cc] ?? "amazon.com",
+    amazonDomain:   "amazon.it", // testing phase — only amazon.it affiliate link exists right now
     language:       "en", // language is handled separately via navigator.language
   };
 }

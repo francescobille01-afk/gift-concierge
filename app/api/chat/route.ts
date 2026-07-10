@@ -114,19 +114,20 @@ YOUR TASK — follow these phases in order:
 PHASE 1 — SYNTHESISE (no searches yet, pure reasoning):
 Using ALL available data — recipient profile, occasion, budget, interests, notes — decide exactly 9 specific products you will suggest. Be fully committed: Brand + model + size/variant/colour already decided. Each product must be the result of intersecting ALL signals together (e.g. "loves specialty coffee + minimalist aesthetic + €50 budget + birthday = Fellow Stagg EKG kettle"), not just one signal in isolation. At this stage you must also have a runner-up product ready for each slot in case the Amazon search fails.
 
-PHASE 2 — AMAZON LOOKUP (one targeted search per product):
-For each of your 9 decided products, call \`web_search\` with a precise query: the exact product name + "${loc.amazonDomain}". Example: \`"Fellow Stagg EKG kettle" site:${loc.amazonDomain}\`. This is a confirmation search, not a discovery search — you already know what you want, you just need the real URL and image.
-- If the search confirms the product is on ${loc.amazonDomain}: extract the real product URL and the CDN image URL (format: "m.media-amazon.com/images/I/...").
-- If the product is NOT found on ${loc.amazonDomain}: immediately use your pre-decided runner-up for that slot and search for that instead. Do NOT waste a search on a failed product — swap and move on.
+PHASE 2 — AMAZON LOOKUP (exactly ONE web_search per product — never repeat a search for the same product):
+For each of your 9 decided products, call \`web_search\` ONCE with the query: the exact product name + " ${loc.amazonDomain}" as plain words (do NOT use "site:" — it is unreliable with this search tool). Example: \`Fellow Stagg EKG kettle ${loc.amazonDomain}\`. This is a confirmation search — you already know what you want, you just need the real URL and image.
+- If a result from that ONE search is on ${loc.amazonDomain}: extract the real product URL and the CDN image URL (format: "m.media-amazon.com/images/I/...").
+- If NO result from that ONE search is on ${loc.amazonDomain}: do NOT search again for the same product. Immediately move on and use your pre-decided runner-up's name for the \`propose_gifts\` call instead, without a confirmed link.
+▸ HARD RULE: you have a strict budget of 9 web_search calls for the entire task — one per product, no retries, no second attempts at a different phrasing. If you spend more than one search on any single product you will run out before reaching Phase 3.
 
-PHASE 3 — PROPOSE:
-Call \`propose_gifts\` with exactly 9 final suggestions. Every suggestion must have a real \`amazonLink\` from Phase 2. Never fabricate a URL.
+PHASE 3 — PROPOSE (mandatory, always run this phase):
+Call \`propose_gifts\` with exactly 9 final suggestions no matter what — even if some products lack a confirmed \`amazonLink\` because their search didn't return one. A partial list is far better than no list. Never end the conversation without calling \`propose_gifts\`.
 
 Also call \`search_seed_catalog\` at any point to get supplementary inspiration from the curated catalog — but your primary selection must come from your Phase 1 synthesis.
 
-▸ AMAZON IS MANDATORY: Only propose products you found on ${loc.amazonDomain} in Phase 2.
+▸ AMAZON IS PREFERRED, NOT BLOCKING: try to confirm every product on ${loc.amazonDomain} in Phase 2, but if a search comes back empty, still include that product in \`propose_gifts\` without an \`amazonLink\` rather than dropping it or stalling.
 ▸ AMAZON LOCALISATION: Search and link to ${loc.amazonDomain} only. Use the product title and description as they appear on ${loc.amazonDomain} — in the local language of ${loc.countryName}. If the listing title is in ${loc.language === "it" ? "Italian" : loc.language === "fr" ? "French" : loc.language === "de" ? "German" : loc.language === "es" ? "Spanish" : loc.language === "pt" ? "Portuguese" : "English"}, use that title.
-▸ NEVER fabricate a URL. Every \`amazonLink\` must come directly from a web_search result you actually retrieved.
+▸ NEVER fabricate a URL. Every \`amazonLink\` must come directly from a web_search result you actually retrieved — if you don't have one, omit the field, don't invent one.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RULES FOR WORLD-CLASS GIFT SUGGESTIONS
@@ -257,14 +258,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Agentic loop — run until stop_reason is "end_turn"
-    for (let i = 0; i < 20; i++) {
+    const MAX_LOOP = 20;
+    const MAX_SEARCHES = 9;
+    let webSearchCount = 0;
+    let totalInput = 0, totalOutput = 0, totalCacheWrite = 0, totalCacheRead = 0;
+    for (let i = 0; i < MAX_LOOP; i++) {
+      // Safety net: if we're close to running out of search budget (or loop
+      // iterations) and propose_gifts still hasn't been called, force it —
+      // guarantees we never return an empty result, even with partial data.
+      const forcePropose =
+        finalSuggestions.length === 0 &&
+        (webSearchCount >= MAX_SEARCHES - 1 || i === MAX_LOOP - 2);
+
       const response = await client.messages.create({
         model: "claude-haiku-4-5",
         max_tokens: 4096,
         system: cachedSystem,
         tools: cachedTools,
         messages: pruneContext(currentMessages),
+        ...(forcePropose ? { tool_choice: { type: "tool" as const, name: "propose_gifts" } } : {}),
       });
+
+      webSearchCount += response.content.filter(
+        (b) => b.type === "server_tool_use" && (b as { name?: string }).name === "web_search"
+      ).length;
+
+      totalInput += response.usage.input_tokens;
+      totalOutput += response.usage.output_tokens;
+      totalCacheWrite += response.usage.cache_creation_input_tokens ?? 0;
+      totalCacheRead += response.usage.cache_read_input_tokens ?? 0;
 
       if (response.stop_reason === "end_turn") {
         finalText = response.content
@@ -327,6 +349,12 @@ export async function POST(req: NextRequest) {
         .join("\n");
       break;
     }
+
+    const HAIKU_IN = 1, HAIKU_OUT = 5, HAIKU_CACHE_WRITE = 1.25, HAIKU_CACHE_READ = 0.1; // $ per 1M tokens
+    const tokenCost =
+      (totalInput * HAIKU_IN + totalOutput * HAIKU_OUT + totalCacheWrite * HAIKU_CACHE_WRITE + totalCacheRead * HAIKU_CACHE_READ) / 1_000_000;
+    const searchCost = webSearchCount * 0.01;
+    console.log(`[DEBUG-COST] TOTAL in=${totalInput} out=${totalOutput} cacheWrite=${totalCacheWrite} cacheRead=${totalCacheRead} searches=${webSearchCount} | tokenCost=$${tokenCost.toFixed(4)} searchCost=$${searchCost.toFixed(4)} TOTAL=$${(tokenCost+searchCost).toFixed(4)}`);
 
     const responseBody: ChatResponse = {
       message: finalText,
