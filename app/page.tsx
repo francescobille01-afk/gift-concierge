@@ -180,12 +180,92 @@ const TR: Record<TKey, Tr> = {
     occFallback:"this occasion",
     rel:["Partner","Parent","Sibling","Friend","Best friend","Child","Grandparent","Colleague","Someone else"],
     intr:["Cooking","Travel","Fitness","Reading","Gaming","Music","Art & Design","Tech","Fashion","Outdoors","Coffee","Wellness","Home","Photography"],
-    deepDive: { 2: {
-      detailQ: "What sport do they do?", detailPlaceholder: "running, gym/weights, yoga, cycling, swimming, crossfit…",
-      contextQ: "Where do they train most?", contextOpts: ["Gym","Home","Outdoors"],
-      levelQ: "How into it are they?", levelOpts: ["Just to stay fit","Really into it, trains often","Serious / competitive level"],
-      brandQ: "Brand they love or gear they already have", brandPlaceholder: "Nike, Garmin, already has weights at home…",
-    } },
+    deepDive: {
+      0: {
+        detailQ: "What kind of cooking do they love?", detailPlaceholder: "baking, Asian food, grilling/BBQ, wine, healthy cooking…",
+        contextQ: "What do they enjoy most?", contextOpts: ["Everyday cooking","Hosting dinners","Home baking"],
+        levelQ: "How into it are they?", levelOpts: ["Basic cooking","Enthusiast, tries new recipes","Almost chef-level"],
+        brandQ: "Brand they love or gear they already have", brandPlaceholder: "KitchenAid, Global knives, already has a stand mixer…",
+      },
+      1: {
+        detailQ: "What kind of traveller are they?", detailPlaceholder: "backpacking, luxury resorts, city breaks, camping/outdoors…",
+        contextQ: "How do they usually travel?", contextOpts: ["Short weekend trips","Long/adventure trips","Relaxing holidays"],
+        levelQ: "How often do they travel?", levelOpts: ["A few trips a year","Travels often","Constantly on the move"],
+        brandQ: "Brand they love or gear they already have", brandPlaceholder: "Samsonite, Away, already has a trekking backpack…",
+      },
+      2: {
+        detailQ: "What sport do they do?", detailPlaceholder: "running, gym/weights, yoga, cycling, swimming, crossfit…",
+        contextQ: "Where do they train most?", contextOpts: ["Gym","Home","Outdoors"],
+        levelQ: "How into it are they?", levelOpts: ["Just to stay fit","Really into it, trains often","Serious / competitive level"],
+        brandQ: "Brand they love or gear they already have", brandPlaceholder: "Nike, Garmin, already has weights at home…",
+      },
+      3: {
+        detailQ: "What genre do they read?", detailPlaceholder: "fiction, non-fiction, fantasy, thriller, poetry…",
+        contextQ: "How do they read most?", contextOpts: ["Physical books","E-reader/Kindle","Audiobooks"],
+        levelQ: "How much do they read?", levelOpts: ["A few books a year","Reads regularly","Devours a book a week"],
+        brandQ: "Favourite author or what they're reading now", brandPlaceholder: "loves Murakami, currently on a fantasy series…",
+      },
+      4: {
+        detailQ: "What kind of games do they like?", detailPlaceholder: "action/adventure, strategy, sports, indie, retro…",
+        contextQ: "What do they play on most?", contextOpts: ["PC","Console","Mobile"],
+        levelQ: "What kind of gamer are they?", levelOpts: ["Plays to unwind","Really into it","Competitive/hardcore level"],
+        brandQ: "Platform/brand they love or gear they already have", brandPlaceholder: "PlayStation, already has a mechanical keyboard…",
+      },
+      5: {
+        detailQ: "What genre do they listen to most?", detailPlaceholder: "pop, rock, jazz, classical, electronic, hip-hop…",
+        contextQ: "How do they experience music?", contextOpts: ["Just listening","Plays an instrument","Goes to concerts often"],
+        levelQ: "How into it are they?", levelOpts: ["Listens for fun","True enthusiast/collector","Musician/DJ"],
+        brandQ: "Favourite artist or gear they already have", brandPlaceholder: "loves Radiohead, already has basic headphones…",
+      },
+      6: {
+        detailQ: "What kind of art/design do they love?", detailPlaceholder: "painting, photography, interior design, illustration, contemporary art…",
+        contextQ: "How do they engage with art?", contextOpts: ["Appreciates/observes","Creates it themselves","Collects pieces"],
+        levelQ: "How involved are they?", levelOpts: ["Casual interest","True enthusiast","Professional/expert level"],
+        brandQ: "Artist/brand they love or gear they already have", brandPlaceholder: "loves Rothko, already has acrylic paints…",
+      },
+      7: {
+        detailQ: "What kind of tech excites them?", detailPlaceholder: "smart home, audio/headphones, digital photography, gaming, gadgets…",
+        contextQ: "Which ecosystem do they use most?", contextOpts: ["Apple","Android/Windows","Mix of platforms"],
+        levelQ: "How up to date are they?", levelOpts: ["Uses basic tech","Always up on new releases","Early adopter/expert"],
+        brandQ: "Brand they love or gear they already have", brandPlaceholder: "loves Sony, already has Bose headphones…",
+      },
+      8: {
+        detailQ: "What style do they prefer?", detailPlaceholder: "streetwear, classic/elegant, minimalist, vintage, sporty…",
+        contextQ: "What are they most into?", contextOpts: ["Clothing","Accessories","Shoes"],
+        levelQ: "How much do they follow fashion?", levelOpts: ["Keeps it simple","Follows trends","True fashion insider"],
+        brandQ: "Brand they love or their size", brandPlaceholder: "loves Massimo Dutti, size M, loves Nike…",
+      },
+      9: {
+        detailQ: "What outdoor activity do they do?", detailPlaceholder: "hiking, camping, climbing, fishing, mountain biking…",
+        contextQ: "Where do they go most?", contextOpts: ["Mountains","Sea/lake","Woods/trails near home"],
+        levelQ: "How experienced are they?", levelOpts: ["Casual/occasional","Goes often","Expert/adventurous level"],
+        brandQ: "Outdoor brand they love or gear they already have", brandPlaceholder: "loves Patagonia, already has hiking boots…",
+      },
+      10: {
+        detailQ: "How do they take their coffee?", detailPlaceholder: "espresso, filter/pour-over, moka, capsules, specialty…",
+        contextQ: "Where do they make it most?", contextOpts: ["Home","Office","On the go"],
+        levelQ: "How into it are they?", levelOpts: ["Simple daily coffee","Cares about quality","True connoisseur/barista level"],
+        brandQ: "Brand they love or gear they already have", brandPlaceholder: "loves Lavazza, already has a moka pot…",
+      },
+      11: {
+        detailQ: "What helps them feel good?", detailPlaceholder: "yoga, meditation, skincare, massages, aromatherapy…",
+        contextQ: "How do they practise it?", contextOpts: ["Home routine","Goes to spas/centres","Takes classes"],
+        levelQ: "How big a part of their routine is it?", levelOpts: ["Now and then","Regular habit","Top priority in their life"],
+        brandQ: "Brand they love or what they already use", brandPlaceholder: "loves Aesop, already has a yoga mat…",
+      },
+      12: {
+        detailQ: "What do they care about most at home?", detailPlaceholder: "decor, kitchen, plants, decoration, organisation…",
+        contextQ: "What's their home style?", contextOpts: ["Minimalist","Warm/cosy","Modern/design-led"],
+        levelQ: "How much do they invest in it?", levelOpts: ["Keeps it practical","Cares a lot about details","True passion for interior design"],
+        brandQ: "Brand they love or what they already have", brandPlaceholder: "loves Ikea, already has lots of plants…",
+      },
+      13: {
+        detailQ: "What kind of photography do they do?", detailPlaceholder: "street, portraits, landscapes, film/analog, travel…",
+        contextQ: "What do they shoot with most?", contextOpts: ["Smartphone","Mirrorless/DSLR","Film/analog"],
+        levelQ: "Where are they in their journey?", levelOpts: ["Casual hobby","Really puts in effort","Semi-professional level"],
+        brandQ: "Brand/model they love or gear they already have", brandPlaceholder: "loves Fujifilm, already has a 50mm lens…",
+      },
+    },
     buyOnAmazon:"Buy on Amazon",
     saveFav:"Save to favorites", savedFav:"Saved",
     signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
@@ -202,7 +282,7 @@ const TR: Record<TKey, Tr> = {
     stepWord:"Passo", ofWord:"di",
     stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Entriamo nel dettaglio","Qualche dettaglio"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Per chi cerchiamo un regalo?",`Perfetto. Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}? Scegli tutto ciò che calza.`,"Entriamo un po' più nel dettaglio — fa una grande differenza.",`Ultima cosa: altro che dovrei sapere su ${n}?`],
+    msgs:(n)=>["Per chi cerchiamo un regalo?",`Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}?`,"Entriamo un po' più nel dettaglio — fa una grande differenza.",`Ultima cosa: altro che dovrei sapere su ${n}?`],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
     relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
     yrs:"anni",
@@ -232,12 +312,92 @@ const TR: Record<TKey, Tr> = {
     occFallback:"questa occasione",
     rel:["Partner","Genitore","Fratello/Sorella","Amico/a","Migliore amico/a","Figlio/a","Nonno/a","Collega","Qualcun altro"],
     intr:["Cucina","Viaggi","Fitness","Lettura","Gaming","Musica","Arte & Design","Tech","Moda","Outdoor","Caffè","Benessere","Casa","Fotografia"],
-    deepDive: { 2: {
-      detailQ: "Che sport pratica?", detailPlaceholder: "corsa, palestra/pesi, yoga, ciclismo, nuoto, crossfit…",
-      contextQ: "Dove si allena di più?", contextOpts: ["Palestra","Casa","Outdoor"],
-      levelQ: "Quanto è appassionato/a?", levelOpts: ["Lo fa per stare in forma","Ci mette passione, si allena spesso","Livello serio/competitivo"],
-      brandQ: "Marca che ama o attrezzatura che ha già", brandPlaceholder: "Nike, Garmin, ha già i pesi in casa…",
-    } },
+    deepDive: {
+      0: {
+        detailQ: "Che tipo di cucina ama?", detailPlaceholder: "pasticceria, cucina asiatica, grigliate/BBQ, vino, cucina salutare…",
+        contextQ: "Cosa gli/le piace di più?", contextOpts: ["Cucina di tutti i giorni","Ama fare cene/intrattenere","Panetteria/pasticceria casalinga"],
+        levelQ: "A che livello cucina?", levelOpts: ["Cucina base","Appassionato/a, prova ricette nuove","Livello quasi chef"],
+        brandQ: "Marca che ama o attrezzatura che ha già", brandPlaceholder: "KitchenAid, coltelli Global, ha già una planetaria…",
+      },
+      1: {
+        detailQ: "Che tipo di viaggiatore/viaggiatrice è?", detailPlaceholder: "zaino in spalla, resort di lusso, city break, campeggio/outdoor…",
+        contextQ: "Come viaggia di solito?", contextOpts: ["Weekend brevi","Viaggi lunghi/avventura","Vacanze di relax"],
+        levelQ: "Quanto viaggia?", levelOpts: ["Qualche viaggio l'anno","Viaggia spesso","Viaggiatore/viaggiatrice instancabile"],
+        brandQ: "Brand di valigie/accessori che ama o cosa ha già", brandPlaceholder: "Samsonite, Away, ha già uno zaino da trekking…",
+      },
+      2: {
+        detailQ: "Che sport pratica?", detailPlaceholder: "corsa, palestra/pesi, yoga, ciclismo, nuoto, crossfit…",
+        contextQ: "Dove si allena di più?", contextOpts: ["Palestra","Casa","Outdoor"],
+        levelQ: "Quanto è appassionato/a?", levelOpts: ["Lo fa per stare in forma","Ci mette passione, si allena spesso","Livello serio/competitivo"],
+        brandQ: "Marca che ama o attrezzatura che ha già", brandPlaceholder: "Nike, Garmin, ha già i pesi in casa…",
+      },
+      3: {
+        detailQ: "Che genere legge?", detailPlaceholder: "narrativa, saggistica, fantasy, thriller, poesia…",
+        contextQ: "Come legge di più?", contextOpts: ["Libri cartacei","E-reader/Kindle","Audiolibri"],
+        levelQ: "Quanto legge?", levelOpts: ["Qualche libro l'anno","Legge regolarmente","Divora un libro a settimana"],
+        brandQ: "Autore preferito o cosa sta leggendo ora", brandPlaceholder: "ama Murakami, sta leggendo una serie fantasy…",
+      },
+      4: {
+        detailQ: "Che tipo di giochi preferisce?", detailPlaceholder: "action/avventura, strategia, sportivi, indie, retro…",
+        contextQ: "Su cosa gioca di più?", contextOpts: ["PC","Console","Mobile"],
+        levelQ: "Che tipo di giocatore/giocatrice è?", levelOpts: ["Gioca per rilassarsi","Giocatore/giocatrice appassionato/a","Livello competitivo/hardcore"],
+        brandQ: "Piattaforma/brand che ama o cosa ha già", brandPlaceholder: "PlayStation, ha già una tastiera meccanica…",
+      },
+      5: {
+        detailQ: "Che genere ascolta di più?", detailPlaceholder: "pop, rock, jazz, classica, elettronica, hip-hop…",
+        contextQ: "Come vive la musica?", contextOpts: ["Solo ascolto","Suona uno strumento","Va a concerti spesso"],
+        levelQ: "Quanto è appassionato/a?", levelOpts: ["Ascolta per svago","Vero/a appassionato/a o collezionista","Musicista/DJ"],
+        brandQ: "Artista preferito o attrezzatura che ha già", brandPlaceholder: "ama i Radiohead, ha già delle cuffie base…",
+      },
+      6: {
+        detailQ: "Che tipo di arte/design ama?", detailPlaceholder: "pittura, fotografia, design d'interni, illustrazione, arte contemporanea…",
+        contextQ: "Come vive l'arte?", contextOpts: ["Osservatore/appassionato","Pratica lui/lei stesso","Colleziona pezzi"],
+        levelQ: "Quanto è coinvolto/a?", levelOpts: ["Interesse occasionale","Vero/a appassionato/a","Livello professionale/esperto"],
+        brandQ: "Artista o brand che ama, o cosa ha già", brandPlaceholder: "ama Rothko, ha già dei colori acrilici…",
+      },
+      7: {
+        detailQ: "Che tipo di tech lo/la appassiona?", detailPlaceholder: "smart home, audio/cuffie, fotografia digitale, gaming, gadget…",
+        contextQ: "Ecosistema che usa di più?", contextOpts: ["Apple","Android/Windows","Multi-piattaforma"],
+        levelQ: "Quanto è aggiornato/a?", levelOpts: ["Usa la tecnologia base","Sempre aggiornato/a sulle novità","Early adopter/esperto"],
+        brandQ: "Brand che ama o cosa ha già", brandPlaceholder: "ama Sony, ha già delle cuffie Bose…",
+      },
+      8: {
+        detailQ: "Che stile preferisce?", detailPlaceholder: "streetwear, classico/elegante, minimalista, vintage, sportivo…",
+        contextQ: "Cosa cerca di più?", contextOpts: ["Abbigliamento","Accessori","Scarpe"],
+        levelQ: "Quanto segue la moda?", levelOpts: ["Stile essenziale","Attento/a alle tendenze","Vera passione/fashion insider"],
+        brandQ: "Brand che ama o taglia", brandPlaceholder: "ama Massimo Dutti, taglia M, ama le Nike…",
+      },
+      9: {
+        detailQ: "Che attività outdoor pratica?", detailPlaceholder: "hiking, campeggio, arrampicata, pesca, mountain bike…",
+        contextQ: "Dove va di più?", contextOpts: ["Montagna","Mare/lago","Boschi/sentieri vicino casa"],
+        levelQ: "Quanto è esperto/a?", levelOpts: ["Amatoriale/occasionale","Ci va spesso","Livello esperto/avventuroso"],
+        brandQ: "Brand outdoor che ama o attrezzatura che ha già", brandPlaceholder: "ama Patagonia, ha già scarponi da trekking…",
+      },
+      10: {
+        detailQ: "Come beve il caffè?", detailPlaceholder: "espresso, filtro/pour-over, moka, capsule, specialty…",
+        contextQ: "Dove lo prepara di più?", contextOpts: ["Casa","Ufficio","In viaggio"],
+        levelQ: "Quanto è appassionato/a?", levelOpts: ["Caffè quotidiano semplice","Ci tiene alla qualità","Vero/a intenditore/intenditrice o da barista"],
+        brandQ: "Marca che ama o attrezzatura che ha già", brandPlaceholder: "ama Lavazza, ha già una moka…",
+      },
+      11: {
+        detailQ: "Cosa lo/la fa stare bene?", detailPlaceholder: "yoga, meditazione, skincare, massaggi, aromaterapia…",
+        contextQ: "Come lo pratica?", contextOpts: ["Routine a casa","Va in centri/spa","Segue corsi/lezioni"],
+        levelQ: "Quanto è nella sua routine?", levelOpts: ["Ogni tanto","Abitudine regolare","Priorità assoluta nella sua vita"],
+        brandQ: "Brand che ama o cosa usa già", brandPlaceholder: "ama Aesop, ha già un tappetino yoga…",
+      },
+      12: {
+        detailQ: "Cosa cura di più in casa?", detailPlaceholder: "arredamento, cucina, piante, decorazione, organizzazione…",
+        contextQ: "Che stile ha la sua casa?", contextOpts: ["Minimalista","Calda/accogliente","Design/moderna"],
+        levelQ: "Quanto ci investe?", levelOpts: ["Praticità base","Cura molto i dettagli","Vera passione per l'interior design"],
+        brandQ: "Brand che ama o cosa ha già", brandPlaceholder: "ama Ikea, ha già molte piante…",
+      },
+      13: {
+        detailQ: "Che tipo di fotografia pratica?", detailPlaceholder: "street, ritratti, paesaggi, pellicola/analogica, viaggi…",
+        contextQ: "Con cosa scatta di più?", contextOpts: ["Smartphone","Mirrorless/reflex","Pellicola/analogico"],
+        levelQ: "Quanto è nel suo percorso?", levelOpts: ["Hobby occasionale","Ci mette impegno","Livello semi-professionale"],
+        brandQ: "Brand/modello che ama o attrezzatura che ha già", brandPlaceholder: "ama Fujifilm, ha già un obiettivo 50mm…",
+      },
+    },
     buyOnAmazon:"Acquista su Amazon",
     saveFav:"Salva tra i preferiti", savedFav:"Salvato",
     signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
@@ -635,6 +795,9 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
     .map(label => ({ label, idx: tr.intr.indexOf(label) }))
     .filter(({ idx }) => idx !== -1 && tr.deepDive[idx] != null);
 
+  const [activeIdx, setActiveIdx] = useState(blocks[0]?.idx ?? -1);
+  const active = blocks.find(b => b.idx === activeIdx) ?? blocks[0];
+
   function updateAnswer(idx: number, patch: Partial<InterestDeepDiveAnswer>) {
     setG(p => ({
       ...p,
@@ -647,45 +810,63 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 
   const inputSt: React.CSSProperties = { width:"100%", padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontSize:14, color:C.body, background:"#fff", boxSizing:"border-box" as const };
 
+  if (!active) return null;
+  const cfg = tr.deepDive[active.idx]!;
+  const ans = g.interestDeepDive[active.idx] ?? { detail:"", context:"", level:"", brand:"" };
+
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:26 }}>
-      {blocks.map(({ label, idx }) => {
-        const cfg = tr.deepDive[idx]!;
-        const ans = g.interestDeepDive[idx] ?? { detail:"", context:"", level:"", brand:"" };
-        return (
-          <div key={idx} style={{ padding:"18px 20px", border:`1.5px solid ${C.bord4}`, borderRadius:16, background:"#fdfbf8" }}>
-            <div style={{ fontSize:13, fontWeight:700, letterSpacing:".06em", textTransform:"uppercase" as const, color:C.maroon, marginBottom:14 }}>{label}</div>
+    <div>
+      {/* Tabs — one per selected interest that has a deep-dive config */}
+      {blocks.length > 1 && (
+        <div style={{ display:"flex", gap:8, marginBottom:18 }}>
+          {blocks.map(({ label, idx }) => (
+            <button key={idx} onClick={() => setActiveIdx(idx)}
+              style={{
+                padding:"9px 16px", borderRadius:999, cursor:"pointer", fontSize:13.5, fontWeight:600,
+                border: idx === active.idx ? "none" : `1.5px solid ${C.bord3}`,
+                background: idx === active.idx ? C.maroon : "#fff",
+                color: idx === active.idx ? "#fff" : C.label2,
+                transition:"all .15s",
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
-            <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.detailQ}</div>
-              <input type="text" value={ans.detail} onChange={e => updateAnswer(idx, { detail: e.target.value })} placeholder={cfg.detailPlaceholder} style={inputSt} />
-            </div>
+      <div style={{ padding:"18px 20px", border:`1.5px solid ${C.bord4}`, borderRadius:16, background:"#fdfbf8" }}>
+        {blocks.length === 1 && (
+          <div style={{ fontSize:13, fontWeight:700, letterSpacing:".06em", textTransform:"uppercase" as const, color:C.maroon, marginBottom:14 }}>{active.label}</div>
+        )}
 
-            <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.contextQ}</div>
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {cfg.contextOpts.map(o => (
-                  <button key={o} onClick={() => updateAnswer(idx, { context: ans.context === o ? "" : o })} style={chipSt(ans.context === o)}>{o}</button>
-                ))}
-              </div>
-            </div>
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.detailQ}</div>
+          <input type="text" value={ans.detail} onChange={e => updateAnswer(active.idx, { detail: e.target.value })} placeholder={cfg.detailPlaceholder} style={inputSt} />
+        </div>
 
-            <div style={{ marginBottom:12 }}>
-              <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.levelQ}</div>
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {cfg.levelOpts.map(o => (
-                  <button key={o} onClick={() => updateAnswer(idx, { level: ans.level === o ? "" : o })} style={chipSt(ans.level === o)}>{o}</button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.brandQ}</div>
-              <input type="text" value={ans.brand} onChange={e => updateAnswer(idx, { brand: e.target.value })} placeholder={cfg.brandPlaceholder} style={inputSt} />
-            </div>
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.contextQ}</div>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            {cfg.contextOpts.map(o => (
+              <button key={o} onClick={() => updateAnswer(active.idx, { context: ans.context === o ? "" : o })} style={chipSt(ans.context === o)}>{o}</button>
+            ))}
           </div>
-        );
-      })}
+        </div>
+
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.levelQ}</div>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            {cfg.levelOpts.map(o => (
+              <button key={o} onClick={() => updateAnswer(active.idx, { level: ans.level === o ? "" : o })} style={chipSt(ans.level === o)}>{o}</button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ fontSize:13.5, fontWeight:600, color:C.label, marginBottom:7 }}>{cfg.brandQ}</div>
+          <input type="text" value={ans.brand} onChange={e => updateAnswer(active.idx, { brand: e.target.value })} placeholder={cfg.brandPlaceholder} style={inputSt} />
+        </div>
+      </div>
     </div>
   );
 }
