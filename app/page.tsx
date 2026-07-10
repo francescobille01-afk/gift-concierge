@@ -133,7 +133,7 @@ interface Tr {
   intr: string[];
   deepDive: Partial<Record<number, InterestDeepDiveConfig>>;
   buyOnAmazon: string;
-  saveFav: string; savedFav: string;
+  saveFav: string; savedFav: string; savedSearch: string;
   signInTitle: string; signInSub: string;
   continueGoogle: string; continueEmail: string; continueGuest: string;
   orWord: string; termsNote: string; waitMsg: string;
@@ -267,7 +267,7 @@ const TR: Record<TKey, Tr> = {
       },
     },
     buyOnAmazon:"Buy on Amazon",
-    saveFav:"Save to favorites", savedFav:"Saved",
+    saveFav:"Save to favorites", savedFav:"Saved", savedSearch:"Saved this search",
     signInTitle:"Welcome to Gifty", signInSub:"Sign in to save your gift hunts, favorites and history across devices.",
     continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
@@ -399,7 +399,7 @@ const TR: Record<TKey, Tr> = {
       },
     },
     buyOnAmazon:"Acquista su Amazon",
-    saveFav:"Salva tra i preferiti", savedFav:"Salvato",
+    saveFav:"Salva tra i preferiti", savedFav:"Salvato", savedSearch:"Salvati in questa ricerca",
     signInTitle:"Benvenuto su Gifty", signInSub:"Accedi per salvare le tue ricerche, i preferiti e la cronologia su tutti i dispositivi.",
     continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
@@ -451,7 +451,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marque qu'il/elle aime ou équipement qu'il/elle a déjà", brandPlaceholder: "Nike, Garmin, a déjà des poids à la maison…",
     } },
     buyOnAmazon:"Acheter sur Amazon",
-    saveFav:"Enregistrer dans les favoris", savedFav:"Enregistré",
+    saveFav:"Enregistrer dans les favoris", savedFav:"Enregistré", savedSearch:"Enregistrés dans cette recherche",
     signInTitle:"Bienvenue sur Gifty", signInSub:"Connectez-vous pour sauvegarder vos recherches, favoris et historique.",
     continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
@@ -503,7 +503,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marke, die er/sie liebt, oder Ausrüstung, die schon vorhanden ist", brandPlaceholder: "Nike, Garmin, hat schon Gewichte zuhause…",
     } },
     buyOnAmazon:"Bei Amazon kaufen",
-    saveFav:"Zu Favoriten hinzufügen", savedFav:"Gespeichert",
+    saveFav:"Zu Favoriten hinzufügen", savedFav:"Gespeichert", savedSearch:"In dieser Suche gespeichert",
     signInTitle:"Willkommen bei Gifty", signInSub:"Melde dich an, um deine Suchanfragen, Favoriten und den Verlauf zu speichern.",
     continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
@@ -555,7 +555,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marca que le encanta o equipo que ya tiene", brandPlaceholder: "Nike, Garmin, ya tiene pesas en casa…",
     } },
     buyOnAmazon:"Comprar en Amazon",
-    saveFav:"Guardar en favoritos", savedFav:"Guardado",
+    saveFav:"Guardar en favoritos", savedFav:"Guardado", savedSearch:"Guardados en esta búsqueda",
     signInTitle:"Bienvenido a Gifty", signInSub:"Inicia sesión para guardar tus búsquedas, favoritos e historial.",
     continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
@@ -607,7 +607,7 @@ const TR: Record<TKey, Tr> = {
       brandQ: "Marca que adora ou equipamento que já tem", brandPlaceholder: "Nike, Garmin, já tem pesos em casa…",
     } },
     buyOnAmazon:"Comprar na Amazon",
-    saveFav:"Guardar nos favoritos", savedFav:"Guardado",
+    saveFav:"Guardar nos favoritos", savedFav:"Guardado", savedSearch:"Guardados nesta pesquisa",
     signInTitle:"Bem-vindo ao Gifty", signInSub:"Inicia sessão para guardar as tuas pesquisas, favoritos e histórico.",
     continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
@@ -707,8 +707,8 @@ function buildLocaleFromIP(raw: { country_code?: string; country_name?: string; 
 }
 
 function buildFirstMessage(g: Gathered, sym: string, tr: Tr): string {
-  const budgetMax = g.budget >= 500 ? 2000 : g.budget;
-  const budgetMin = Math.max(10, Math.round(g.budget * 0.65));
+  const budgetMax = g.budget >= 500 ? 2000 : Math.round(g.budget * 1.15);
+  const budgetMin = Math.max(10, Math.round(g.budget * 0.70));
   const occLabel = g.occasion ? (tr.occ[g.occasion] ?? g.occasion) : "gift";
   const allInterests = [...g.interests, ...(g.customInterest.trim() ? [g.customInterest.trim()] : [])];
   const autoHints = g.interests
@@ -1221,8 +1221,8 @@ export default function Home() {
   function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("match"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
   /* ── API call ── */
   function buildRecipientAndLocale() {
-    const budgetMax = g.budget >= 500 ? 2000 : g.budget;
-    const budgetMin = Math.max(10, Math.round(g.budget * 0.65));
+    const budgetMax = g.budget >= 500 ? 2000 : Math.round(g.budget * 1.15);
+    const budgetMin = Math.max(10, Math.round(g.budget * 0.70));
     const occLabel  = g.occasion ? (tr.occ[g.occasion] ?? g.occasion) : "Gift";
     const locale: UserLocale = {
       countryCode: lang.country === "United Kingdom" ? "GB" : lang.country === "Italia" ? "IT" : "US",
@@ -1394,14 +1394,14 @@ export default function Home() {
           </button>
         </div>
         <div style={{ padding:"16px 17px 17px", display:"flex", flexDirection:"column", flex:1 }}>
-          <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:17.5, lineHeight:1.22, color:C.ink, marginBottom:14 }}>{gift.title}</div>
+          <div style={{ fontFamily:BODY, fontWeight:700, fontSize:15.5, lineHeight:1.3, color:C.ink, marginBottom:14 }}>{gift.title}</div>
 
 
           <div style={{ marginTop:"auto" }}>
             {(() => {
               const nums = (gift.priceRange.match(/\d+/g) || []).map(Number);
               const highPrice = nums.length > 0 ? Math.max(...nums) : 0;
-              const overBudget = g.budget < 500 && highPrice > g.budget * 1.1;
+              const overBudget = g.budget < 500 && highPrice > g.budget * 1.15;
               return (
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
                   <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color: overBudget ? "#c0392b" : C.ink }}>{gift.priceRange}</span>
@@ -1554,7 +1554,7 @@ export default function Home() {
           {sessionFavs.length > 0 && (
             <div className="gc-fade" style={{ position:"relative" }}>
               <div style={{ fontSize:11, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" as const, color:"#d8b98c", marginBottom:10 }}>
-                ♥ Saved this search ({sessionFavs.length})
+                ♥ {tr.savedSearch} ({sessionFavs.length})
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {sessionFavs.slice(0, 4).map(f => (

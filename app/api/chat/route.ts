@@ -52,9 +52,9 @@ const tools: Anthropic.Messages.ToolUnion[] = [
             type: "object",
             properties: {
               id: { type: "string" },
-              title: { type: "string" },
+              title: { type: "string", description: "SHORT product name: brand + product type, max 5-6 words. NO sizes, inch counts, model codes, colours or spec clutter — those belong in the description. e.g. 'Mercer Culinary Santoku' not 'Santoku Mercer Culinary Genesis 7 Pollici'" },
               description: { type: "string" },
-              priceRange: { type: "string", description: "e.g. '€25–€45'" },
+              priceRange: { type: "string", description: "ONE exact price, the product's current Amazon price to the best of your knowledge, e.g. '€49'. Never a range." },
               reason: { type: "string", description: "Why this suits the recipient — must cite a specific signal (brand they like, activity they do, social post detail, wishlist item, style observed)" },
               imageUrl: { type: "string", description: "A direct, real image URL (ending in .jpg/.png/.webp etc, or a CDN image URL) of the ACTUAL product, taken from the web_search results for this product's official page or Amazon listing. Never invent a URL — only use one you actually saw in search results." },
               officialLink: { type: "string", description: "The real URL of the brand's or retailer's official product page for this exact item, found via web_search. Omit if you could not find a real one." },
@@ -142,20 +142,20 @@ Also call \`search_seed_catalog\` at any point to get supplementary inspiration 
 RULES FOR WORLD-CLASS GIFT SUGGESTIONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-▸ BE HYPER-SPECIFIC — always name real, branded, purchasable products with full detail.
+▸ BE HYPER-SPECIFIC — always pick real, branded, purchasable products, never vague categories.
   ✗ FORBIDDEN: "A nice journal" / "A skincare set" / "A cooking experience" / "Luxury candle"
-  ✓ REQUIRED: "Leuchtturm1917 A5 Bullet Journal in Dark Blue, Hardcover" / "Le Creuset 26cm Signature Cast Iron Casserole in Marseille Blue" / "Tatcha The Water Cream 50ml"
-  Brand + model name + size/variant/colour. Every time. No exceptions.
+  ✓ The product you CHOOSE must be exact (brand + model + variant), but SPLIT the detail across fields:
+    - title: short and clean — brand + product type only, max 5-6 words (e.g. "Leuchtturm1917 Bullet Journal")
+    - description: this is where size, colour, variant and specs go (e.g. "A5, copertina rigida, blu scuro…")
 
 ▸ CATALOG = INSPIRATION ONLY. You are NOT limited to it. The catalog is a starting floor. Always look beyond it for better-matched real products.
 
 ▸ IF NOTES MENTION A WISH — make it your #1 suggestion. Find the exact item or the premium version of it.
 
-▸ BUDGET IS A HARD CONSTRAINT, NOT A SUGGESTION: The buyer's budget is ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}.
-  ✗ ABSOLUTELY FORBIDDEN: any suggestion whose priceRange falls even partly outside ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}. A ${loc.currencySymbol}180 item is NOT acceptable for a ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax} budget, even if it's a great match otherwise — find a cheaper alternative instead.
-  ✓ Both the low AND high end of each suggestion's priceRange must sit inside ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax}. Before calling propose_gifts, check every single priceRange against this range and discard/replace any that don't fit.
+▸ BUDGET IS A HARD CONSTRAINT, NOT A SUGGESTION: every product's price must sit inside ${loc.currencySymbol}${recipient.budgetMin}–${loc.currencySymbol}${recipient.budgetMax} (this window is already derived from the buyer's stated budget: at most 30% below it, at most 15% above it).
+  ✗ ABSOLUTELY FORBIDDEN: any product priced outside that window — too cheap is just as wrong as too expensive. A ${loc.currencySymbol}20 item for a ${loc.currencySymbol}100 budget makes the buyer look stingy; a ${loc.currencySymbol}180 item blows the budget. Find an alternative inside the window instead.
+  ✓ State ONE exact price per product (its current Amazon price as best you know it, e.g. "${loc.currencySymbol}49") — never a range. Before calling propose_gifts, check every single price against the window and discard/replace any that don't fit.
   EXCEPTION — only if budgetMax is ${loc.currencySymbol}2000 (meaning the user selected an open-ended "${loc.currencySymbol}500+" budget): treat this as "${loc.currencySymbol}500 and up", so higher-priced premium/luxury items are fine and there is no upper ceiling.
-  Use the full range you're given — don't cluster every suggestion near the bottom of the range either.
 
 ▸ STYLE MATCH IS NON-NEGOTIABLE: A minimalist does not want maximalist clutter. A quirky personality does not want boring basics. A classic dresser does not want streetwear. Map the stated style + social aesthetic → pick products that live in that world.
 
