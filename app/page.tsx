@@ -1106,7 +1106,7 @@ export default function Home() {
   const [stepKey,     setStepKey]     = useState(0);
   const [g,           setG]           = useState<Gathered>(EMPTY);
   const [gifts,       setGifts]       = useState<GiftSuggestion[]>([]);
-  const [sortBy,      setSortBy]      = useState<"match"|"price"|"priceHigh">("match");
+  const [sortBy,      setSortBy]      = useState<"match"|"price"|"priceHigh">("price");
   const [loadingLine, setLoadingLine] = useState(0);
   const [langIdx,     setLangIdx]     = useState(2); // default: Italian (testing phase — Amazon affiliate is IT-only)
   const [langMenuOpen,setLangMenuOpen]= useState(false);
@@ -1218,7 +1218,7 @@ export default function Home() {
     if (step === 5 && !hasInterestDeepDive()) { setStep(3); setStepKey(k => k + 1); return; }
     setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1);
   }
-  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("match"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
+  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
   /* ── API call ── */
   function buildRecipientAndLocale() {
     const budgetMax = g.budget >= 500 ? 2000 : Math.round(g.budget * 1.15);
@@ -1854,7 +1854,7 @@ export default function Home() {
                   {/* Sort */}
                   <div style={{ display:"flex", alignItems:"center", gap:9, margin:"22px 0 20px" }}>
                     <span style={{ fontSize:13, color:C.muted2, fontWeight:600 }}>{tr.sortLabel}</span>
-                    {(["match","price","priceHigh"] as const).map((s, i) => (
+                    {([["price",1],["priceHigh",2]] as const).map(([s, i]) => (
                       <button key={s} onClick={() => setSortBy(s)}
                         style={s === sortBy
                           ? { padding:"8px 15px", borderRadius:999, border:`1.5px solid ${C.maroon}`, background:C.maroon, color:"#fff", font:`600 13px ${BODY}`, cursor:"pointer" }
