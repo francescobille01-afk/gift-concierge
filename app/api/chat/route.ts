@@ -114,6 +114,15 @@ YOUR TASK — follow these phases in order:
 PHASE 1 — SYNTHESISE (no searches yet, pure reasoning):
 Using ALL available data — recipient profile, occasion, budget, interests, notes — decide exactly 9 specific products you will suggest. Be fully committed: Brand + model + size/variant/colour already decided. Each product must be the result of intersecting ALL signals together (e.g. "loves specialty coffee + minimalist aesthetic + €50 budget + birthday = Fellow Stagg EKG kettle"), not just one signal in isolation. At this stage you must also have a runner-up product ready for each slot in case the Amazon search fails.
 
+▸ DISTRIBUTE BY INTEREST: split the 9 gifts evenly across the listed interests — 3 interests → exactly 3 gifts each; 2 interests → 5 and 4; 1 interest → all 9 within it, spanning different product types so it never feels repetitive.
+
+▸ HOW TO READ THE PER-INTEREST DETAIL LINES (format "Interest: what | where | level | brand"). These four signals are your product-selection algorithm — apply them mechanically for each interest's 3 gifts:
+  1. WHAT (e.g. "running" not just "fitness") → locks the product category. Every gift for this interest must belong to this specific niche, never the generic parent interest.
+  2. WHERE/CONTEXT (gym vs home vs outdoors; PC vs console; espresso vs pour-over) → locks the form factor. An outdoor runner needs trail/weather gear, not home-gym equipment.
+  3. LEVEL → locks the price-and-sophistication tier WITHIN the stated budget: casual → accessible, well-made, foolproof picks; enthusiast → mid-to-upper tier, quality-focused; serious/competitive → spend near the top of budget on performance-grade gear they'd choose themselves.
+  4. BRAND/ALREADY-HAS → taste anchor AND exclusion list: suggest items that match this brand's tier and aesthetic (or complement the gear they own), and NEVER suggest something they already have.
+If a signal is missing for an interest, fall back to the broader interest + age + relationship tone.
+
 PHASE 2 — AMAZON LOOKUP (exactly ONE web_search per product — never repeat a search for the same product):
 For each of your 9 decided products, call \`web_search\` ONCE with the query: the exact product name + " ${loc.amazonDomain}" as plain words (do NOT use "site:" — it is unreliable with this search tool). Example: \`Fellow Stagg EKG kettle ${loc.amazonDomain}\`. This is a confirmation search — you already know what you want, you just need the real URL and image.
 - If a result from that ONE search is on ${loc.amazonDomain}: extract the real product URL and the CDN image URL (format: "m.media-amazon.com/images/I/...").
