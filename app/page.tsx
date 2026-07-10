@@ -1368,7 +1368,10 @@ export default function Home() {
       : `/api/product-image?q=${encodeURIComponent(imgQ)}`;
     const fallbackImg = ogImg;
     const [imgSrc, setImgSrc] = useState(gift.imageUrl || ogImg);
-    const fallbackLink = `https://www.google.com/search?q=${encodeURIComponent(gift.title)}`;
+    // No web search anymore → gifts have no exact product URL. The button
+    // links to an amazon.it search for the product name; the affiliate tag is
+    // added by addAffiliateTag, so purchases within 24h are still credited.
+    const fallbackLink = `https://www.amazon.it/s?k=${encodeURIComponent(gift.title)}`;
     const officialLink = gift.officialLink || gift.link;
     const amazonLink   = gift.amazonLink;
     const fav    = isFav(gift.id);
