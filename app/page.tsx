@@ -196,7 +196,7 @@ const TR: Record<TKey, Tr> = {
   it: {
     nav:["Home","Cronologia","Preferiti","Contattaci"],
     h1a:"Il regalo perfetto,", h1b:"trovato per te.",
-    intro:"Rispondi a qualche domanda veloce e Gifty — il tuo concierge personale — troverà il regalo perfetto per te.",
+    intro:"Rispondi a qualche domanda veloce e Gifty — il tuo concierge personale — troverà il regalo perfetto per la tua occasione.",
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Legge i social pubblici per indizi veri",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
