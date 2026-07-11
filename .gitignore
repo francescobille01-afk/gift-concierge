@@ -7,3 +7,7 @@ node_modules/
 
 # Claude Code session data
 .claude/
+
+# Local-only business/legal notes (kept out of the online repo)
+AMAZON_ASSOCIATES_NOTES.md
+LEGAL_COMPLIANCE.md
