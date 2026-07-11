@@ -203,19 +203,19 @@ const TR: Record<TKey, Tr> = {
         detailQ: "What genre do they read?", detailPlaceholder: "fiction, non-fiction, fantasy, thriller, poetry…",
         contextQ: "How do they read most?", contextOpts: ["Physical books","E-reader/Kindle","Audiobooks"],
         levelQ: "How much do they read?", levelOpts: ["A few books a year","Reads regularly","Devours a book a week"],
-        brandQ: "Favourite author or what they're reading now", brandPlaceholder: "loves Murakami, currently on a fantasy series…",
+        brandQ: "A favourite author or series they love? (the best clue of all)", brandPlaceholder: "loves Murakami, obsessed with the Sanderson series…",
       },
       4: {
         detailQ: "What kind of games do they like?", detailPlaceholder: "action/adventure, strategy, sports, indie, retro…",
         contextQ: "What do they play on most?", contextOpts: ["PC","Console","Mobile"],
         levelQ: "What kind of gamer are they?", levelOpts: ["Plays to unwind","Really into it","Competitive/hardcore level"],
-        brandQ: "Platform/brand they love or gear they already have", brandPlaceholder: "PlayStation, already has a mechanical keyboard…",
+        brandQ: "A favourite game or series they love, and their console? (the best clue of all)", brandPlaceholder: "loves Zelda, plays on PS5, already has an elite controller…",
       },
       5: {
         detailQ: "What genre do they listen to most?", detailPlaceholder: "pop, rock, jazz, classical, electronic, hip-hop…",
         contextQ: "How do they experience music?", contextOpts: ["Just listening","Plays an instrument","Goes to concerts often"],
         levelQ: "How into it are they?", levelOpts: ["Listens for fun","True enthusiast/collector","Musician/DJ"],
-        brandQ: "Favourite artist or gear they already have", brandPlaceholder: "loves Radiohead, already has basic headphones…",
+        brandQ: "A favourite artist or band they love? (the best clue of all)", brandPlaceholder: "loves Radiohead, into vinyl, plays guitar…",
       },
       6: {
         detailQ: "What kind of art/design do they love?", detailPlaceholder: "painting, photography, interior design, illustration, contemporary art…",
@@ -227,7 +227,7 @@ const TR: Record<TKey, Tr> = {
         detailQ: "What kind of tech excites them?", detailPlaceholder: "smart home, audio/headphones, digital photography, gaming, gadgets…",
         contextQ: "Which ecosystem do they use most?", contextOpts: ["Apple","Android/Windows","Mix of platforms"],
         levelQ: "How up to date are they?", levelOpts: ["Uses basic tech","Always up on new releases","Early adopter/expert"],
-        brandQ: "Brand they love or gear they already have", brandPlaceholder: "loves Sony, already has Bose headphones…",
+        brandQ: "Their main device/setup, or a brand they love? (the best clue of all)", brandPlaceholder: "has an iPhone 15 + MacBook, loves Sony, already has AirPods…",
       },
       8: {
         detailQ: "What style do they prefer?", detailPlaceholder: "streetwear, classic/elegant, minimalist, vintage, sporty…",
@@ -335,19 +335,19 @@ const TR: Record<TKey, Tr> = {
         detailQ: "Che genere legge?", detailPlaceholder: "narrativa, saggistica, fantasy, thriller, poesia…",
         contextQ: "Come legge di più?", contextOpts: ["Libri cartacei","E-reader/Kindle","Audiolibri"],
         levelQ: "Quanto legge?", levelOpts: ["Qualche libro l'anno","Legge regolarmente","Divora un libro a settimana"],
-        brandQ: "Autore preferito o cosa sta leggendo ora", brandPlaceholder: "ama Murakami, sta leggendo una serie fantasy…",
+        brandQ: "Un autore o una serie che ama? (l'indizio più prezioso)", brandPlaceholder: "ama Murakami, fissata con la serie di Sanderson…",
       },
       4: {
         detailQ: "Che tipo di giochi preferisce?", detailPlaceholder: "action/avventura, strategia, sportivi, indie, retro…",
         contextQ: "Su cosa gioca di più?", contextOpts: ["PC","Console","Mobile"],
         levelQ: "Che tipo di giocatore/giocatrice è?", levelOpts: ["Gioca per rilassarsi","Giocatore/giocatrice appassionato/a","Livello competitivo/hardcore"],
-        brandQ: "Piattaforma/brand che ama o cosa ha già", brandPlaceholder: "PlayStation, ha già una tastiera meccanica…",
+        brandQ: "Un gioco o una serie che ama, e la sua console? (l'indizio più prezioso)", brandPlaceholder: "ama Zelda, gioca su PS5, ha già un controller elite…",
       },
       5: {
         detailQ: "Che genere ascolta di più?", detailPlaceholder: "pop, rock, jazz, classica, elettronica, hip-hop…",
         contextQ: "Come vive la musica?", contextOpts: ["Solo ascolto","Suona uno strumento","Va a concerti spesso"],
         levelQ: "Quanto è appassionato/a?", levelOpts: ["Ascolta per svago","Vero/a appassionato/a o collezionista","Musicista/DJ"],
-        brandQ: "Artista preferito o attrezzatura che ha già", brandPlaceholder: "ama i Radiohead, ha già delle cuffie base…",
+        brandQ: "Un artista o una band che ama? (l'indizio più prezioso)", brandPlaceholder: "ama i Radiohead, colleziona vinili, suona la chitarra…",
       },
       6: {
         detailQ: "Che tipo di arte/design ama?", detailPlaceholder: "pittura, fotografia, design d'interni, illustrazione, arte contemporanea…",
@@ -359,7 +359,7 @@ const TR: Record<TKey, Tr> = {
         detailQ: "Che tipo di tech lo/la appassiona?", detailPlaceholder: "smart home, audio/cuffie, fotografia digitale, gaming, gadget…",
         contextQ: "Ecosistema che usa di più?", contextOpts: ["Apple","Android/Windows","Multi-piattaforma"],
         levelQ: "Quanto è aggiornato/a?", levelOpts: ["Usa la tecnologia base","Sempre aggiornato/a sulle novità","Early adopter/esperto"],
-        brandQ: "Brand che ama o cosa ha già", brandPlaceholder: "ama Sony, ha già delle cuffie Bose…",
+        brandQ: "Il dispositivo che usa di più, o un brand che ama? (l'indizio più prezioso)", brandPlaceholder: "ha iPhone 15 e MacBook, ama Sony, ha già le AirPods…",
       },
       8: {
         detailQ: "Che stile preferisce?", detailPlaceholder: "streetwear, classico/elegante, minimalista, vintage, sportivo…",
