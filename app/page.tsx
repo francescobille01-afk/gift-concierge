@@ -1141,6 +1141,16 @@ export default function Home() {
   const tr   = TR[lang.t as TKey] ?? TR.en;
   const sym  = lang.sym;
 
+  /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
+  useEffect(() => {
+    if (document.getElementById("iubenda-loader")) return;
+    const s = document.createElement("script");
+    s.id = "iubenda-loader";
+    s.src = "https://cdn.iubenda.com/iubenda.js";
+    s.async = true;
+    document.body.appendChild(s);
+  }, []);
+
   /* ── Locale detection ──
      Testing phase: default is always Italian (index 2) regardless of browser
      language or IP — Amazon affiliate program is IT-only right now. The
@@ -1985,7 +1995,11 @@ export default function Home() {
             <span className="gc-tip-badge">ⓘ</span>
             <span className="gc-tip-box">
               <span style={{ display:"block", marginBottom:7 }}>{tr.disclaimerAmazon}</span>
-              <span style={{ display:"block" }}>{tr.disclaimerPrice}</span>
+              <span style={{ display:"block", marginBottom:10 }}>{tr.disclaimerPrice}</span>
+              <span style={{ paddingTop:9, borderTop:`1px solid ${C.border}`, display:"flex", gap:14 }}>
+                <a href="https://www.iubenda.com/privacy-policy/48819018" className="iubenda-embed iubenda-noiframe" title="Privacy Policy" style={{ color:C.maroon, fontWeight:600, textDecoration:"none" }}>Privacy Policy</a>
+                <a href="https://www.iubenda.com/privacy-policy/48819018/cookie-policy" className="iubenda-embed iubenda-noiframe" title="Cookie Policy" style={{ color:C.maroon, fontWeight:600, textDecoration:"none" }}>Cookie Policy</a>
+              </span>
             </span>
           </span>
         </div>
