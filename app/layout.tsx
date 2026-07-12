@@ -34,6 +34,8 @@ export default function RootLayout({
         <ClerkProvider>
           {children}
         </ClerkProvider>
+        {/* iubenda cookie consent banner (Cookie Solution) — GDPR/Garante */}
+        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"></script>
       </body>
     </html>
   );
