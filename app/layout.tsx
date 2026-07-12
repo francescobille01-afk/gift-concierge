@@ -1,5 +1,6 @@
 import {ClerkProvider} from "@clerk/nextjs";
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -31,11 +32,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
       <body className="font-sans antialiased">
+        {/* iubenda Privacy Controls & Cookie Solution — must load as early as
+            possible (iubenda: "all'inizio dell'head"). beforeInteractive lets
+            Next inject it into <head> before hydration. */}
+        <Script
+          src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"
+          strategy="beforeInteractive"
+        />
         <ClerkProvider>
           {children}
         </ClerkProvider>
-        {/* iubenda cookie consent banner (Cookie Solution) — GDPR/Garante */}
-        <script type="text/javascript" src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"></script>
       </body>
     </html>
   );
