@@ -138,6 +138,7 @@ interface Tr {
   continueGoogle: string; continueEmail: string; continueGuest: string;
   orWord: string; termsNote: string; waitMsg: string;
   checkEmail: string; codeSent: string; verifyCode: string; verifying: string;
+  disclaimerAmazon: string; disclaimerPrice: string;
 }
 
 const TR: Record<TKey, Tr> = {
@@ -145,7 +146,7 @@ const TR: Record<TKey, Tr> = {
     nav: ["Home","History","Favorites","Contact us"],
     h1a:"The perfect gift,", h1b:"found for you.",
     intro:"Answer a few quick questions and Gifty — your personal concierge — will find the perfect gift for you.",
-    bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Reads their public socials for real clues",
+    bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Deeply personalised to their tastes",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
     stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Let's get specific"],
@@ -161,7 +162,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["They already have…","Loves a particular brand","Inside joke gift"],
     back:"Back", continue:"Continue →", findGifts:"Find my gifts ✨",
     loadingTitle:"Gifty is curating…",
-    loadingLines:["Reading their social profile…","Mining captions, hashtags & posts…","Matching to their interests & budget…","Ranking the best finds…"],
+    loadingLines:["Studying their profile…","Analysing interests & personality…","Matching to their tastes & budget…","Ranking the best finds…"],
     curatedTag:"CURATED FOR YOU",
     headline:(n,name,occ)=>`${n} gifts for ${name?name+"'s":"their"} ${occ}`,
     sub:(b,c)=>`Ranked by fit · ${b} budget · ${c}`,
@@ -272,12 +273,13 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Continue with Google", continueEmail:"Continue with email", continueGuest:"Continue as guest",
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
     checkEmail:"Check your email", codeSent:"We sent a 6-digit code to", verifyCode:"Verify code", verifying:"Verifying…",
+    disclaimerAmazon:"As an Amazon Associate, Gifty receives compensation from qualifying purchases.", disclaimerPrice:"Prices reflect estimates and may vary on the Amazon platform.",
   },
   it: {
     nav:["Home","Cronologia","Preferiti","Contattaci"],
     h1a:"Il regalo perfetto,", h1b:"trovato per te.",
     intro:"Rispondi a qualche domanda veloce e Gifty — il tuo concierge personale — troverà il regalo perfetto per la tua occasione.",
-    bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Legge i social pubblici per indizi veri",
+    bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Personalizzato a fondo sui suoi gusti",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
     stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Entriamo nel dettaglio"],
@@ -293,7 +295,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["Ha già…","Ama un marchio in particolare","Regalo scherzo"],
     back:"Indietro", continue:"Continua →", findGifts:"Trova i regali ✨",
     loadingTitle:"Gifty sta selezionando…",
-    loadingLines:["Leggo il profilo social…","Analizzo didascalie, hashtag e post…","Abbino a interessi e budget…","Ordino i risultati migliori…"],
+    loadingLines:["Studio il profilo…","Analizzo interessi e personalità…","Abbino ai gusti e al budget…","Ordino i risultati migliori…"],
     curatedTag:"SELEZIONATI PER TE",
     headline:(n,name,occ)=>`${n} regali per ${occ}${name?" di "+name:""}`,
     sub:(b,c)=>`Ordinati per affinità · budget ${b} · ${c}`,
@@ -404,12 +406,13 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Continua con Google", continueEmail:"Continua con email", continueGuest:"Continua come ospite",
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
     checkEmail:"Controlla la tua email", codeSent:"Abbiamo inviato un codice a 6 cifre a", verifyCode:"Verifica codice", verifying:"Verifica in corso…",
+    disclaimerAmazon:"In qualità di Affiliato Amazon, Gifty riceve compensi dagli acquisti idonei.", disclaimerPrice:"I prezzi riflettono stime e potrebbero variare sulla piattaforma Amazon.",
   },
   fr: {
     nav:["Accueil","Historique","Favoris","Contact"],
     h1a:"Le cadeau parfait,", h1b:"trouvé pour vous.",
     intro:"Répondez à quelques questions rapides et Gifty — votre concierge personnel — trouvera le cadeau parfait pour vous.",
-    bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Lit leurs réseaux publics pour de vrais indices",
+    bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Personnalisé selon ses goûts",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
     stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Entrons dans le détail"],
@@ -425,7 +428,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["Il a déjà…","Aime une marque en particulier","Cadeau private joke"],
     back:"Retour", continue:"Continuer →", findGifts:"Trouver mes cadeaux ✨",
     loadingTitle:"Gifty fait sa sélection…",
-    loadingLines:["Lecture du profil social…","Analyse des légendes, hashtags et posts…","Mise en correspondance avec les goûts et le budget…","Classement des meilleures trouvailles…"],
+    loadingLines:["Étude du profil…","Analyse des goûts et de la personnalité…","Mise en correspondance avec les goûts et le budget…","Classement des meilleures trouvailles…"],
     curatedTag:"SÉLECTIONNÉS POUR VOUS",
     headline:(n,name,occ)=>`${n} cadeaux pour ${occ}${name?" de "+name:""}`,
     sub:(b,c)=>`Classés par pertinence · budget ${b} · ${c}`,
@@ -456,12 +459,13 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Continuer avec Google", continueEmail:"Continuer avec l'email", continueGuest:"Continuer en tant qu'invité",
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
     checkEmail:"Vérifiez votre email", codeSent:"Nous avons envoyé un code à 6 chiffres à", verifyCode:"Vérifier le code", verifying:"Vérification…",
+    disclaimerAmazon:"En tant que partenaire Amazon, Gifty reçoit des commissions sur les achats éligibles.", disclaimerPrice:"Les prix reflètent des estimations et peuvent varier sur la plateforme Amazon.",
   },
   de: {
     nav:["Start","Verlauf","Favoriten","Kontakt"],
     h1a:"Das perfekte Geschenk,", h1b:"für dich gefunden.",
     intro:"Beantworte ein paar kurze Fragen und Gifty — dein persönlicher Concierge — findet das perfekte Geschenk für dich.",
-    bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Liest öffentliche Profile für echte Hinweise",
+    bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Tief auf ihren Geschmack zugeschnitten",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
     stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Ins Detail gehen"],
@@ -477,7 +481,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["Hat schon…","Liebt eine bestimmte Marke","Insider-Geschenk"],
     back:"Zurück", continue:"Weiter →", findGifts:"Geschenke finden ✨",
     loadingTitle:"Gifty kuratiert…",
-    loadingLines:["Social-Profil wird gelesen…","Bildunterschriften, Hashtags & Posts werden ausgewertet…","Abgleich mit Interessen & Budget…","Beste Funde werden sortiert…"],
+    loadingLines:["Profil wird studiert…","Interessen & Persönlichkeit werden analysiert…","Abgleich mit Geschmack & Budget…","Beste Funde werden sortiert…"],
     curatedTag:"FÜR DICH KURATIERT",
     headline:(n,name,occ)=>`${n} Geschenke für ${name?name+"s":"den"} ${occ}`,
     sub:(b,c)=>`Nach Passung sortiert · Budget ${b} · ${c}`,
@@ -508,12 +512,13 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Mit Google fortfahren", continueEmail:"Mit E-Mail fortfahren", continueGuest:"Als Gast fortfahren",
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
     checkEmail:"Prüfe deine E-Mail", codeSent:"Wir haben einen 6-stelligen Code gesendet an", verifyCode:"Code bestätigen", verifying:"Wird überprüft…",
+    disclaimerAmazon:"Als Amazon-Partner erhält Gifty Provisionen von qualifizierten Käufen.", disclaimerPrice:"Die Preise sind Schätzungen und können auf Amazon variieren.",
   },
   es: {
     nav:["Inicio","Historial","Favoritos","Contacto"],
     h1a:"El regalo perfecto,", h1b:"encontrado para ti.",
     intro:"Responde unas preguntas rápidas y Gifty — tu concierge personal — encontrará el regalo perfecto para ti.",
-    bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Lee sus redes públicas para pistas reales",
+    bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Personalizado a fondo según sus gustos",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
     stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Vamos al detalle"],
@@ -529,7 +534,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["Ya tiene…","Le encanta una marca","Regalo de broma interna"],
     back:"Atrás", continue:"Continuar →", findGifts:"Buscar regalos ✨",
     loadingTitle:"Gifty está seleccionando…",
-    loadingLines:["Leyendo el perfil social…","Analizando pies de foto, hashtags y posts…","Comparando con intereses y presupuesto…","Ordenando los mejores hallazgos…"],
+    loadingLines:["Estudiando el perfil…","Analizando intereses y personalidad…","Comparando con gustos y presupuesto…","Ordenando los mejores hallazgos…"],
     curatedTag:"SELECCIONADOS PARA TI",
     headline:(n,name,occ)=>`${n} regalos para ${occ}${name?" de "+name:""}`,
     sub:(b,c)=>`Ordenados por afinidad · presupuesto ${b} · ${c}`,
@@ -560,12 +565,13 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Continuar con Google", continueEmail:"Continuar con email", continueGuest:"Continuar como invitado",
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
     checkEmail:"Revisa tu email", codeSent:"Enviamos un código de 6 dígitos a", verifyCode:"Verificar código", verifying:"Verificando…",
+    disclaimerAmazon:"Como afiliado de Amazon, Gifty recibe compensaciones por compras elegibles.", disclaimerPrice:"Los precios reflejan estimaciones y pueden variar en la plataforma Amazon.",
   },
   pt: {
     nav:["Início","Histórico","Favoritos","Contato"],
     h1a:"O presente perfeito,", h1b:"encontrado para você.",
     intro:"Responda a algumas perguntas rápidas e Gifty — o seu concierge pessoal — encontrará o presente perfeito para você.",
-    bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Lê as redes públicas para pistas reais",
+    bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Personalizado ao detalhe para os seus gostos",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
     stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","Vamos ao detalhe"],
@@ -581,7 +587,7 @@ const TR: Record<TKey, Tr> = {
     promptChips:["Já tem…","Adora uma marca específica","Presente de piada interna"],
     back:"Voltar", continue:"Continuar →", findGifts:"Encontrar presentes ✨",
     loadingTitle:"Gifty está a selecionar…",
-    loadingLines:["A ler o perfil social…","A analisar legendas, hashtags e posts…","A comparar com interesses e orçamento…","A ordenar as melhores descobertas…"],
+    loadingLines:["A estudar o perfil…","A analisar interesses e personalidade…","A comparar com gostos e orçamento…","A ordenar as melhores descobertas…"],
     curatedTag:"SELECIONADOS PARA SI",
     headline:(n,name,occ)=>`${n} presentes para ${occ}${name?" de "+name:""}`,
     sub:(b,c)=>`Ordenados por afinidade · orçamento ${b} · ${c}`,
@@ -612,6 +618,7 @@ const TR: Record<TKey, Tr> = {
     continueGoogle:"Continuar com Google", continueEmail:"Continuar com email", continueGuest:"Continuar como convidado",
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
     checkEmail:"Verifica o teu email", codeSent:"Enviámos um código de 6 dígitos para", verifyCode:"Verificar código", verifying:"A verificar…",
+    disclaimerAmazon:"Como Afiliado Amazon, Gifty recebe compensações de compras elegíveis.", disclaimerPrice:"Os preços refletem estimativas e podem variar na plataforma Amazon.",
   },
 };
 
@@ -1523,6 +1530,12 @@ export default function Home() {
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
         ::selection{background:#c9a26b;color:#fff}
+        .gc-tip{position:relative;display:inline-flex}
+        .gc-tip-box{position:absolute;bottom:42px;right:0;width:250px;background:#fff;border:1px solid #ece0d2;border-radius:12px;padding:12px 14px;text-align:left;font:400 11.5px 'Hanken Grotesk',sans-serif;line-height:1.5;color:#3a2e26;box-shadow:0 8px 28px rgba(124,63,63,.18);opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:1001}
+        .gc-tip-box::after{content:"";position:absolute;bottom:-6px;right:13px;width:11px;height:11px;background:#fff;border-right:1px solid #ece0d2;border-bottom:1px solid #ece0d2;transform:rotate(45deg)}
+        .gc-tip:hover .gc-tip-box{opacity:1;transform:translateY(0)}
+        .gc-tip-badge{width:30px;height:30px;border-radius:50%;border:1.5px solid #d8c4b0;background:#fff;color:#7c3f3f;font-size:14px;cursor:default;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,63,63,.12);transition:border-color .15s,box-shadow .15s}
+        .gc-tip:hover .gc-tip-badge{border-color:#7c3f3f;box-shadow:0 4px 14px rgba(124,63,63,.22)}
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}}
       `}</style>
 
@@ -1963,7 +1976,19 @@ export default function Home() {
             </div>
           )}
 
+
         </main>
+
+        {/* ══ DISCLAIMER BADGE (fixed, hover to reveal) ══ */}
+        <div style={{ position:"fixed", bottom:18, right:18, zIndex:1000 }}>
+          <span className="gc-tip">
+            <span className="gc-tip-badge">ⓘ</span>
+            <span className="gc-tip-box">
+              <span style={{ display:"block", marginBottom:7 }}>{tr.disclaimerAmazon}</span>
+              <span style={{ display:"block" }}>{tr.disclaimerPrice}</span>
+            </span>
+          </span>
+        </div>
       </div>
     </>
   );
