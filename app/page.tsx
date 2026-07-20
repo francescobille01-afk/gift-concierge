@@ -686,6 +686,10 @@ const EMPTY: Gathered = {
 function fmtAge(a: number) { return a <= 2 ? `${a} yr` : a >= 90 ? "90+" : `${a}`; }
 function fmtBudget(b: number, sym: string) { return b >= 500 ? `${sym}500+` : `${sym}${b}`; }
 function parsePriceLow(r: string): number { const m = r.replace(/[, ]/g,"").match(/\d+/); return m ? parseInt(m[0]) : 9999; }
+// Favorites are matched by product name, not by the AI-assigned id (which is
+// just a positional "1".."9" that collides across different searches).
+function normTitle(t: string) { return (t ?? "").trim().toLowerCase().replace(/\s+/g, " "); }
+function sameGift(a: GiftSuggestion, b: GiftSuggestion) { return normTitle(a.title) === normTitle(b.title); }
 
 function detectLangIdx(): number {
   const lang = navigator.language?.toLowerCase() ?? "";
@@ -1132,7 +1136,13 @@ export default function Home() {
   const [contactSent, setContactSent] = useState(false);
 
   const [isGuest, setIsGuest] = useState(false);
-  const { isSignedIn, isLoaded: authLoaded } = useAuth();
+  const { isSignedIn, isLoaded: authLoaded, userId } = useAuth();
+
+  // Favorites & history are scoped per account so different logins on the same
+  // browser don't share them. Guests (and pre-auth) fall back to a "guest" bucket.
+  const uid      = userId ?? "guest";
+  const FAV_KEY  = `gifty-favorites:${uid}`;
+  const HIST_KEY = `gifty-history:${uid}`;
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
@@ -1171,15 +1181,15 @@ export default function Home() {
     localStorage.setItem("gifty-lang-idx", String(langIdx));
   }, [langIdx]);
 
-  /* ── Load from localStorage ── */
+  /* ── Load from localStorage (re-runs when the account changes) ── */
   useEffect(() => {
     try {
-      const favs = localStorage.getItem("gifty-favorites");
-      if (favs) setFavorites(JSON.parse(favs));
-      const hist = localStorage.getItem("gifty-history");
-      if (hist) setHistory(JSON.parse(hist));
+      const favs = localStorage.getItem(FAV_KEY);
+      setFavorites(favs ? JSON.parse(favs) : []);
+      const hist = localStorage.getItem(HIST_KEY);
+      setHistory(hist ? JSON.parse(hist) : []);
     } catch { /* ignore */ }
-  }, []);
+  }, [uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Loading status lines ── */
   const LOADING_LINES = tr.loadingLines;
@@ -1202,15 +1212,15 @@ export default function Home() {
   }, []);
 
   /* ── Favorites helpers ── */
-  function isFav(id: string) { return favorites.some(f => f.id === id); }
+  function isFav(gift: GiftSuggestion) { return favorites.some(f => sameGift(f, gift)); }
   function toggleFav(gift: GiftSuggestion) {
-    const adding = !favorites.some(f => f.id === gift.id);
+    const adding = !favorites.some(f => sameGift(f, gift));
     setFavorites(prev => {
-      const next = adding ? [...prev, gift] : prev.filter(f => f.id !== gift.id);
-      try { localStorage.setItem("gifty-favorites", JSON.stringify(next)); } catch { /* ignore */ }
+      const next = adding ? [...prev, gift] : prev.filter(f => !sameGift(f, gift));
+      try { localStorage.setItem(FAV_KEY, JSON.stringify(next)); } catch { /* ignore */ }
       return next;
     });
-    setSessionFavs(prev => adding ? [...prev, gift] : prev.filter(f => f.id !== gift.id));
+    setSessionFavs(prev => adding ? [...prev, gift] : prev.filter(f => !sameGift(f, gift)));
   }
 
   /* ── Navigation ── */
@@ -1284,7 +1294,7 @@ export default function Home() {
     };
     setHistory(prev => {
       const next = [entry, ...prev].slice(0, 20);
-      try { localStorage.setItem("gifty-history", JSON.stringify(next)); } catch { /* ignore */ }
+      try { localStorage.setItem(HIST_KEY, JSON.stringify(next)); } catch { /* ignore */ }
       return next;
     });
   }
@@ -1391,7 +1401,7 @@ export default function Home() {
     const fallbackLink = `https://www.amazon.it/s?k=${encodeURIComponent(gift.title)}`;
     const officialLink = gift.officialLink || gift.link;
     const amazonLink   = gift.amazonLink;
-    const fav    = isFav(gift.id);
+    const fav    = isFav(gift);
     const thumb  = thumbs[gift.id];
     return (
       <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:18, overflow:"hidden", boxShadow:"0 4px 18px rgba(124,63,63,.06)", display:"flex", flexDirection:"column" }}>
