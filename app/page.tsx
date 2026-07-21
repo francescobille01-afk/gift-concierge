@@ -1648,7 +1648,12 @@ export default function Home() {
           {/* Disclaimer badge — bottom-right corner of the dark panel, hover to reveal */}
           <div style={{ position:"absolute", bottom:18, right:18, zIndex:5 }}>
             <span className="gc-tip">
-              <span className="gc-tip-badge">ⓘ</span>
+              <span className="gc-tip-badge" aria-label="Note legali">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c3f3f" aria-hidden="true">
+                  <circle cx="12" cy="6.4" r="1.8"/>
+                  <rect x="10.3" y="10" width="3.4" height="9.2" rx="1.7"/>
+                </svg>
+              </span>
               <span className="gc-tip-box">
                 <span style={{ display:"block", marginBottom:7 }}>{tr.disclaimerAmazon}</span>
                 <span style={{ display:"block" }}>{tr.disclaimerPrice}</span>
