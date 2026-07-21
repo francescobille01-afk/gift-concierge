@@ -686,6 +686,16 @@ const EMPTY: Gathered = {
 function fmtAge(a: number) { return a <= 2 ? `${a} yr` : a >= 90 ? "90+" : `${a}`; }
 function fmtBudget(b: number, sym: string) { return b >= 500 ? `${sym}500+` : `${sym}${b}`; }
 function parsePriceLow(r: string): number { const m = r.replace(/[, ]/g,"").match(/\d+/); return m ? parseInt(m[0]) : 9999; }
+// Pre-API: the model's price is an estimate, and the link goes to an Amazon
+// search page — so we never show it as an exact price. Widen it into an
+// indicative band ("~€14–18") to avoid implying a guaranteed Amazon price.
+function toPriceBand(priceRange: string, sym: string): string {
+  const nums = (priceRange.match(/\d+/g) || []).map(Number);
+  if (nums.length === 0) return priceRange;
+  const lo = Math.max(1, Math.round(Math.min(...nums) * 0.85));
+  const hi = Math.round(Math.max(...nums) * 1.15);
+  return lo === hi ? `~${sym}${lo}` : `~${sym}${lo}–${hi}`;
+}
 // Favorites are matched by product name, not by the AI-assigned id (which is
 // just a positional "1".."9" that collides across different searches).
 function normTitle(t: string) { return (t ?? "").trim().toLowerCase().replace(/\s+/g, " "); }
@@ -1435,7 +1445,7 @@ export default function Home() {
               const overBudget = g.budget < 500 && highPrice > g.budget * 1.15;
               return (
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
-                  <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color: overBudget ? "#c0392b" : C.ink }}>{gift.priceRange}</span>
+                  <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:20, color: overBudget ? "#c0392b" : C.ink }}>{toPriceBand(gift.priceRange, sym)}</span>
                   {overBudget && <span style={{ fontSize:11, fontWeight:700, color:"#c0392b", background:"#fde8e8", padding:"2px 7px", borderRadius:999 }}>Over budget</span>}
                 </div>
               );
