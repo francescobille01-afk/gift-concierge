@@ -1551,8 +1551,8 @@ export default function Home() {
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
         ::selection{background:#c9a26b;color:#fff}
         .gc-tip{position:relative;display:inline-flex}
-        .gc-tip-box{position:absolute;bottom:42px;right:0;width:250px;background:#fff;border:1px solid #ece0d2;border-radius:12px;padding:12px 14px;text-align:left;font:400 11.5px 'Hanken Grotesk',sans-serif;line-height:1.5;color:#3a2e26;box-shadow:0 8px 28px rgba(124,63,63,.18);opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:1001}
-        .gc-tip-box::after{content:"";position:absolute;bottom:-6px;right:13px;width:11px;height:11px;background:#fff;border-right:1px solid #ece0d2;border-bottom:1px solid #ece0d2;transform:rotate(45deg)}
+        .gc-tip-box{position:absolute;bottom:42px;left:0;width:250px;background:#fff;border:1px solid #ece0d2;border-radius:12px;padding:12px 14px;text-align:left;font:400 11.5px 'Hanken Grotesk',sans-serif;line-height:1.5;color:#3a2e26;box-shadow:0 8px 28px rgba(124,63,63,.18);opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease;z-index:1001}
+        .gc-tip-box::after{content:"";position:absolute;bottom:-6px;left:13px;width:11px;height:11px;background:#fff;border-right:1px solid #ece0d2;border-bottom:1px solid #ece0d2;transform:rotate(45deg)}
         .gc-tip:hover .gc-tip-box{opacity:1;transform:translateY(0)}
         .gc-tip-badge{width:30px;height:30px;border-radius:50%;border:1.5px solid #d8c4b0;background:#fff;color:#7c3f3f;font-size:14px;cursor:default;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,63,63,.12);transition:border-color .15s,box-shadow .15s}
         .gc-tip:hover .gc-tip-badge{border-color:#7c3f3f;box-shadow:0 4px 14px rgba(124,63,63,.22)}
@@ -2000,7 +2000,7 @@ export default function Home() {
         </main>
 
         {/* ══ DISCLAIMER BADGE (fixed, hover to reveal) ══ */}
-        <div style={{ position:"fixed", bottom:18, right:18, zIndex:1000 }}>
+        <div style={{ position:"fixed", bottom:18, left:18, zIndex:1000 }}>
           <span className="gc-tip">
             <span className="gc-tip-badge">ⓘ</span>
             <span className="gc-tip-box">
