@@ -1,26 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.9",
-};
-
-function extractOgImage(html: string): string | null {
-  const patterns = [
-    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
-    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
-    /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
-    /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i,
-  ];
-  for (const re of patterns) {
-    const m = html.match(re);
-    if (m?.[1] && m[1].startsWith("http")) return m[1].trim();
-  }
-  return null;
-}
-
 function svgPlaceholder(q: string): NextResponse {
   let h = 0;
   for (let i = 0; i < q.length; i++) h = (h * 31 + q.charCodeAt(i)) >>> 0;
@@ -47,28 +26,6 @@ function svgPlaceholder(q: string): NextResponse {
 }
 
 export async function GET(req: NextRequest) {
-  const url = req.nextUrl.searchParams.get("url");
   const q = req.nextUrl.searchParams.get("q") ?? "gift";
-
-  if (!url) return svgPlaceholder(q);
-
-  try {
-    const res = await fetch(url, {
-      headers: HEADERS,
-      signal: AbortSignal.timeout(8_000),
-      redirect: "follow",
-    });
-
-    if (!res.ok) return svgPlaceholder(q);
-
-    const html = await res.text();
-    const imageUrl = extractOgImage(html);
-
-    if (!imageUrl) return svgPlaceholder(q);
-
-    // Redirect the browser to fetch the image directly (avoids proxying large images)
-    return NextResponse.redirect(imageUrl, { status: 302 });
-  } catch {
-    return svgPlaceholder(q);
-  }
+  return svgPlaceholder(q);
 }
