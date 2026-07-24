@@ -1766,10 +1766,9 @@ export default function Home() {
                   <div style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
                       <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 4</span>
-                      <span style={{ fontSize:13, color:C.muted2 }}>{tr.stepNames[step]}</span>
                     </div>
                     <div style={{ height:6, background:C.bord3, borderRadius:999, overflow:"hidden" }}>
-                      <div style={{ height:"100%", background:"linear-gradient(90deg,#c9a26b,#7c3f3f)", borderRadius:999, width:`${((step+1)/5)*100}%`, transition:"width .45s cubic-bezier(.4,0,.2,1)" }}/>
+                      <div style={{ height:"100%", background:"linear-gradient(90deg,#c9a26b,#7c3f3f)", borderRadius:999, width:`${((step+1)/4)*100}%`, transition:"width .45s cubic-bezier(.4,0,.2,1)" }}/>
                     </div>
                   </div>
 
