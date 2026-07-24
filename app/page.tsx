@@ -104,8 +104,9 @@ interface Tr {
   conciergeLabel: string;
   msgs: (n: string) => string[];
   namePlaceholder: string; nameHelp: string;
-  relTitle: string; ageQ: string;
+  relTitle: string; ageQ: string; genderQ: string;
   yrs: string;
+  genderOpts: string[];
   otherLabel: string; customPlaceholder: string;
   pickAtLeast: string; selectedWord: string;
   budgetTitle: string;
@@ -143,18 +144,19 @@ interface Tr {
 
 const TR: Record<TKey, Tr> = {
   en: {
-    nav: ["Home","History","Favorites","Contact us"],
+    nav: ["Home","Favorites"],
     h1a:"The perfect gift,", h1b:"found for you.",
     intro:"Answer a few quick questions and Gifty — your personal concierge — will find the perfect gift for you.",
     bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Deeply personalised to their tastes",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
-    stepNames:["Who are we gifting?","The occasion","The recipient & budget","Their interests","Let's get specific"],
+    stepNames:["Who are we gifting?","The occasion","The recipient","Budget & interests","Let's get specific"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Who are we finding a gift for?",`Got it. What's the occasion for ${n}?`,`And who is ${n} to you — roughly how old are they, and what's your budget?`,`What is ${n} into? Pick everything that fits.`,"Let's get a bit more specific — this makes a huge difference."],
+    msgs:(n)=>["Who are we finding a gift for?","What's the occasion?","And their gender, and roughly how old are they?","What's your budget, and what are they into?","Let's get a bit more specific — this makes a huge difference."],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
-    relTitle:"Your relationship", ageQ:"Roughly how old are they?",
+    relTitle:"Your relationship", ageQ:"Roughly how old are they?", genderQ:"Gender",
     yrs:"yrs",
+    genderOpts:["Man","Woman","Prefer not to say"],
     otherLabel:"Other…", customPlaceholder:"e.g. Formula 1, yoga, wine, vintage cars…",
     pickAtLeast:"Pick at least one", selectedWord:"selected",
     budgetTitle:"Budget",
@@ -179,7 +181,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Send message", sentTitle:"Message sent", sentSub:"Thanks for reaching out — we'll get back to you shortly.", sendAnother:"Send another", orEmail:"Or email us at",
     occ:{ birthday:"Birthday", christmas:"Christmas", valentine:"Valentine's", mothers:"Mother's Day", fathers:"Father's Day", graduation:"Graduation", wedding:"Wedding", anniversary:"Anniversary", housewarming:"Housewarming", baby:"Baby Shower", justbecause:"Just Because", other:"Other" },
     occFallback:"this occasion",
-    rel:["Partner","Parent","Sibling","Friend","Best friend","Child","Grandparent","Colleague","Someone else"],
+    rel:["Partner","Family","Friends","Colleagues","Other"],
     intr:["Cooking","Travel","Fitness","Reading","Gaming","Music","Art & Design","Tech","Fashion","Outdoors","Coffee","Wellness","Home","Photography"],
     deepDive: {
       0: {
@@ -276,18 +278,19 @@ const TR: Record<TKey, Tr> = {
     disclaimerAmazon:"As an Amazon Associate, Gifty receives compensation from qualifying purchases.", disclaimerPrice:"Prices and availability subject to change.",
   },
   it: {
-    nav:["Home","Cronologia","Preferiti","Contattaci"],
+    nav:["Home","Preferiti"],
     h1a:"Il regalo perfetto,", h1b:"trovato per te.",
     intro:"Rispondi a qualche domanda veloce e Gifty — il tuo concierge personale — troverà il regalo perfetto per la tua occasione.",
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Personalizzato a fondo sui suoi gusti",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
-    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario e budget","I suoi interessi","Entriamo nel dettaglio"],
+    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario","Budget e interessi","Entriamo nel dettaglio"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Per chi cerchiamo un regalo?",`Qual è l'occasione per ${n}?`,`E chi è ${n} per te — quanti anni ha più o meno, e qual è il tuo budget?`,`Cosa piace a ${n}?`,"Entriamo un po' più nel dettaglio — fa una grande differenza."],
+    msgs:(n)=>["Per chi stai cercando un regalo?","Qual è l'occasione?","E il genere, quanti anni ha più o meno?","Qual è il tuo budget, e cosa gli/le piace?","Entriamo un po' più nel dettaglio — fa una grande differenza."],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
-    relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?",
+    relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?", genderQ:"Genere",
     yrs:"anni",
+    genderOpts:["Uomo","Donna","Non specificato"],
     otherLabel:"Altro…", customPlaceholder:"es. Formula 1, yoga, vino, auto d'epoca…",
     pickAtLeast:"Scegline almeno uno", selectedWord:"selezionati",
     budgetTitle:"Budget",
@@ -312,7 +315,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Invia messaggio", sentTitle:"Messaggio inviato", sentSub:"Grazie per averci scritto — ti risponderemo a breve.", sendAnother:"Invia un altro", orEmail:"Oppure scrivici a",
     occ:{ birthday:"Compleanno", christmas:"Natale", valentine:"San Valentino", mothers:"Festa della Mamma", fathers:"Festa del Papà", graduation:"Laurea", wedding:"Matrimonio", anniversary:"Anniversario", housewarming:"Inaugurazione casa", baby:"Nascita", justbecause:"Senza motivo", other:"Altro" },
     occFallback:"questa occasione",
-    rel:["Partner","Genitore","Fratello/Sorella","Amico/a","Migliore amico/a","Figlio/a","Nonno/a","Collega","Qualcun altro"],
+    rel:["Fidanzato/a","Parenti","Amici","Colleghi","Altro"],
     intr:["Cucina","Viaggi","Fitness","Lettura","Gaming","Musica","Arte & Design","Tech","Moda","Outdoor","Caffè","Benessere","Casa","Fotografia"],
     deepDive: {
       0: {
@@ -409,18 +412,19 @@ const TR: Record<TKey, Tr> = {
     disclaimerAmazon:"In qualità di Affiliato Amazon, Gifty riceve compensi dagli acquisti idonei.", disclaimerPrice:"Prezzi e disponibilità soggetti a modifica.",
   },
   fr: {
-    nav:["Accueil","Historique","Favoris","Contact"],
+    nav:["Accueil","Favoris"],
     h1a:"Le cadeau parfait,", h1b:"trouvé pour vous.",
     intro:"Répondez à quelques questions rapides et Gifty — votre concierge personnel — trouvera le cadeau parfait pour vous.",
     bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Personnalisé selon ses goûts",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
-    stepNames:["Pour qui ?","L'occasion","Le destinataire et budget","Ses centres d'intérêt","Entrons dans le détail"],
+    stepNames:["Pour qui ?","L'occasion","Le destinataire","Budget et centres d'intérêt","Entrons dans le détail"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?",`Très bien. Quelle est l'occasion pour ${n} ?`,`Et qui est ${n} pour vous — quel âge a-t-il environ, et quel est votre budget ?`,`Qu'est-ce qui plaît à ${n} ? Choisissez tout ce qui correspond.`,"Entrons un peu plus dans le détail — ça fait une grande différence."],
+    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?","Quelle est l'occasion ?","Et son genre, quel âge a-t-il environ ?","Quel est votre budget, et qu'est-ce qui lui plaît ?","Entrons un peu plus dans le détail — ça fait une grande différence."],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
-    relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?",
+    relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?", genderQ:"Genre",
     yrs:"ans",
+    genderOpts:["Homme","Femme","Ne pas préciser"],
     otherLabel:"Autre…", customPlaceholder:"ex. Formule 1, yoga, vin, voitures vintage…",
     pickAtLeast:"Choisissez-en au moins un", selectedWord:"sélectionné(s)",
     budgetTitle:"Budget",
@@ -445,7 +449,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Envoyer", sentTitle:"Message envoyé", sentSub:"Merci de nous avoir contactés — nous reviendrons vers vous rapidement.", sendAnother:"En envoyer un autre", orEmail:"Ou écrivez-nous à",
     occ:{ birthday:"Anniversaire", christmas:"Noël", valentine:"Saint-Valentin", mothers:"Fête des Mères", fathers:"Fête des Pères", graduation:"Diplôme", wedding:"Mariage", anniversary:"Anniversaire de couple", housewarming:"Pendaison de crémaillère", baby:"Naissance", justbecause:"Sans raison", other:"Autre" },
     occFallback:"cette occasion",
-    rel:["Partenaire","Parent","Frère/Sœur","Ami(e)","Meilleur(e) ami(e)","Enfant","Grand-parent","Collègue","Quelqu'un d'autre"],
+    rel:["Partenaire","Famille","Amis","Collègues","Autre"],
     intr:["Cuisine","Voyage","Fitness","Lecture","Jeux vidéo","Musique","Art & Design","Tech","Mode","Plein air","Café","Bien-être","Maison","Photographie"],
     deepDive: { 2: {
       detailQ: "Quel sport pratique-t-il/elle ?", detailPlaceholder: "course à pied, salle/musculation, yoga, vélo, natation, crossfit…",
@@ -462,18 +466,19 @@ const TR: Record<TKey, Tr> = {
     disclaimerAmazon:"En tant que partenaire Amazon, Gifty reçoit des commissions sur les achats éligibles.", disclaimerPrice:"Prix et disponibilité sujets à modification.",
   },
   de: {
-    nav:["Start","Verlauf","Favoriten","Kontakt"],
+    nav:["Start","Favoriten"],
     h1a:"Das perfekte Geschenk,", h1b:"für dich gefunden.",
     intro:"Beantworte ein paar kurze Fragen und Gifty — dein persönlicher Concierge — findet das perfekte Geschenk für dich.",
     bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Tief auf ihren Geschmack zugeschnitten",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
-    stepNames:["Für wen?","Der Anlass","Die Person & Budget","Interessen","Ins Detail gehen"],
+    stepNames:["Für wen?","Der Anlass","Die Person","Budget & Interessen","Ins Detail gehen"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Für wen suchen wir ein Geschenk?",`Alles klar. Was ist der Anlass für ${n}?`,`Und wer ist ${n} für dich — wie alt ungefähr, und was ist dein Budget?`,`Worauf steht ${n}? Wähle alles, was passt.`,"Lass uns etwas genauer werden — das macht einen großen Unterschied."],
+    msgs:(n)=>["Für wen suchen wir ein Geschenk?","Was ist der Anlass?","Und Geschlecht, wie alt ungefähr?","Was ist dein Budget, und worauf steht die Person?","Lass uns etwas genauer werden — das macht einen großen Unterschied."],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
-    relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?",
+    relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?", genderQ:"Geschlecht",
     yrs:"J.",
+    genderOpts:["Mann","Frau","Keine Angabe"],
     otherLabel:"Anderes…", customPlaceholder:"z.B. Formel 1, Yoga, Wein, Oldtimer…",
     pickAtLeast:"Wähle mindestens eins", selectedWord:"ausgewählt",
     budgetTitle:"Budget",
@@ -498,7 +503,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Nachricht senden", sentTitle:"Nachricht gesendet", sentSub:"Danke für deine Nachricht — wir melden uns bald.", sendAnother:"Weitere senden", orEmail:"Oder schreib uns an",
     occ:{ birthday:"Geburtstag", christmas:"Weihnachten", valentine:"Valentinstag", mothers:"Muttertag", fathers:"Vatertag", graduation:"Abschluss", wedding:"Hochzeit", anniversary:"Jahrestag", housewarming:"Einzug", baby:"Babyparty", justbecause:"Einfach so", other:"Andere" },
     occFallback:"diesen Anlass",
-    rel:["Partner","Elternteil","Geschwister","Freund/in","Beste/r Freund/in","Kind","Großelternteil","Kollege","Jemand anderes"],
+    rel:["Partner/in","Familie","Freunde","Kollegen","Andere"],
     intr:["Kochen","Reisen","Fitness","Lesen","Gaming","Musik","Kunst & Design","Tech","Mode","Outdoor","Kaffee","Wellness","Zuhause","Fotografie"],
     deepDive: { 2: {
       detailQ: "Welchen Sport macht er/sie?", detailPlaceholder: "Laufen, Fitnessstudio/Gewichte, Yoga, Radfahren, Schwimmen, Crossfit…",
@@ -515,18 +520,19 @@ const TR: Record<TKey, Tr> = {
     disclaimerAmazon:"Als Amazon-Partner erhält Gifty Provisionen von qualifizierten Käufen.", disclaimerPrice:"Preise und Verfügbarkeit können sich ändern.",
   },
   es: {
-    nav:["Inicio","Historial","Favoritos","Contacto"],
+    nav:["Inicio","Favoritos"],
     h1a:"El regalo perfecto,", h1b:"encontrado para ti.",
     intro:"Responde unas preguntas rápidas y Gifty — tu concierge personal — encontrará el regalo perfecto para ti.",
     bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Personalizado a fondo según sus gustos",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
-    stepNames:["¿Para quién?","La ocasión","El destinatario y presupuesto","Sus intereses","Vamos al detalle"],
+    stepNames:["¿Para quién?","La ocasión","El destinatario","Presupuesto e intereses","Vamos al detalle"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["¿Para quién buscamos un regalo?",`Perfecto. ¿Cuál es la ocasión para ${n}?`,`¿Y quién es ${n} para ti — qué edad tiene más o menos, y cuál es tu presupuesto?`,`¿Qué le gusta a ${n}? Elige todo lo que encaje.`,"Vamos a entrar un poco más en detalle — marca una gran diferencia."],
+    msgs:(n)=>["¿Para quién buscamos un regalo?","¿Cuál es la ocasión?","¿Y su género, qué edad tiene más o menos?","¿Cuál es tu presupuesto, y qué le gusta?","Vamos a entrar un poco más en detalle — marca una gran diferencia."],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
-    relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?",
+    relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?", genderQ:"Género",
     yrs:"años",
+    genderOpts:["Hombre","Mujer","Prefiero no decirlo"],
     otherLabel:"Otro…", customPlaceholder:"ej. Fórmula 1, yoga, vino, coches clásicos…",
     pickAtLeast:"Elige al menos uno", selectedWord:"seleccionados",
     budgetTitle:"Presupuesto",
@@ -551,7 +557,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Enviar mensaje", sentTitle:"Mensaje enviado", sentSub:"Gracias por escribirnos — te responderemos pronto.", sendAnother:"Enviar otro", orEmail:"O escríbenos a",
     occ:{ birthday:"Cumpleaños", christmas:"Navidad", valentine:"San Valentín", mothers:"Día de la Madre", fathers:"Día del Padre", graduation:"Graduación", wedding:"Boda", anniversary:"Aniversario", housewarming:"Inauguración", baby:"Baby shower", justbecause:"Porque sí", other:"Otro" },
     occFallback:"esta ocasión",
-    rel:["Pareja","Padre/Madre","Hermano/a","Amigo/a","Mejor amigo/a","Hijo/a","Abuelo/a","Colega","Alguien más"],
+    rel:["Pareja","Familia","Amigos","Colegas","Otro"],
     intr:["Cocina","Viajes","Fitness","Lectura","Videojuegos","Música","Arte y Diseño","Tech","Moda","Aire libre","Café","Bienestar","Hogar","Fotografía"],
     deepDive: { 2: {
       detailQ: "¿Qué deporte practica?", detailPlaceholder: "correr, gimnasio/pesas, yoga, ciclismo, natación, crossfit…",
@@ -568,18 +574,19 @@ const TR: Record<TKey, Tr> = {
     disclaimerAmazon:"Como afiliado de Amazon, Gifty recibe compensaciones por compras elegibles.", disclaimerPrice:"Precios y disponibilidad sujetos a cambios.",
   },
   pt: {
-    nav:["Início","Histórico","Favoritos","Contato"],
+    nav:["Início","Favoritos"],
     h1a:"O presente perfeito,", h1b:"encontrado para você.",
     intro:"Responda a algumas perguntas rápidas e Gifty — o seu concierge pessoal — encontrará o presente perfeito para você.",
     bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Personalizado ao detalhe para os seus gostos",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
-    stepNames:["Para quem?","A ocasião","O destinatário e orçamento","Os interesses","Vamos ao detalhe"],
+    stepNames:["Para quem?","A ocasião","O destinatário","Orçamento e interesses","Vamos ao detalhe"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Para quem procuramos um presente?",`Certo. Qual é a ocasião para ${n}?`,`E quem é ${n} para você — que idade tem mais ou menos, e qual é o seu orçamento?`,`Do que ${n} gosta? Escolha tudo o que combina.`,"Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
+    msgs:(n)=>["Para quem procuramos um presente?","Qual é a ocasião?","E o género, que idade tem mais ou menos?","Qual é o seu orçamento, e do que gosta?","Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
-    relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?",
+    relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?", genderQ:"Género",
     yrs:"anos",
+    genderOpts:["Homem","Mulher","Prefiro não dizer"],
     otherLabel:"Outro…", customPlaceholder:"ex. Fórmula 1, yoga, vinho, carros vintage…",
     pickAtLeast:"Escolha pelo menos um", selectedWord:"selecionados",
     budgetTitle:"Orçamento",
@@ -604,7 +611,7 @@ const TR: Record<TKey, Tr> = {
     sendMsg:"Enviar mensagem", sentTitle:"Mensagem enviada", sentSub:"Obrigado por entrar em contacto — respondemos em breve.", sendAnother:"Enviar outra", orEmail:"Ou escreva-nos para",
     occ:{ birthday:"Aniversário", christmas:"Natal", valentine:"Dia dos Namorados", mothers:"Dia da Mãe", fathers:"Dia do Pai", graduation:"Formatura", wedding:"Casamento", anniversary:"Aniversário de casal", housewarming:"Inauguração de casa", baby:"Chá de bebé", justbecause:"Sem motivo", other:"Outro" },
     occFallback:"esta ocasião",
-    rel:["Parceiro/a","Pai / Mãe","Irmão/ã","Amigo/a","Melhor amigo/a","Filho/a","Avô / Avó","Colega","Outra pessoa"],
+    rel:["Parceiro/a","Família","Amigos","Colegas","Outro"],
     intr:["Culinária","Viagens","Fitness","Leitura","Gaming","Música","Arte & Design","Tech","Moda","Ao ar livre","Café","Bem-estar","Casa","Fotografia"],
     deepDive: { 2: {
       detailQ: "Que desporto pratica?", detailPlaceholder: "corrida, ginásio/pesos, yoga, ciclismo, natação, crossfit…",
@@ -668,6 +675,8 @@ interface Gathered {
   recipientName: string;
   occasion: string | null;
   relationship: string;
+  showOtherRel: boolean;
+  gender: string;
   age: number;
   interests: string[];
   customInterest: string;
@@ -678,7 +687,7 @@ interface Gathered {
 }
 
 const EMPTY: Gathered = {
-  recipientName:"", occasion:null, relationship:"", age:30,
+  recipientName:"", occasion:null, relationship:"", showOtherRel:false, gender:"", age:30,
   interests:[], customInterest:"", showOther:false, budget:75, details:"", interestDeepDive:{},
 };
 
@@ -1124,7 +1133,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
 }
 
 export default function Home() {
-  const [view,        setView]        = useState<"app"|"history"|"favorites"|"contact">("app");
+  const [view,        setView]        = useState<"app"|"favorites">("app");
   const [screen,      setScreen]      = useState<"intake"|"loading"|"results">("intake");
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
@@ -1238,9 +1247,9 @@ export default function Home() {
 
   /* ── Navigation ── */
   function canContinue() {
-    if (step === 0) return g.recipientName.trim().length > 0;
+    if (step === 0) return g.relationship.trim().length > 0;
     if (step === 1) return !!g.occasion;
-    if (step === 2) return !!g.relationship;
+    if (step === 2) return true;
     if (step === 3) return g.interests.length > 0 || g.customInterest.trim().length > 0;
     return true;
   }
@@ -1277,6 +1286,7 @@ export default function Home() {
       name: g.recipientName || "",
       age: fmtAge(g.age),
       relation: g.relationship,
+      gender: g.gender,
       occasion: occLabel,
       interests: [...g.interests, ...(g.customInterest.trim() ? [g.customInterest.trim()] : [])].join(", "),
       budgetMin, budgetMax,
@@ -1467,9 +1477,7 @@ export default function Home() {
 
   /* ─────────────────────────────── RENDER ─────────────────────── */
   const showApp       = view === "app";
-  const showHistory   = view === "history";
   const showFavorites = view === "favorites";
-  const showContact   = view === "contact";
 
   /* ── Loading screen ── */
   if (!authLoaded) {
@@ -1688,9 +1696,9 @@ export default function Home() {
           <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
             <nav style={{ display:"flex", alignItems:"center", gap:2, marginRight:6, flexShrink:0 }}>
               {tr.nav.map((label, i) => {
-                const views: Array<"app"|"history"|"favorites"|"contact"> = ["app","history","favorites","contact"];
+                const views: Array<"app"|"favorites"> = ["app","favorites"];
                 const active = view === views[i];
-                const isFavsTab = i === 2;
+                const isFavsTab = i === 1;
                 return (
                   <button key={label} onClick={() => setView(views[i])}
                     style={{ display:"flex", alignItems:"center", padding:"8px 14px", borderRadius:999, border:"none", background: active ? C.goldS : "transparent", color: active ? C.maroon : C.muted4, font:`${active?600:500} 13.5px ${BODY}`, cursor:"pointer", transition:"all .15s" }}>
@@ -1757,24 +1765,31 @@ export default function Home() {
                     <div style={{ flexShrink:0, width:46, height:46, borderRadius:"50%", background:"linear-gradient(140deg,#7c3f3f,#a8694a)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f3e7d8", fontFamily:DISPLAY, fontWeight:600, fontSize:19, boxShadow:"0 4px 12px rgba(124,63,63,.25)" }}>G</div>
                     <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:"4px 18px 18px 18px", padding:"15px 19px", boxShadow:"0 2px 10px rgba(124,63,63,.05)" }}>
                       <div style={{ fontSize:12, fontWeight:600, color:C.gold, letterSpacing:".03em", marginBottom:3 }}>{tr.conciergeLabel}</div>
-                      <div style={{ fontSize:17, lineHeight:1.45, color:C.body, fontWeight:500 }}>{tr.msgs(g.recipientName || "them")[step]}</div>
+                      <div style={{ fontSize:17, lineHeight:1.45, color:C.body, fontWeight:500 }}>{tr.msgs("")[step]}</div>
                     </div>
                   </div>
 
                   {/* Step content */}
                   <div key={`content-${stepKey}`} className="gc-fade" style={{ flex:1 }}>
 
-                    {/* Step 0 — Name */}
+                    {/* Step 0 — Relationship */}
                     {step === 0 && (
                       <div>
-                        <input
-                          type="text" autoFocus
-                          value={g.recipientName}
-                          onChange={e => setG(p => ({ ...p, recipientName: e.target.value }))}
-                          onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
-                          placeholder={tr.namePlaceholder}
-                          style={{ width:"100%", padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
-                        />
+                        <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
+                          {tr.rel.map((r, i) => (
+                            <button key={i} onClick={() => setG(p => ({ ...p, relationship: r, showOtherRel: r === tr.rel[tr.rel.length - 1] }))} style={chipSt(g.relationship === r || (g.showOtherRel && r === tr.rel[tr.rel.length - 1]))}>{r}</button>
+                          ))}
+                        </div>
+                        {g.showOtherRel && (
+                          <input
+                            type="text" autoFocus
+                            value={g.relationship === tr.rel[tr.rel.length - 1] ? "" : g.relationship}
+                            onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
+                            onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
+                            placeholder={tr.customPlaceholder}
+                            style={{ width:"100%", marginTop:14, padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
+                          />
+                        )}
                       </div>
                     )}
 
@@ -1790,13 +1805,13 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Step 2 — Relationship + Age */}
+                    {/* Step 2 — Gender + Age */}
                     {step === 2 && (
                       <div>
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.relTitle}</div>
+                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.genderQ}</div>
                         <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:30 }}>
-                          {tr.rel.map((r, i) => (
-                            <button key={i} onClick={() => setG(p => ({ ...p, relationship: r }))} style={chipSt(g.relationship === r)}>{r}</button>
+                          {tr.genderOpts.map((opt, i) => (
+                            <button key={i} onClick={() => setG(p => ({ ...p, gender: opt }))} style={chipSt(g.gender === opt)}>{opt}</button>
                           ))}
                         </div>
                         <div style={{ marginBottom:12 }}>
@@ -1811,7 +1826,13 @@ export default function Home() {
                           style={{ width:120, padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:DISPLAY, fontWeight:600, fontSize:18, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
                         />
                         <span style={{ marginLeft:10, fontSize:14, color:C.muted2 }}>{tr.yrs}</span>
-                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", margin:"26px 0 12px" }}>
+                      </div>
+                    )}
+
+                    {/* Step 3 — Budget + Interests */}
+                    {step === 3 && (
+                      <div>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:12 }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.budgetTitle}</span>
                           <span style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:22, color:C.maroon }}>{fmtBudget(g.budget, sym)}</span>
                         </div>
@@ -1820,18 +1841,16 @@ export default function Home() {
                           style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${((g.budget-10)/490)*100}%,#e3d4c2 ${((g.budget-10)/490)*100}%)` }}
                         />
                         {/* Tick labels positioned at exact % matching the linear 10-500 scale */}
-                        <div style={{ position:"relative", height:18, marginTop:5 }}>
+                        <div style={{ position:"relative", height:18, marginTop:5, marginBottom:30 }}>
                           {([10,100,250,500] as const).map(v => (
                             <span key={v} style={{ position:"absolute", left:`${((v-10)/490)*100}%`, transform:"translateX(-50%)", fontSize:12, color:C.muted2, whiteSpace:"nowrap" as const }}>
                               {v === 500 ? `${sym}500+` : `${sym}${v}`}
                             </span>
                           ))}
                         </div>
+                        <InterestsStep g={g} setG={setG} tr={tr} />
                       </div>
                     )}
-
-                    {/* Step 3 — Interests */}
-                    {step === 3 && <InterestsStep g={g} setG={setG} tr={tr} />}
 
                     {/* Step 4 — Interest deep-dive (final step) */}
                     {step === 4 && <InterestDeepDiveStep g={g} setG={setG} tr={tr} />}
@@ -1926,41 +1945,6 @@ export default function Home() {
             </>
           )}
 
-          {/* ══ HISTORY ══ */}
-          {showHistory && (
-            <div className="gc-fade" style={{ maxWidth:760, width:"100%", margin:"0 auto" }}>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:30, lineHeight:1.12, color:C.ink, margin:"0 0 6px", letterSpacing:"-.02em" }}>{tr.histTitle}</h2>
-              <p style={{ fontSize:15.5, color:C.muted, margin:"0 0 26px" }}>{tr.histSub}</p>
-
-              {history.length > 0 ? (
-                <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                  {history.map(h => (
-                    <div key={h.id} style={{ display:"flex", alignItems:"center", gap:16, background:"#fff", border:`1px solid ${C.border}`, borderRadius:16, padding:"16px 18px", boxShadow:"0 2px 10px rgba(124,63,63,.04)" }}>
-                      <div style={{ flexShrink:0, width:48, height:48, borderRadius:13, background:C.goldS, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{h.emoji}</div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:17, color:C.ink }}>{tr.histRow(h.name, tr.occ[h.occId] ?? h.occId)}</div>
-                        <div style={{ fontSize:13, color:C.muted2, marginTop:2 }}>{h.count} {tr.giftsWord} · {tr.budgetWord} {fmtBudget(h.budgetVal, sym)} · {whenLabel(h.when)}</div>
-                      </div>
-                      <button onClick={() => { setViewedEntry(h); setScreen("results"); setView("app"); }}
-                        style={{ flexShrink:0, padding:"9px 16px", borderRadius:10, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.maroon, font:`600 13.5px ${BODY}`, cursor:"pointer" }}>
-                        {tr.viewResults}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", border:`1px dashed ${C.bord3}`, borderRadius:18 }}>
-                  <div style={{ fontSize:38, marginBottom:12 }}>🔍</div>
-                  <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:19, color:C.ink, marginBottom:6 }}>{tr.histEmptyTitle}</div>
-                  <p style={{ fontSize:14, color:C.muted, margin:"0 0 20px" }}>{tr.histEmptySub}</p>
-                  <button onClick={() => setView("app")} style={{ padding:"12px 22px", borderRadius:12, border:"none", background:C.maroon, color:"#fff", font:`600 14.5px ${BODY}`, cursor:"pointer" }}>
-                    {tr.startSearch}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* ══ FAVORITES ══ */}
           {showFavorites && (
             <div className="gc-fade" style={{ maxWidth:980, width:"100%", margin:"0 auto" }}>
@@ -1979,53 +1963,6 @@ export default function Home() {
                   <button onClick={() => setView("app")} style={{ padding:"12px 22px", borderRadius:12, border:"none", background:C.maroon, color:"#fff", font:`600 14.5px ${BODY}`, cursor:"pointer" }}>
                     {tr.findGiftsBtn}
                   </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ══ CONTACT ══ */}
-          {showContact && (
-            <div className="gc-fade" style={{ maxWidth:560, width:"100%", margin:"0 auto" }}>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:30, lineHeight:1.12, color:C.ink, margin:"0 0 6px", letterSpacing:"-.02em" }}>{tr.contactTitle}</h2>
-              <p style={{ fontSize:15.5, color:C.muted, margin:"0 0 26px" }}>{tr.contactSub}</p>
-
-              {contactSent ? (
-                <div style={{ textAlign:"center", padding:"50px 24px", background:"#fff", border:`1px solid ${C.border}`, borderRadius:18, boxShadow:"0 4px 18px rgba(124,63,63,.06)" }}>
-                  <div style={{ width:56, height:56, borderRadius:"50%", background:C.goldS, color:C.maroon, fontSize:26, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px" }}>✓</div>
-                  <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:20, color:C.ink, marginBottom:6 }}>{tr.sentTitle}</div>
-                  <p style={{ fontSize:14.5, color:C.muted, margin:"0 0 22px" }}>{tr.sentSub}</p>
-                  <button onClick={() => { setContactSent(false); setCName(""); setCEmail(""); setCMsg(""); }}
-                    style={{ padding:"11px 20px", borderRadius:11, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.maroon, font:`600 14px ${BODY}`, cursor:"pointer" }}>
-                    {tr.sendAnother}
-                  </button>
-                </div>
-              ) : (
-                <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:18, padding:26, boxShadow:"0 4px 18px rgba(124,63,63,.06)", display:"flex", flexDirection:"column", gap:16 }}>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:600, color:C.label, marginBottom:7 }}>{tr.yourName}</div>
-                    <input type="text" value={cName} onChange={e => setCName(e.target.value)} placeholder={tr.namePh}
-                      style={{ width:"100%", padding:"12px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontSize:15, color:C.body, background:"#fff", boxSizing:"border-box" as const }} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:600, color:C.label, marginBottom:7 }}>{tr.email}</div>
-                    <input type="email" value={cEmail} onChange={e => setCEmail(e.target.value)} placeholder="you@email.com"
-                      style={{ width:"100%", padding:"12px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontSize:15, color:C.body, background:"#fff", boxSizing:"border-box" as const }} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize:13, fontWeight:600, color:C.label, marginBottom:7 }}>{tr.help}</div>
-                    <textarea value={cMsg} onChange={e => setCMsg(e.target.value)} placeholder={tr.msgPh}
-                      style={{ width:"100%", minHeight:120, resize:"vertical", padding:"13px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontSize:15, lineHeight:1.5, color:C.body, background:"#fff", boxSizing:"border-box" as const }} />
-                  </div>
-                  <button
-                    disabled={!cName.trim() || !cEmail.trim() || !cMsg.trim()}
-                    onClick={() => setContactSent(true)}
-                    style={cName.trim() && cEmail.trim() && cMsg.trim() ? btnPrimary : btnDisabled}>
-                    {tr.sendMsg}
-                  </button>
-                  <div style={{ display:"flex", alignItems:"center", gap:8, fontSize:13, color:C.muted, paddingTop:4, borderTop:`1px solid #f0e8de` }}>
-                    <span style={{ color:C.gold }}>✉</span> {tr.orEmail} <strong style={{ color:C.maroon }}>hello@gifty.app</strong>
-                  </div>
                 </div>
               )}
             </div>

@@ -86,6 +86,7 @@ ${localeSection}
 RECIPIENT PROFILE:
 - Name: ${recipient.name || "the recipient"}
 - Age: ${recipient.age || "unknown"}
+- Gender: ${recipient.gender || "not specified"}
 - Relation to giver: ${recipient.relation || "unspecified"}
 - Occasion: ${recipient.occasion || "general gift"}
 - Interests & hobbies: ${recipient.interests || "not specified"}

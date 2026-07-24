@@ -34,6 +34,7 @@ export interface RecipientProfile {
   name: string;
   age: string;
   relation: string;
+  gender?: string;
   occasion: string;
   interests: string;
   budgetMin: number;
