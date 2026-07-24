@@ -965,8 +965,11 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
 
   return (
     <div style={{ display:"flex", minHeight:"100vh", fontFamily: BODY }}>
+      <style suppressHydrationWarning>{`
+        @media(max-width:700px){.gc-authbrand{display:none!important}.gc-authmain{padding:40px 20px!important}}
+      `}</style>
       {/* ── LEFT PANEL ── */}
-      <aside style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"52px 46px", position:"relative", overflow:"hidden" }}>
+      <aside className="gc-authbrand" style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"52px 46px", position:"relative", overflow:"hidden" }}>
         {/* logo */}
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <div style={{ width:90, height:90, borderRadius:24, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
@@ -1017,7 +1020,7 @@ function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
       </aside>
 
       {/* ── RIGHT PANEL ── */}
-      <main style={{ flex:1, background: C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 40px", position:"relative" }}>
+      <main className="gc-authmain" style={{ flex:1, background: C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 40px", position:"relative" }}>
         {/* Language picker top-right */}
         <div style={{ position:"absolute", top:20, right:24 }}>
           <select
@@ -1566,7 +1569,13 @@ export default function Home() {
         .gc-tip:hover .gc-tip-box{opacity:1;transform:translateY(0)}
         .gc-tip-badge{width:30px;height:30px;border-radius:50%;border:1.5px solid #d8c4b0;background:#fff;color:#7c3f3f;font-size:14px;cursor:default;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,63,63,.12);transition:border-color .15s,box-shadow .15s}
         .gc-tip:hover .gc-tip-badge{border-color:#7c3f3f;box-shadow:0 4px 14px rgba(124,63,63,.22)}
-        @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}}
+        @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
+          .gc-topnav{flex-wrap:nowrap!important}
+          .gc-topnav nav{flex:1 1 auto;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start!important}
+          .gc-topnav nav::-webkit-scrollbar{display:none}
+          .gc-topnav button{white-space:nowrap}
+          .gc-topnav > div{flex-shrink:0}
+        }
       `}</style>
 
       <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
@@ -1676,8 +1685,8 @@ export default function Home() {
         <main className="gc-main" style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", height:"100vh" }}>
 
           {/* Top nav */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
-            <nav style={{ display:"flex", alignItems:"center", gap:2, marginRight:6 }}>
+          <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
+            <nav style={{ display:"flex", alignItems:"center", gap:2, marginRight:6, flexShrink:0 }}>
               {tr.nav.map((label, i) => {
                 const views: Array<"app"|"history"|"favorites"|"contact"> = ["app","history","favorites","contact"];
                 const active = view === views[i];
