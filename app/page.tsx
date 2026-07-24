@@ -107,6 +107,8 @@ interface Tr {
   relTitle: string; ageQ: string; genderQ: string;
   yrs: string;
   genderOpts: string[];
+  relOtherPlaceholder: string;
+  occQ: string; occPlaceholder: string;
   otherLabel: string; customPlaceholder: string;
   pickAtLeast: string; selectedWord: string;
   budgetTitle: string;
@@ -150,13 +152,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Free · No account · ~2 minutes", bBudget:"Every budget, every occasion", bSocial:"Deeply personalised to their tastes",
     proofPre:"Loved by", proofPost:"thoughtful gifters",
     stepWord:"Step", ofWord:"of",
-    stepNames:["Who are we gifting?","The occasion","The recipient","Budget & interests","Let's get specific"],
+    stepNames:["The recipient","Budget & occasion","Interests","Let's get specific"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Who are we finding a gift for?","What's the occasion?","And their gender, and roughly how old are they?","What's your budget, and what are they into?","Let's get a bit more specific — this makes a huge difference."],
+    msgs:(n)=>["Who are we finding a gift for?","What's your budget, and for what occasion?","What are they into?","Let's get a bit more specific — this makes a huge difference."],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
-    relTitle:"Your relationship", ageQ:"Roughly how old are they?", genderQ:"Gender",
+    relTitle:"Your relationship", ageQ:"How old are they?", genderQ:"Gender",
     yrs:"yrs",
-    genderOpts:["Man","Woman","Prefer not to say"],
+    genderOpts:["Man","Woman","Neutral"],
+    relOtherPlaceholder:"e.g. Best friend, Grandparents…",
+    occQ:"What's the occasion?", occPlaceholder:"e.g. Birthday, Christmas, Valentine's Day…",
     otherLabel:"Other…", customPlaceholder:"e.g. Formula 1, yoga, wine, vintage cars…",
     pickAtLeast:"Pick at least one", selectedWord:"selected",
     budgetTitle:"Budget",
@@ -284,13 +288,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Nessun account · ~2 minuti", bBudget:"Ogni budget, ogni occasione", bSocial:"Personalizzato a fondo sui suoi gusti",
     proofPre:"Amato da", proofPost:"gifter premurosi",
     stepWord:"Passo", ofWord:"di",
-    stepNames:["Per chi è il regalo?","L'occasione","Il destinatario","Budget e interessi","Entriamo nel dettaglio"],
+    stepNames:["Il destinatario","Budget e occasione","Interessi","Entriamo nel dettaglio"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Per chi stai cercando un regalo?","Qual è l'occasione?","E il genere, quanti anni ha più o meno?","Qual è il tuo budget, e cosa gli/le piace?","Entriamo un po' più nel dettaglio — fa una grande differenza."],
+    msgs:(n)=>["Per chi stai cercando un regalo?","Qual è il tuo budget, e per quale occasione?","Cosa gli/le piace?","Entriamo un po' più nel dettaglio — fa una grande differenza."],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
-    relTitle:"La tua relazione", ageQ:"Quanti anni ha più o meno?", genderQ:"Genere",
+    relTitle:"La tua relazione", ageQ:"Quanti anni ha?", genderQ:"Genere",
     yrs:"anni",
-    genderOpts:["Uomo","Donna","Non specificato"],
+    genderOpts:["Uomo","Donna","Neutrale"],
+    relOtherPlaceholder:"es. Migliore amico/a, Nonni…",
+    occQ:"Qual è l'occasione?", occPlaceholder:"es. Compleanno, Natale, San Valentino…",
     otherLabel:"Altro…", customPlaceholder:"es. Formula 1, yoga, vino, auto d'epoca…",
     pickAtLeast:"Scegline almeno uno", selectedWord:"selezionati",
     budgetTitle:"Budget",
@@ -418,13 +424,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratuit · Sans compte · ~2 minutes", bBudget:"Tous les budgets, toutes les occasions", bSocial:"Personnalisé selon ses goûts",
     proofPre:"Adoré par", proofPost:"offreurs attentionnés",
     stepWord:"Étape", ofWord:"sur",
-    stepNames:["Pour qui ?","L'occasion","Le destinataire","Budget et centres d'intérêt","Entrons dans le détail"],
+    stepNames:["Le destinataire","Budget et occasion","Centres d'intérêt","Entrons dans le détail"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?","Quelle est l'occasion ?","Et son genre, quel âge a-t-il environ ?","Quel est votre budget, et qu'est-ce qui lui plaît ?","Entrons un peu plus dans le détail — ça fait une grande différence."],
+    msgs:(n)=>["Pour qui cherchons-nous un cadeau ?","Quel est votre budget, et pour quelle occasion ?","Qu'est-ce qui lui plaît ?","Entrons un peu plus dans le détail — ça fait une grande différence."],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
-    relTitle:"Votre relation", ageQ:"Quel âge a-t-il environ ?", genderQ:"Genre",
+    relTitle:"Votre relation", ageQ:"Quel âge a-t-il ?", genderQ:"Genre",
     yrs:"ans",
-    genderOpts:["Homme","Femme","Ne pas préciser"],
+    genderOpts:["Homme","Femme","Neutre"],
+    relOtherPlaceholder:"ex. Meilleur(e) ami(e), Grands-parents…",
+    occQ:"Quelle est l'occasion ?", occPlaceholder:"ex. Anniversaire, Noël, Saint-Valentin…",
     otherLabel:"Autre…", customPlaceholder:"ex. Formule 1, yoga, vin, voitures vintage…",
     pickAtLeast:"Choisissez-en au moins un", selectedWord:"sélectionné(s)",
     budgetTitle:"Budget",
@@ -472,13 +480,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Kostenlos · Kein Konto · ~2 Minuten", bBudget:"Jedes Budget, jeder Anlass", bSocial:"Tief auf ihren Geschmack zugeschnitten",
     proofPre:"Geliebt von", proofPost:"aufmerksamen Schenkern",
     stepWord:"Schritt", ofWord:"von",
-    stepNames:["Für wen?","Der Anlass","Die Person","Budget & Interessen","Ins Detail gehen"],
+    stepNames:["Die Person","Budget & Anlass","Interessen","Ins Detail gehen"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Für wen suchen wir ein Geschenk?","Was ist der Anlass?","Und Geschlecht, wie alt ungefähr?","Was ist dein Budget, und worauf steht die Person?","Lass uns etwas genauer werden — das macht einen großen Unterschied."],
+    msgs:(n)=>["Für wen suchen wir ein Geschenk?","Was ist dein Budget, und für welchen Anlass?","Worauf steht die Person?","Lass uns etwas genauer werden — das macht einen großen Unterschied."],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
-    relTitle:"Deine Beziehung", ageQ:"Wie alt ungefähr?", genderQ:"Geschlecht",
+    relTitle:"Deine Beziehung", ageQ:"Wie alt ist die Person?", genderQ:"Geschlecht",
     yrs:"J.",
-    genderOpts:["Mann","Frau","Keine Angabe"],
+    genderOpts:["Mann","Frau","Neutral"],
+    relOtherPlaceholder:"z.B. Beste/r Freund/in, Großeltern…",
+    occQ:"Was ist der Anlass?", occPlaceholder:"z.B. Geburtstag, Weihnachten, Valentinstag…",
     otherLabel:"Anderes…", customPlaceholder:"z.B. Formel 1, Yoga, Wein, Oldtimer…",
     pickAtLeast:"Wähle mindestens eins", selectedWord:"ausgewählt",
     budgetTitle:"Budget",
@@ -526,13 +536,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Gratis · Sin cuenta · ~2 minutos", bBudget:"Cada presupuesto, cada ocasión", bSocial:"Personalizado a fondo según sus gustos",
     proofPre:"Amado por", proofPost:"regaladores atentos",
     stepWord:"Paso", ofWord:"de",
-    stepNames:["¿Para quién?","La ocasión","El destinatario","Presupuesto e intereses","Vamos al detalle"],
+    stepNames:["El destinatario","Presupuesto y ocasión","Intereses","Vamos al detalle"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["¿Para quién buscamos un regalo?","¿Cuál es la ocasión?","¿Y su género, qué edad tiene más o menos?","¿Cuál es tu presupuesto, y qué le gusta?","Vamos a entrar un poco más en detalle — marca una gran diferencia."],
+    msgs:(n)=>["¿Para quién buscamos un regalo?","¿Cuál es tu presupuesto, y para qué ocasión?","¿Qué le gusta?","Vamos a entrar un poco más en detalle — marca una gran diferencia."],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
-    relTitle:"Tu relación", ageQ:"¿Qué edad tiene más o menos?", genderQ:"Género",
+    relTitle:"Tu relación", ageQ:"¿Qué edad tiene?", genderQ:"Género",
     yrs:"años",
-    genderOpts:["Hombre","Mujer","Prefiero no decirlo"],
+    genderOpts:["Hombre","Mujer","Neutral"],
+    relOtherPlaceholder:"ej. Mejor amigo/a, Abuelos…",
+    occQ:"¿Cuál es la ocasión?", occPlaceholder:"ej. Cumpleaños, Navidad, San Valentín…",
     otherLabel:"Otro…", customPlaceholder:"ej. Fórmula 1, yoga, vino, coches clásicos…",
     pickAtLeast:"Elige al menos uno", selectedWord:"seleccionados",
     budgetTitle:"Presupuesto",
@@ -580,13 +592,15 @@ const TR: Record<TKey, Tr> = {
     bFree:"Grátis · Sem conta · ~2 minutos", bBudget:"Cada orçamento, cada ocasião", bSocial:"Personalizado ao detalhe para os seus gostos",
     proofPre:"Amado por", proofPost:"presenteadores atentos",
     stepWord:"Passo", ofWord:"de",
-    stepNames:["Para quem?","A ocasião","O destinatário","Orçamento e interesses","Vamos ao detalhe"],
+    stepNames:["O destinatário","Orçamento e ocasião","Interesses","Vamos ao detalhe"],
     conciergeLabel:"GIFTY",
-    msgs:(n)=>["Para quem procuramos um presente?","Qual é a ocasião?","E o género, que idade tem mais ou menos?","Qual é o seu orçamento, e do que gosta?","Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
+    msgs:(n)=>["Para quem procuramos um presente?","Qual é o seu orçamento, e para que ocasião?","Do que gosta?","Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
-    relTitle:"A sua relação", ageQ:"Que idade tem mais ou menos?", genderQ:"Género",
+    relTitle:"A sua relação", ageQ:"Que idade tem?", genderQ:"Género",
     yrs:"anos",
-    genderOpts:["Homem","Mulher","Prefiro não dizer"],
+    genderOpts:["Homem","Mulher","Neutro"],
+    relOtherPlaceholder:"ex. Melhor amigo/a, Avós…",
+    occQ:"Qual é a ocasião?", occPlaceholder:"ex. Aniversário, Natal, Dia dos Namorados…",
     otherLabel:"Outro…", customPlaceholder:"ex. Fórmula 1, yoga, vinho, carros vintage…",
     pickAtLeast:"Escolha pelo menos um", selectedWord:"selecionados",
     budgetTitle:"Orçamento",
@@ -1248,9 +1262,8 @@ export default function Home() {
   /* ── Navigation ── */
   function canContinue() {
     if (step === 0) return g.relationship.trim().length > 0;
-    if (step === 1) return !!g.occasion;
-    if (step === 2) return true;
-    if (step === 3) return g.interests.length > 0 || g.customInterest.trim().length > 0;
+    if (step === 1) return !!g.occasion && g.occasion.trim().length > 0;
+    if (step === 2) return g.interests.length > 0 || g.customInterest.trim().length > 0;
     return true;
   }
   function hasInterestDeepDive() {
@@ -1260,10 +1273,10 @@ export default function Home() {
     });
   }
   function advance() {
-    // Step 4 (interest deep-dive) is the last step; if none of the chosen
-    // interests have a deep-dive config, step 3 is effectively the last one.
-    if (step === 3 && !hasInterestDeepDive()) { fireRequest(); return; }
-    if (step < 4) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest();
+    // Step 3 (interest deep-dive) is the last step; if none of the chosen
+    // interests have a deep-dive config, step 2 is effectively the last one.
+    if (step === 2 && !hasInterestDeepDive()) { fireRequest(); return; }
+    if (step < 3) { setStep(s => s + 1); setStepKey(k => k + 1); } else fireRequest();
   }
   function goBack() {
     setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1);
@@ -1752,7 +1765,7 @@ export default function Home() {
                   {/* Progress */}
                   <div style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
-                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 5</span>
+                      <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 4</span>
                       <span style={{ fontSize:13, color:C.muted2 }}>{tr.stepNames[step]}</span>
                     </div>
                     <div style={{ height:6, background:C.bord3, borderRadius:999, overflow:"hidden" }}>
@@ -1772,7 +1785,7 @@ export default function Home() {
                   {/* Step content */}
                   <div key={`content-${stepKey}`} className="gc-fade" style={{ flex:1 }}>
 
-                    {/* Step 0 — Relationship */}
+                    {/* Step 0 — Relationship + Gender + Age */}
                     {step === 0 && (
                       <div>
                         <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
@@ -1786,29 +1799,11 @@ export default function Home() {
                             value={g.relationship === tr.rel[tr.rel.length - 1] ? "" : g.relationship}
                             onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
                             onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
-                            placeholder={tr.customPlaceholder}
+                            placeholder={tr.relOtherPlaceholder}
                             style={{ width:"100%", marginTop:14, padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
                           />
                         )}
-                      </div>
-                    )}
-
-                    {/* Step 1 — Occasion */}
-                    {step === 1 && (
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:11 }}>
-                        {OCC_IDS.map(id => (
-                          <button key={id} onClick={() => setG(p => ({ ...p, occasion: id }))} style={tileSt(g.occasion === id)}>
-                            <span style={{ fontSize:24 }}>{OCC_EMOJI[id]}</span>
-                            <span>{tr.occ[id]}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Step 2 — Gender + Age */}
-                    {step === 2 && (
-                      <div>
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.genderQ}</div>
+                        <div style={{ fontSize:14, fontWeight:600, color:C.label, margin:"30px 0 11px" }}>{tr.genderQ}</div>
                         <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:30 }}>
                           {tr.genderOpts.map((opt, i) => (
                             <button key={i} onClick={() => setG(p => ({ ...p, gender: opt }))} style={chipSt(g.gender === opt)}>{opt}</button>
@@ -1829,8 +1824,8 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Step 3 — Budget + Interests */}
-                    {step === 3 && (
+                    {/* Step 1 — Budget + Occasion */}
+                    {step === 1 && (
                       <div>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:12 }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.budgetTitle}</span>
@@ -1848,12 +1843,25 @@ export default function Home() {
                             </span>
                           ))}
                         </div>
-                        <InterestsStep g={g} setG={setG} tr={tr} />
+                        <div style={{ marginBottom:12 }}>
+                          <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.occQ}</span>
+                        </div>
+                        <input
+                          type="text" autoFocus
+                          value={g.occasion ?? ""}
+                          onChange={e => setG(p => ({ ...p, occasion: e.target.value }))}
+                          onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
+                          placeholder={tr.occPlaceholder}
+                          style={{ width:"100%", padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
+                        />
                       </div>
                     )}
 
-                    {/* Step 4 — Interest deep-dive (final step) */}
-                    {step === 4 && <InterestDeepDiveStep g={g} setG={setG} tr={tr} />}
+                    {/* Step 2 — Interests */}
+                    {step === 2 && <InterestsStep g={g} setG={setG} tr={tr} />}
+
+                    {/* Step 3 — Interest deep-dive (final step) */}
+                    {step === 3 && <InterestDeepDiveStep g={g} setG={setG} tr={tr} />}
                   </div>
 
                   {/* Nav */}
@@ -1865,7 +1873,7 @@ export default function Home() {
                     )}
                     <div style={{ flex:1 }}/>
                     <button onClick={advance} disabled={!canContinue()} style={canContinue() ? btnPrimary : btnDisabled}>
-                      {(step === 4 || (step === 3 && !hasInterestDeepDive())) ? tr.findGifts : tr.continue}
+                      {(step === 3 || (step === 2 && !hasInterestDeepDive())) ? tr.findGifts : tr.continue}
                     </button>
                   </div>
                 </div>
