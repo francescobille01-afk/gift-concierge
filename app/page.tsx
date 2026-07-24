@@ -156,7 +156,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["Who are we finding a gift for?","What's your budget, and for what occasion?","What are they into?","Let's get a bit more specific — this makes a huge difference."],
     namePlaceholder:"Their first name…", nameHelp:"The name helps Gifty figure out their likely gender and personalise suggestions accordingly.",
-    relTitle:"Your relationship", ageQ:"How old are they?", genderQ:"Gender",
+    relTitle:"Relationship", ageQ:"How old are they?", genderQ:"Gender",
     yrs:"yrs",
     genderOpts:["Man","Woman","Neutral"],
     relOtherPlaceholder:"e.g. Best friend, Grandparents…",
@@ -292,7 +292,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["Per chi stai cercando un regalo?","Qual è il tuo budget, e per quale occasione?","Cosa gli/le piace?","Entriamo un po' più nel dettaglio — fa una grande differenza."],
     namePlaceholder:"Il suo nome…", nameHelp:"Il nome aiuta Gifty a capire il probabile genere e a personalizzare i suggerimenti.",
-    relTitle:"La tua relazione", ageQ:"Quanti anni ha?", genderQ:"Genere",
+    relTitle:"Rapporto", ageQ:"Quanti anni ha?", genderQ:"Genere",
     yrs:"anni",
     genderOpts:["Uomo","Donna","Neutrale"],
     relOtherPlaceholder:"es. Migliore amico/a, Nonni…",
@@ -428,7 +428,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["Pour qui cherchons-nous un cadeau ?","Quel est votre budget, et pour quelle occasion ?","Qu'est-ce qui lui plaît ?","Entrons un peu plus dans le détail — ça fait une grande différence."],
     namePlaceholder:"Son prénom…", nameHelp:"Le prénom aide Gifty à deviner le genre probable et à personnaliser les suggestions.",
-    relTitle:"Votre relation", ageQ:"Quel âge a-t-il ?", genderQ:"Genre",
+    relTitle:"Relation", ageQ:"Quel âge a-t-il ?", genderQ:"Genre",
     yrs:"ans",
     genderOpts:["Homme","Femme","Neutre"],
     relOtherPlaceholder:"ex. Meilleur(e) ami(e), Grands-parents…",
@@ -484,7 +484,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["Für wen suchen wir ein Geschenk?","Was ist dein Budget, und für welchen Anlass?","Worauf steht die Person?","Lass uns etwas genauer werden — das macht einen großen Unterschied."],
     namePlaceholder:"Ihr Vorname…", nameHelp:"Der Name hilft Gifty, das wahrscheinliche Geschlecht zu erkennen und Vorschläge anzupassen.",
-    relTitle:"Deine Beziehung", ageQ:"Wie alt ist die Person?", genderQ:"Geschlecht",
+    relTitle:"Beziehung", ageQ:"Wie alt ist die Person?", genderQ:"Geschlecht",
     yrs:"J.",
     genderOpts:["Mann","Frau","Neutral"],
     relOtherPlaceholder:"z.B. Beste/r Freund/in, Großeltern…",
@@ -540,7 +540,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["¿Para quién buscamos un regalo?","¿Cuál es tu presupuesto, y para qué ocasión?","¿Qué le gusta?","Vamos a entrar un poco más en detalle — marca una gran diferencia."],
     namePlaceholder:"Su nombre…", nameHelp:"El nombre ayuda a Gifty a deducir el género probable y personalizar las sugerencias.",
-    relTitle:"Tu relación", ageQ:"¿Qué edad tiene?", genderQ:"Género",
+    relTitle:"Relación", ageQ:"¿Qué edad tiene?", genderQ:"Género",
     yrs:"años",
     genderOpts:["Hombre","Mujer","Neutral"],
     relOtherPlaceholder:"ej. Mejor amigo/a, Abuelos…",
@@ -596,7 +596,7 @@ const TR: Record<TKey, Tr> = {
     conciergeLabel:"GIFTY",
     msgs:(n)=>["Para quem procuramos um presente?","Qual é o seu orçamento, e para que ocasião?","Do que gosta?","Vamos entrar um pouco mais no detalhe — faz uma grande diferença."],
     namePlaceholder:"O seu nome…", nameHelp:"O nome ajuda o Gifty a identificar o género provável e a personalizar as sugestões.",
-    relTitle:"A sua relação", ageQ:"Que idade tem?", genderQ:"Género",
+    relTitle:"Relação", ageQ:"Que idade tem?", genderQ:"Género",
     yrs:"anos",
     genderOpts:["Homem","Mulher","Neutro"],
     relOtherPlaceholder:"ex. Melhor amigo/a, Avós…",
@@ -1787,6 +1787,7 @@ export default function Home() {
                     {/* Step 0 — Relationship + Gender + Age */}
                     {step === 0 && (
                       <div>
+                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.relTitle}</div>
                         <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
                           {tr.rel.map((r, i) => (
                             <button key={i} onClick={() => setG(p => ({ ...p, relationship: r, showOtherRel: r === tr.rel[tr.rel.length - 1] }))} style={chipSt(g.relationship === r || (g.showOtherRel && r === tr.rel[tr.rel.length - 1]))}>{r}</button>
