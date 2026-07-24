@@ -1812,13 +1812,14 @@ export default function Home() {
                         <div style={{ marginBottom:12 }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.ageQ}</span>
                         </div>
-                        <input type="number" min={1} max={99} step={1} value={g.age}
+                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={g.age === 0 ? "" : String(g.age)}
                           onChange={e => {
-                            const v = e.target.value === "" ? 0 : Math.max(1, Math.min(99, +e.target.value));
+                            const digits = e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+                            const v = digits === "" ? 0 : Math.max(1, Math.min(99, +digits));
                             setG(p => ({ ...p, age: v }));
                           }}
                           placeholder={tr.yrs}
-                          style={{ width:120, padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:DISPLAY, fontWeight:600, fontSize:18, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
+                          style={{ width:120, padding:"11px 15px", border:`1.5px solid ${C.bord3}`, borderRadius:12, fontFamily:BODY, fontWeight:500, fontSize:16, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
                         />
                         <span style={{ marginLeft:10, fontSize:14, color:C.muted2 }}>{tr.yrs}</span>
                       </div>
