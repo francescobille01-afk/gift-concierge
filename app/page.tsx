@@ -1495,8 +1495,13 @@ export default function Home() {
   const showApp       = view === "app";
   const showFavorites = view === "favorites";
 
-  /* ── Loading screen ── */
-  if (!authLoaded) {
+  /* ── Loading screen ──
+     Only shown while Clerk resolves an EXISTING session (returning signed-in
+     user). Guests/new visitors default to isGuest=true and skip this
+     entirely — gating the whole page on authLoaded meant server-rendered
+     HTML (what crawlers/non-JS clients see) was permanently stuck here,
+     since Clerk only finishes loading client-side. */
+  if (!authLoaded && !isGuest) {
     return (
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#f8f5f0", fontFamily:BODY }}>
         <style suppressHydrationWarning>{`
