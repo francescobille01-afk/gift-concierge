@@ -4,6 +4,13 @@ import Script from "next/script";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
+// Auth state (Clerk) must be evaluated per-request, not baked into a static
+// build-time snapshot — without this, "/" can get frozen as a stale/broken
+// prerender (seen live: root route was serving a cached 404 shell with a
+// noindex tag to any non-JS client, which is what got the site rejected by
+// Amazon Associates as "not publicly viewable").
+export const dynamic = "force-dynamic";
+
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
