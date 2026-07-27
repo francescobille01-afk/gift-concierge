@@ -1171,7 +1171,10 @@ export default function Home() {
   const [cMsg,        setCMsg]        = useState("");
   const [contactSent, setContactSent] = useState(false);
 
-  const [isGuest, setIsGuest] = useState(false);
+  // Default to guest mode so the app itself (not a login wall) is what
+  // visitors and crawlers see first. Signing in is still available anytime
+  // via the "My profile" button, which opens Clerk's sign-in as a modal.
+  const [isGuest, setIsGuest] = useState(true);
   const { isSignedIn, isLoaded: authLoaded, userId } = useAuth();
 
   // Favorites & history are scoped per account so different logins on the same
@@ -1261,7 +1264,7 @@ export default function Home() {
 
   /* ── Navigation ── */
   function canContinue() {
-    if (step === 0) return g.relationship.trim().length > 0;
+    if (step === 0) return g.relationship.trim().length > 0 && g.gender.trim().length > 0 && g.age > 0;
     if (step === 1) return !!g.occasion && g.occasion.trim().length > 0;
     if (step === 2) return g.interests.length > 0 || g.customInterest.trim().length > 0;
     return true;
@@ -1682,6 +1685,12 @@ export default function Home() {
             </div>
             <div style={{ fontSize:12.5, color:"#e8d5c4", background:"rgba(0,0,0,.18)", border:"1px solid rgba(255,255,255,.1)", borderRadius:999, padding:"7px 14px", display:"inline-flex", alignItems:"center", gap:6 }}>
               {lang.flag} {lang.code} · {lang.currency} ({lang.sym}) · {lang.country}
+            </div>
+            <div style={{ marginTop:12 }}>
+              <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
+                style={{ fontSize:12.5, color:"#d8c4b0", textDecoration:"underline" }}>
+                Privacy Policy
+              </a>
             </div>
           </div>
 
