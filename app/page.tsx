@@ -718,11 +718,6 @@ function toPriceBand(priceRange: string, sym: string): string {
   const hi = Math.round(Math.max(...nums) * 1.15);
   return lo === hi ? `~${sym}${lo}` : `~${sym}${lo}–${hi}`;
 }
-// Favorites are matched by product name, not by the AI-assigned id (which is
-// just a positional "1".."9" that collides across different searches).
-function normTitle(t: string) { return (t ?? "").trim().toLowerCase().replace(/\s+/g, " "); }
-function sameGift(a: GiftSuggestion, b: GiftSuggestion) { return normTitle(a.title) === normTitle(b.title); }
-
 function detectLangIdx(): number {
   const lang = navigator.language?.toLowerCase() ?? "";
   if (lang.startsWith("it")) return 2;
@@ -915,7 +910,6 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 }
 
 export default function Home() {
-  const [view,        setView]        = useState<"app"|"favorites">("app");
   const [screen,      setScreen]      = useState<"intake"|"loading"|"results">("intake");
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
@@ -925,8 +919,6 @@ export default function Home() {
   const [loadingLine, setLoadingLine] = useState(0);
   const [langIdx,     setLangIdx]     = useState(2); // default: Italian (testing phase — Amazon affiliate is IT-only)
   const [langMenuOpen,setLangMenuOpen]= useState(false);
-  const [favorites,   setFavorites]   = useState<GiftSuggestion[]>([]);
-  const [sessionFavs, setSessionFavs] = useState<GiftSuggestion[]>([]);
   const [history,     setHistory]     = useState<HistoryEntry[]>([]);
   const [viewedEntry, setViewedEntry] = useState<HistoryEntry | null>(null);
   const [convo,       setConvo]       = useState<ChatMessage[]>([]);
@@ -939,7 +931,6 @@ export default function Home() {
   const [cMsg,        setCMsg]        = useState("");
   const [contactSent, setContactSent] = useState(false);
 
-  const FAV_KEY  = "gifty-favorites";
   const HIST_KEY = "gifty-history";
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -982,8 +973,6 @@ export default function Home() {
   /* ── Load from localStorage ── */
   useEffect(() => {
     try {
-      const favs = localStorage.getItem(FAV_KEY);
-      setFavorites(favs ? JSON.parse(favs) : []);
       const hist = localStorage.getItem(HIST_KEY);
       setHistory(hist ? JSON.parse(hist) : []);
     } catch { /* ignore */ }
@@ -1009,18 +998,6 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  /* ── Favorites helpers ── */
-  function isFav(gift: GiftSuggestion) { return favorites.some(f => sameGift(f, gift)); }
-  function toggleFav(gift: GiftSuggestion) {
-    const adding = !favorites.some(f => sameGift(f, gift));
-    setFavorites(prev => {
-      const next = adding ? [...prev, gift] : prev.filter(f => !sameGift(f, gift));
-      try { localStorage.setItem(FAV_KEY, JSON.stringify(next)); } catch { /* ignore */ }
-      return next;
-    });
-    setSessionFavs(prev => adding ? [...prev, gift] : prev.filter(f => !sameGift(f, gift)));
-  }
-
   /* ── Navigation ── */
   function canContinue() {
     if (step === 0) return g.relationship.trim().length > 0 && g.gender.trim().length > 0 && g.age > 0;
@@ -1043,7 +1020,7 @@ export default function Home() {
   function goBack() {
     setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1);
   }
-  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen("intake"); setView("app"); setViewedEntry(null); setSessionFavs([]); setThumbs({}); setConvo([]); setErrorMsg(null); }
+  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen("intake"); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); }
   /* ── API call ── */
   function buildRecipientAndLocale() {
     const budgetMax = g.budget >= 500 ? 2000 : Math.round(g.budget * 1.15);
@@ -1098,7 +1075,7 @@ export default function Home() {
   }
 
   async function fireRequest() {
-    setScreen("loading"); setLoadingLine(0); setErrorMsg(null); setSessionFavs([]);
+    setScreen("loading"); setLoadingLine(0); setErrorMsg(null);
     const { recipient, locale } = buildRecipientAndLocale();
     const firstMessage = buildFirstMessage(g, sym, tr);
     try {
@@ -1199,7 +1176,6 @@ export default function Home() {
     const fallbackLink = `https://www.amazon.it/s?k=${encodeURIComponent(gift.title)}`;
     const officialLink = gift.officialLink || gift.link;
     const amazonLink   = gift.amazonLink;
-    const fav    = isFav(gift);
     const thumb  = thumbs[gift.id];
     return (
       <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:18, overflow:"hidden", boxShadow:"0 4px 18px rgba(124,63,63,.06)", display:"flex", flexDirection:"column" }}>
@@ -1214,13 +1190,6 @@ export default function Home() {
               {gift.category}
             </span>
           )}
-          {/* Heart / favorite button — top left */}
-          <button
-            onClick={() => toggleFav(gift)}
-            style={{ position:"absolute", top:10, left:10, zIndex:1, display:"flex", alignItems:"center", gap:6, padding:"7px 12px 7px 10px", borderRadius:999, border:"none", background: fav ? C.maroon : "rgba(255,255,255,.94)", color: fav ? "#fff" : C.maroon, fontSize:12.5, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 10px rgba(124,63,63,.25)", transition:"all .15s", whiteSpace:"nowrap" as const }}>
-            <span style={{ fontSize:14 }}>{fav ? "♥" : "♡"}</span>
-            {fav ? tr.savedFav : tr.saveFav}
-          </button>
         </div>
         <div style={{ padding:"16px 17px 17px", display:"flex", flexDirection:"column", flex:1 }}>
           <div style={{ fontFamily:BODY, fontWeight:700, fontSize:15.5, lineHeight:1.3, color:C.ink, marginBottom:14 }}>{gift.title}</div>
@@ -1251,9 +1220,6 @@ export default function Home() {
   }
 
   /* ─────────────────────────────── RENDER ─────────────────────── */
-  const showApp       = view === "app";
-  const showFavorites = view === "favorites";
-
   return (
     <>
       <style suppressHydrationWarning>{`
@@ -1314,29 +1280,6 @@ export default function Home() {
               <span style={{ fontSize:14, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>AI Gift Concierge</span>
             </div>
           </div>
-
-          {/* Session favorites */}
-          {sessionFavs.length > 0 && (
-            <div className="gc-fade" style={{ position:"relative" }}>
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" as const, color:"#d8b98c", marginBottom:10 }}>
-                ♥ {tr.savedSearch} ({sessionFavs.length})
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                {sessionFavs.slice(0, 4).map(f => (
-                  <div key={f.id} style={{ display:"flex", alignItems:"center", gap:10, background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.1)", borderRadius:10, padding:"7px 9px" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={f.imageUrl || `/api/product-image?q=${encodeURIComponent(f.imageSearchQuery ?? f.title)}`} alt={f.title}
-                      style={{ width:30, height:30, borderRadius:7, objectFit:"cover", flexShrink:0 }} />
-                    <span style={{ fontSize:12.5, color:"#f0e3d2", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" as const }}>{f.title}</span>
-                  </div>
-                ))}
-                {sessionFavs.length > 4 && (
-                  <span style={{ fontSize:11.5, color:"#d8c4b0" }}>+{sessionFavs.length - 4} more</span>
-                )}
-              </div>
-            </div>
-          )}
-
 
           {/* Headline */}
           <div className="gc-fade" style={{ position:"relative" }}>
@@ -1401,22 +1344,6 @@ export default function Home() {
 
           {/* Top nav */}
           <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
-            <nav style={{ display:"flex", alignItems:"center", gap:2, marginRight:6, flexShrink:0 }}>
-              {tr.nav.map((label, i) => {
-                const views: Array<"app"|"favorites"> = ["app","favorites"];
-                const active = view === views[i];
-                const isFavsTab = i === 1;
-                return (
-                  <button key={label} onClick={() => setView(views[i])}
-                    style={{ display:"flex", alignItems:"center", padding:"8px 14px", borderRadius:999, border:"none", background: active ? C.goldS : "transparent", color: active ? C.maroon : C.muted4, font:`${active?600:500} 13.5px ${BODY}`, cursor:"pointer", transition:"all .15s" }}>
-                    {label}
-                    {isFavsTab && favorites.length > 0 && (
-                      <span style={{ marginLeft:6, background:C.maroon, color:"#fff", fontSize:11, fontWeight:700, padding:"1px 7px", borderRadius:999 }}>{favorites.length}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
             {/* Language menu */}
             <div ref={langMenuRef} style={{ position:"relative" }}>
               <button onClick={() => setLangMenuOpen(v => !v)}
@@ -1439,9 +1366,6 @@ export default function Home() {
           </div>
 
           {/* ══ HOME / APP ══ */}
-          {showApp && (
-            <>
-              <>
               {/* INTAKE */}
               {screen === "intake" && (
                 <div style={{ maxWidth:640, width:"100%", margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
@@ -1633,33 +1557,6 @@ export default function Home() {
 
                 </div>
               )}
-              </>
-            </>
-          )}
-
-          {/* ══ FAVORITES ══ */}
-          {showFavorites && (
-            <div className="gc-fade" style={{ maxWidth:980, width:"100%", margin:"0 auto" }}>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:30, lineHeight:1.12, color:C.ink, margin:"0 0 6px", letterSpacing:"-.02em" }}>{tr.favTitle}</h2>
-              <p style={{ fontSize:15.5, color:C.muted, margin:"0 0 26px" }}>{tr.favSub}</p>
-
-              {favorites.length > 0 ? (
-                <div className="gc-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18 }}>
-                  {favorites.map(gift => <GiftCard key={gift.id} gift={gift} />)}
-                </div>
-              ) : (
-                <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", border:`1px dashed ${C.bord3}`, borderRadius:18 }}>
-                  <div style={{ fontSize:38, marginBottom:12 }}>🤍</div>
-                  <div style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:19, color:C.ink, marginBottom:6 }}>{tr.favEmptyTitle}</div>
-                  <p style={{ fontSize:14, color:C.muted, margin:"0 0 20px" }}>{tr.favEmptySub}</p>
-                  <button onClick={() => setView("app")} style={{ padding:"12px 22px", borderRadius:12, border:"none", background:C.maroon, color:"#fff", font:`600 14.5px ${BODY}`, cursor:"pointer" }}>
-                    {tr.findGiftsBtn}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
 
         </main>
       </div>
