@@ -1,14 +1,13 @@
-import {ClerkProvider} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-// Auth state (Clerk) must be evaluated per-request, not baked into a static
-// build-time snapshot — without this, "/" can get frozen as a stale/broken
-// prerender (seen live: root route was serving a cached 404 shell with a
-// noindex tag to any non-JS client, which is what got the site rejected by
-// Amazon Associates as "not publicly viewable").
+// Keep this route rendered fresh per-request rather than statically
+// prerendered — a past static snapshot got frozen as a stale/broken build
+// (served a cached 404 shell with a noindex tag to any non-JS client),
+// which contributed to the site being rejected by Amazon Associates as
+// "not publicly viewable".
 export const dynamic = "force-dynamic";
 
 const cormorant = Cormorant_Garamond({
@@ -46,9 +45,7 @@ export default function RootLayout({
           src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"
           strategy="beforeInteractive"
         />
-        <ClerkProvider>
-          {children}
-        </ClerkProvider>
+        {children}
       </body>
     </html>
   );

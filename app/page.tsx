@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { SignedIn, UserButton, SignInButton, useAuth, useSignIn } from "@clerk/nextjs";
 import type { GiftSuggestion, ChatResponse, UserLocale, ChatMessage } from "@/lib/types";
 
 /* ─── Design tokens ─────────────────────────────────────────── */
@@ -915,237 +914,6 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
   );
 }
 
-/* ═══════════════════════════ COMPONENT ══════════════════════════ */
-/* ─── Custom sign-in page ────────────────────────────────────── */
-function CustomSignIn({ onGuest, langIdx, setLangIdx, tr }: {
-  onGuest: () => void;
-  langIdx: number;
-  setLangIdx: (i: number) => void;
-  tr: Tr;
-}) {
-  const { signIn, isLoaded, setActive } = useSignIn();
-  const [email, setEmail]   = useState("");
-  const [otp,   setOtp]     = useState("");
-  const [stage, setStage]   = useState<"form" | "otp">("form");
-  const [busy,  setBusy]    = useState(false);
-  const [err,   setErr]     = useState<string | null>(null);
-
-  const lang = LANGS[langIdx];
-
-  const handleSocial = async (strategy: "oauth_google" | "oauth_apple" | "oauth_facebook") => {
-    if (!isLoaded) return;
-    setBusy(true); setErr(null);
-    try {
-      await signIn!.authenticateWithRedirect({
-        strategy,
-        redirectUrl: `${window.location.origin}/sso-callback`,
-        redirectUrlComplete: "/",
-      });
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Something went wrong");
-      setBusy(false);
-    }
-  };
-
-  const handleEmail = async () => {
-    if (!isLoaded || !email) return;
-    setBusy(true); setErr(null);
-    try {
-      const res = await signIn!.create({ identifier: email });
-      const factor = res.supportedFirstFactors?.find((f: { strategy: string }) => f.strategy === "email_code") as { strategy: string; emailAddressId: string } | undefined;
-      if (!factor) throw new Error("Email code not supported");
-      await signIn!.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
-      setStage("otp");
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Something went wrong");
-    } finally { setBusy(false); }
-  };
-
-  const handleOtp = async () => {
-    if (!isLoaded || !otp) return;
-    setBusy(true); setErr(null);
-    try {
-      const res = await signIn!.attemptFirstFactor({ strategy: "email_code", code: otp });
-      if (res.status === "complete") {
-        await setActive!({ session: res.createdSessionId });
-      }
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Incorrect code — try again");
-    } finally { setBusy(false); }
-  };
-
-  const inputSt: React.CSSProperties = {
-    width: "100%", height: 52, borderRadius: 12, border: `1.5px solid ${C.bord3}`,
-    background: "#fff", color: C.ink, font: `400 15px ${BODY}`,
-    padding: "0 16px", outline: "none", boxSizing: "border-box",
-  };
-  const socialBtn = (bg: string, color: string): React.CSSProperties => ({
-    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-    width: "100%", height: 52, borderRadius: 12, border: bg === "#fff" ? `1.5px solid ${C.bord3}` : "none",
-    background: bg, color, font: `600 15px ${BODY}`, cursor: busy ? "not-allowed" : "pointer",
-    opacity: busy ? 0.6 : 1, transition: "opacity .15s",
-  });
-
-  return (
-    <div style={{ display:"flex", minHeight:"100vh", fontFamily: BODY }}>
-      <style suppressHydrationWarning>{`
-        @media(max-width:700px){.gc-authbrand{display:none!important}.gc-authmain{padding:40px 20px!important}}
-      `}</style>
-      {/* ── LEFT PANEL ── */}
-      <aside className="gc-authbrand" style={{ width: 460, flexShrink: 0, background: C.brand, display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"52px 46px", position:"relative", overflow:"hidden" }}>
-        {/* logo */}
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ width:90, height:90, borderRadius:24, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 6px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4)" }}>
-            <GiftSVG size={52} fill="#4a2a16" />
-          </div>
-          <div>
-            <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:52, letterSpacing:"-.02em", color:"#f8eee0", display:"block", lineHeight:1 }}>Gifty</span>
-            <span style={{ fontSize:14, fontWeight:500, letterSpacing:".04em", color:"#d8b98c" }}>AI Gift Concierge</span>
-          </div>
-        </div>
-
-        {/* headline */}
-        <div>
-          <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:16 }}>
-            <span style={{ width:26, height:1.5, background:"linear-gradient(90deg,#c9a26b,transparent)" }}/>
-            <span style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#d8b98c" }}>AI-Powered Gifting</span>
-          </div>
-          <h1 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:42, lineHeight:1.06, letterSpacing:"-.025em", margin:"0 0 20px", color:"#f8eee0" }}>
-            {tr.h1a}<br/>{tr.h1b}
-          </h1>
-          <p style={{ fontSize:16, lineHeight:1.6, color:"#e3cfb9", margin:"0 0 32px" }}>
-            {tr.intro}
-          </p>
-          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {[tr.bFree, tr.bBudget, tr.bSocial].map(txt => (
-              <div key={txt} style={{ display:"flex", alignItems:"center", gap:12, fontSize:14.5, color:"#f0e3d2" }}>
-                <span style={{ width:22, height:22, borderRadius:"50%", background:"rgba(201,162,107,.25)", border:"1px solid rgba(201,162,107,.4)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f0d9a8", flexShrink:0, fontSize:11 }}>✓</span>
-                {txt}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* social proof */}
-        <div style={{ paddingTop:32, borderTop:"1px solid rgba(255,255,255,.12)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:12, fontSize:13.5, color:"#d8c4b0" }}>
-            <div style={{ display:"flex" }}>
-              {(["#c9a26b","#e8d5c4","#a8694a"] as const).map((bg, i) => (
-                <span key={i} style={{ width:28, height:28, borderRadius:"50%", background:bg, border:"2.5px solid #5e2e2e", marginLeft:i ? -9 : 0 }}/>
-              ))}
-            </div>
-            <span>{tr.proofPre} <strong style={{ color:"#fff" }}>42,000+</strong> {tr.proofPost}</span>
-          </div>
-          <div style={{ marginTop:14, fontSize:12.5, color:"#e8d5c4", background:"rgba(0,0,0,.18)", border:"1px solid rgba(255,255,255,.1)", borderRadius:999, padding:"6px 14px", display:"inline-flex", alignItems:"center", gap:6 }}>
-            {lang.flag} {lang.code} · {lang.currency} ({lang.sym}) · {lang.country}
-          </div>
-        </div>
-      </aside>
-
-      {/* ── RIGHT PANEL ── */}
-      <main className="gc-authmain" style={{ flex:1, background: C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 40px", position:"relative" }}>
-        {/* Language picker top-right */}
-        <div style={{ position:"absolute", top:20, right:24 }}>
-          <select
-            value={langIdx}
-            onChange={e => setLangIdx(Number(e.target.value))}
-            style={{ padding:"7px 12px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label, font:`600 13px ${BODY}`, cursor:"pointer", outline:"none" }}
-          >
-            {LANGS.map((l, i) => (
-              <option key={i} value={i}>{l.flag} {l.code} · {l.currency}</option>
-            ))}
-          </select>
-        </div>
-        <div style={{ width:"100%", maxWidth:420 }}>
-          {/* icon */}
-          <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
-            <div style={{ width:68, height:68, borderRadius:18, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 24px rgba(124,63,63,.28)" }}>
-              <GiftSVG size={38} fill="#4a2a16" />
-            </div>
-          </div>
-
-          {stage === "form" ? (
-            <>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:28, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>{tr.signInTitle}</h2>
-              <p style={{ fontSize:14.5, color:C.label, textAlign:"center", margin:"0 0 32px", lineHeight:1.5 }}>
-                {tr.signInSub}
-              </p>
-
-              {/* Social buttons */}
-              <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:20 }}>
-                <button style={socialBtn("#fff", C.ink)} onClick={() => handleSocial("oauth_google")} disabled={busy}>
-                  <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                  {tr.continueGoogle}
-                </button>
-
-              </div>
-
-              {/* Divider */}
-              <div style={{ display:"flex", alignItems:"center", gap:12, margin:"4px 0 20px" }}>
-                <span style={{ flex:1, height:1, background:C.bord3 }}/>
-                <span style={{ fontSize:11, fontWeight:700, letterSpacing:".12em", textTransform:"uppercase" as const, color:C.muted2 }}>{tr.orWord}</span>
-                <span style={{ flex:1, height:1, background:C.bord3 }}/>
-              </div>
-
-              {/* Email */}
-              <input
-                type="email" placeholder="you@email.com" value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleEmail()}
-                style={inputSt}
-              />
-              <button
-                onClick={handleEmail} disabled={busy || !email}
-                style={{ ...socialBtn(email ? C.goldS : C.bord3, email ? C.label2 : C.muted2), marginTop:10, cursor: email && !busy ? "pointer" : "not-allowed" }}
-              >
-                {busy ? tr.waitMsg : tr.continueEmail}
-              </button>
-
-              {err && <p style={{ color:"#c0392b", fontSize:13, textAlign:"center", margin:"12px 0 0" }}>{err}</p>}
-
-              <div style={{ textAlign:"center", marginTop:20 }}>
-                <button onClick={onGuest} style={{ background:"none", border:"none", cursor:"pointer", color:C.maroon, font:`600 14px ${BODY}`, textDecoration:"underline" }}>
-                  {tr.continueGuest}
-                </button>
-              </div>
-
-              <p style={{ fontSize:12, color:C.muted2, textAlign:"center", margin:"16px 0 0", lineHeight:1.5 }}>
-                {tr.termsNote}
-              </p>
-            </>
-          ) : (
-            /* OTP stage */
-            <>
-              <h2 style={{ fontFamily:DISPLAY, fontWeight:600, fontSize:26, color:C.ink, textAlign:"center", margin:"0 0 8px" }}>{tr.checkEmail}</h2>
-              <p style={{ fontSize:14.5, color:C.label, textAlign:"center", margin:"0 0 28px", lineHeight:1.5 }}>
-                {tr.codeSent} <strong>{email}</strong>
-              </p>
-              <input
-                type="text" placeholder="123456" value={otp} maxLength={6}
-                onChange={e => setOtp(e.target.value.replace(/\D/g,""))}
-                onKeyDown={e => e.key === "Enter" && handleOtp()}
-                style={{ ...inputSt, textAlign:"center", letterSpacing:".3em", fontSize:22, fontWeight:600 }}
-              />
-              <button
-                onClick={handleOtp} disabled={busy || otp.length < 6}
-                style={{ ...socialBtn(otp.length === 6 ? C.maroon : C.bord3, otp.length === 6 ? "#fff" : C.muted2), marginTop:10 }}
-              >
-                {busy ? tr.verifying : tr.verifyCode}
-              </button>
-              {err && <p style={{ color:"#c0392b", fontSize:13, textAlign:"center", margin:"12px 0 0" }}>{err}</p>}
-              <div style={{ textAlign:"center", marginTop:16 }}>
-                <button onClick={() => { setStage("form"); setOtp(""); setErr(null); }} style={{ background:"none", border:"none", cursor:"pointer", color:C.muted3, font:`400 13px ${BODY}` }}>
-                  ← Back
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
-
 export default function Home() {
   const [view,        setView]        = useState<"app"|"favorites">("app");
   const [screen,      setScreen]      = useState<"intake"|"loading"|"results">("intake");
@@ -1171,17 +939,8 @@ export default function Home() {
   const [cMsg,        setCMsg]        = useState("");
   const [contactSent, setContactSent] = useState(false);
 
-  // Default to guest mode so the app itself (not a login wall) is what
-  // visitors and crawlers see first. Signing in is still available anytime
-  // via the "My profile" button, which opens Clerk's sign-in as a modal.
-  const [isGuest, setIsGuest] = useState(true);
-  const { isSignedIn, isLoaded: authLoaded, userId } = useAuth();
-
-  // Favorites & history are scoped per account so different logins on the same
-  // browser don't share them. Guests (and pre-auth) fall back to a "guest" bucket.
-  const uid      = userId ?? "guest";
-  const FAV_KEY  = `gifty-favorites:${uid}`;
-  const HIST_KEY = `gifty-history:${uid}`;
+  const FAV_KEY  = "gifty-favorites";
+  const HIST_KEY = "gifty-history";
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
@@ -1220,7 +979,7 @@ export default function Home() {
     localStorage.setItem("gifty-lang-idx", String(langIdx));
   }, [langIdx]);
 
-  /* ── Load from localStorage (re-runs when the account changes) ── */
+  /* ── Load from localStorage ── */
   useEffect(() => {
     try {
       const favs = localStorage.getItem(FAV_KEY);
@@ -1228,7 +987,7 @@ export default function Home() {
       const hist = localStorage.getItem(HIST_KEY);
       setHistory(hist ? JSON.parse(hist) : []);
     } catch { /* ignore */ }
-  }, [uid]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Loading status lines ── */
   const LOADING_LINES = tr.loadingLines;
@@ -1495,85 +1254,6 @@ export default function Home() {
   const showApp       = view === "app";
   const showFavorites = view === "favorites";
 
-  /* ── Loading screen ──
-     Only shown while Clerk resolves an EXISTING session (returning signed-in
-     user). Guests/new visitors default to isGuest=true and skip this
-     entirely — gating the whole page on authLoaded meant server-rendered
-     HTML (what crawlers/non-JS clients see) was permanently stuck here,
-     since Clerk only finishes loading client-side. */
-  if (!authLoaded && !isGuest) {
-    return (
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#f8f5f0", fontFamily:BODY }}>
-        <style suppressHydrationWarning>{`
-          @keyframes giftPop {
-            0%, 20% { transform: scale(1) rotate(0deg); }
-            35% { transform: scale(1.12) rotate(-4deg); }
-            50% { transform: scale(0.97) rotate(3deg); }
-            65%, 100% { transform: scale(1) rotate(0deg); }
-          }
-          .gc-gift-logo {
-            animation: giftPop 2s ease-in-out infinite;
-          }
-          .gc-confetti-burst {
-            position: absolute;
-            border-radius: 2px;
-            pointer-events: none;
-            top: 50%;
-            left: 50%;
-            opacity: 0;
-          }
-          ${Array.from({length: 14}, (_, i) => {
-            const angle = (360 / 14) * i + (Math.random() - 0.5) * 20;
-            const distance = 60 + Math.random() * 35;
-            const rad = (angle * Math.PI) / 180;
-            const x = Math.cos(rad) * distance;
-            const y = Math.sin(rad) * distance;
-            const rot = 180 + Math.random() * 360;
-            return `
-              @keyframes burst-${i} {
-                0%, 30% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-                38% { opacity: 1; }
-                75% { transform: translate(${x}px, ${y}px) rotate(${rot}deg); opacity: 1; }
-                100% { transform: translate(${x * 1.1}px, ${y * 1.1 + 15}px) rotate(${rot}deg); opacity: 0; }
-              }
-              .gc-confetti-${i} { animation: burst-${i} 2s ease-out infinite; }
-            `;
-          }).join('')}
-        `}</style>
-        <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", gap:28 }}>
-          <div style={{ position:"relative", width:100, height:100, display:"flex", alignItems:"center", justifyContent:"center" }}>
-            {/* Confetti bursting out from behind the logo */}
-            {Array.from({length: 14}, (_, i) => (
-              <div key={i} className={`gc-confetti-burst gc-confetti-${i}`} style={{
-                width: 6 + (i % 3) * 2,
-                height: 6 + (i % 3) * 2,
-                background: [C.maroon, "#d8b98c", "#c9a26b", "#e3c089"][i % 4],
-                zIndex: 1,
-              }}/>
-            ))}
-            {/* Gift logo — same as app logo */}
-            <div className="gc-gift-logo" style={{ position:"relative", zIndex:2, width:68, height:68, borderRadius:18, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 24px rgba(124,63,63,.3)" }}>
-              <GiftSVG size={38} fill="#4a2a16" />
-            </div>
-          </div>
-          <p style={{ fontSize:15, color:"#8b6f47", textAlign:"center", fontWeight:500 }}>Refreshing page…</p>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Sign-in gate ── */
-  if (authLoaded && !isSignedIn && !isGuest) {
-    return (
-      <>
-        <style suppressHydrationWarning>{`
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
-        `}</style>
-        <CustomSignIn onGuest={() => setIsGuest(true)} langIdx={langIdx} setLangIdx={setLangIdx} tr={tr} />
-      </>
-    );
-  }
-
   return (
     <>
       <style suppressHydrationWarning>{`
@@ -1756,17 +1436,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* My profile */}
-            <SignedIn>
-              <UserButton showName />
-            </SignedIn>
-            {isGuest && (
-              <SignInButton mode="modal">
-                <button style={{ padding:"8px 16px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label2, font:`600 13.5px ${BODY}`, cursor:"pointer" }}>
-                  My profile
-                </button>
-              </SignInButton>
-            )}
           </div>
 
           {/* ══ HOME / APP ══ */}
