@@ -856,11 +856,11 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
     <div>
       {/* Tabs — one per selected interest that has a deep-dive config */}
       {blocks.length > 1 && (
-        <div style={{ display:"flex", gap:8, marginBottom:18 }}>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:18 }}>
           {blocks.map(({ label, idx }) => (
             <button key={idx} onClick={() => setActiveIdx(idx)}
               style={{
-                padding:"9px 16px", borderRadius:999, cursor:"pointer", fontSize:13.5, fontWeight:600,
+                padding:"12px 16px", borderRadius:999, cursor:"pointer", fontSize:13.5, fontWeight:600,
                 border: idx === active.idx ? "none" : `1.5px solid ${C.bord3}`,
                 background: idx === active.idx ? C.maroon : "#fff",
                 color: idx === active.idx ? "#fff" : C.label2,
@@ -1209,7 +1209,7 @@ export default function Home() {
             })()}
             <div style={{ display:"flex", gap:8 }}>
               <a href={addAffiliateTag(amazonLink || fallbackLink)} target="_blank" rel="noopener noreferrer"
-                style={{ flex:1, textAlign:"center" as const, padding:"9px 12px", borderRadius:10, border:"none", background:C.maroon, color:"#fff", font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
+                style={{ flex:1, textAlign:"center" as const, padding:"13px 12px", borderRadius:10, border:"none", background:C.maroon, color:"#fff", font:`600 13.5px ${BODY}`, cursor:"pointer", textDecoration:"none", display:"inline-block" }}>
                 🛒 {tr.buyOnAmazon}
               </a>
             </div>
@@ -1235,7 +1235,7 @@ export default function Home() {
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
-        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
+        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
         ::selection{background:#c9a26b;color:#fff}
         .gc-tip{position:relative;display:inline-flex}
@@ -1261,9 +1261,14 @@ export default function Home() {
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
         }
+        /* 100vh doesn't account for mobile browser address-bar chrome, which
+           can clip the bottom of the screen (e.g. the Continue button).
+           dvh does; the vh line above is just the fallback for browsers
+           that don't support dvh yet. */
+        .gc-shell, .gc-brand, .gc-main { height: 100dvh !important; }
       `}</style>
 
-      <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
+      <div className="gc-shell" style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
 
         {/* ══ BRAND PANEL ══════════════════════════════════════ */}
         <aside className="gc-brand" style={{ width:"38%", maxWidth:520, background:C.brand, color:"#f3e7d8", padding:"52px 46px", display:"flex", flexDirection:"column", justifyContent:"space-between", position:"sticky", top:0, height:"100vh", overflow:"hidden", flexShrink:0 }}>
@@ -1369,7 +1374,7 @@ export default function Home() {
             {/* Language menu */}
             <div ref={langMenuRef} style={{ position:"relative" }}>
               <button onClick={() => setLangMenuOpen(v => !v)}
-                style={{ padding:"8px 14px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label, font:`600 13px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
+                style={{ padding:"12px 14px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.label, font:`600 13px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
                 {lang.flag} {lang.code} <span style={{ opacity:.5, fontSize:10 }}>▾</span>
               </button>
               {langMenuOpen && (
@@ -1467,11 +1472,21 @@ export default function Home() {
                         />
                         {/* Tick labels positioned at exact % matching the linear 10-500 scale */}
                         <div style={{ position:"relative", height:18, marginTop:5, marginBottom:30 }}>
-                          {([10,100,250,500] as const).map(v => (
-                            <span key={v} style={{ position:"absolute", left:`${((v-10)/490)*100}%`, transform:"translateX(-50%)", fontSize:12, color:C.muted2, whiteSpace:"nowrap" as const }}>
-                              {v === 500 ? `${sym}500+` : `${sym}${v}`}
-                            </span>
-                          ))}
+                          {([10,100,250,500] as const).map(v => {
+                            const pct = ((v-10)/490)*100;
+                            const edge = pct === 0 ? "left" : pct === 100 ? "right" : "center";
+                            return (
+                              <span key={v} style={{
+                                position:"absolute",
+                                left: edge === "right" ? "auto" : `${pct}%`,
+                                right: edge === "right" ? 0 : "auto",
+                                transform: edge === "center" ? "translateX(-50%)" : "none",
+                                fontSize:12, color:C.muted2, whiteSpace:"nowrap" as const,
+                              }}>
+                                {v === 500 ? `${sym}500+` : `${sym}${v}`}
+                              </span>
+                            );
+                          })}
                         </div>
                         <div style={{ marginBottom:12 }}>
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.occQ}</span>
@@ -1547,7 +1562,7 @@ export default function Home() {
                         {tr.sub(fmtBudget(g.budget, sym), lang.country)}
                       </p>
                     </div>
-                    <button onClick={restart} style={{ flexShrink:0, padding:"12px 18px", borderRadius:12, border:`1.5px solid ${C.bord5}`, background:"#fff", color:C.muted4, font:`600 14px ${BODY}`, cursor:"pointer" }}>
+                    <button onClick={restart} style={{ flexShrink:0, padding:"13px 18px", borderRadius:12, border:`1.5px solid ${C.bord5}`, background:"#fff", color:C.muted4, font:`600 14px ${BODY}`, cursor:"pointer" }}>
                       ↺ {tr.startOver}
                     </button>
                   </div>
@@ -1564,8 +1579,8 @@ export default function Home() {
                     {([["price",1],["priceHigh",2]] as const).map(([s, i]) => (
                       <button key={s} onClick={() => setSortBy(s)}
                         style={s === sortBy
-                          ? { padding:"8px 15px", borderRadius:999, border:`1.5px solid ${C.maroon}`, background:C.maroon, color:"#fff", font:`600 13px ${BODY}`, cursor:"pointer" }
-                          : { padding:"8px 15px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.muted4, font:`600 13px ${BODY}`, cursor:"pointer" }
+                          ? { padding:"11px 16px", borderRadius:999, border:`1.5px solid ${C.maroon}`, background:C.maroon, color:"#fff", font:`600 13px ${BODY}`, cursor:"pointer" }
+                          : { padding:"11px 16px", borderRadius:999, border:`1.5px solid ${C.bord3}`, background:"#fff", color:C.muted4, font:`600 13px ${BODY}`, cursor:"pointer" }
                         }>
                         {tr.sortOpts[i]}
                       </button>
