@@ -813,7 +813,7 @@ function InterestsStep({ g, setG, tr }: { g: Gathered; setG: React.Dispatch<Reac
         <div style={{ marginTop:14 }}>
           <input
             autoFocus
-            type="text"
+            type="text" autoComplete="off" autoCorrect="off" name="gc-custom-interest"
             value={g.customInterest}
             onChange={e => setG(p => ({ ...p, customInterest: e.target.value }))}
             placeholder={tr.customPlaceholder}
@@ -1244,12 +1244,21 @@ export default function Home() {
         .gc-tip:hover .gc-tip-box{opacity:1;transform:translateY(0)}
         .gc-tip-badge{width:30px;height:30px;border-radius:50%;border:1.5px solid #d8c4b0;background:#fff;color:#7c3f3f;font-size:14px;cursor:default;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,63,63,.12);transition:border-color .15s,box-shadow .15s}
         .gc-tip:hover .gc-tip-badge{border-color:#7c3f3f;box-shadow:0 4px 14px rgba(124,63,63,.22)}
+        /* Keep Continue/Back always reachable without scrolling — on ANY screen
+           size, not just mobile: a laptop window shorter than the panel's
+           content (e.g. step 4's long sub-questions) hides it just as badly.
+           position:sticky anchors it to the bottom of .gc-main's own scroll
+           area, so on desktop it never overlaps the left brand panel. */
+        .gc-intake-wrap{padding-bottom:20px}
+        .gc-intake-nav{position:sticky;bottom:0;background:${C.bg};padding:14px 0 calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(124,63,63,.08);z-index:40}
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
+          .gc-mobile-header{display:flex!important}
           .gc-topnav{flex-wrap:nowrap!important}
           .gc-topnav nav{flex:1 1 auto;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start!important}
           .gc-topnav nav::-webkit-scrollbar{display:none}
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
+          .gc-intake-nav{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}
         }
       `}</style>
 
@@ -1344,6 +1353,18 @@ export default function Home() {
 
           {/* Top nav */}
           <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
+            {/* Mobile-only brand mark — .gc-brand (with the full logo) is hidden
+                below 900px, so without this the mobile header has no branding
+                at all. Shown via CSS only under 900px (see gc-mobile-header). */}
+            <div className="gc-mobile-header" style={{ display:"none", alignItems:"center", gap:10, marginRight:"auto" }}>
+              <div style={{ width:34, height:34, borderRadius:9, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                <GiftSVG size={19} fill="#4a2a16" />
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", lineHeight:1.15 }}>
+                <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:19, color:C.ink, letterSpacing:"-.01em" }}>Gifty</span>
+                <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".04em", color:C.muted2, textTransform:"uppercase" as const }}>AI Gift Concierge</span>
+              </div>
+            </div>
             {/* Language menu */}
             <div ref={langMenuRef} style={{ position:"relative" }}>
               <button onClick={() => setLangMenuOpen(v => !v)}
@@ -1368,7 +1389,7 @@ export default function Home() {
           {/* ══ HOME / APP ══ */}
               {/* INTAKE */}
               {screen === "intake" && (
-                <div style={{ maxWidth:640, width:"100%", margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
+                <div className="gc-intake-wrap" style={{ maxWidth:640, width:"100%", margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
                   {/* Progress */}
                   <div style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
@@ -1402,7 +1423,7 @@ export default function Home() {
                         </div>
                         {g.showOtherRel && (
                           <input
-                            type="text" autoFocus
+                            type="text" autoFocus autoComplete="off" autoCorrect="off" name="gc-relation-other"
                             value={g.relationship === tr.rel[tr.rel.length - 1] ? "" : g.relationship}
                             onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
                             onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
@@ -1455,7 +1476,7 @@ export default function Home() {
                           <span style={{ fontSize:14, fontWeight:600, color:C.label }}>{tr.occQ}</span>
                         </div>
                         <input
-                          type="text" autoFocus
+                          type="text" autoComplete="off" autoCorrect="off" name="gc-occasion"
                           value={g.occasion ?? ""}
                           onChange={e => setG(p => ({ ...p, occasion: e.target.value }))}
                           onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
@@ -1473,7 +1494,7 @@ export default function Home() {
                   </div>
 
                   {/* Nav */}
-                  <div style={{ display:"flex", alignItems:"center", gap:14, marginTop:34, paddingTop:22, borderTop:`1px solid ${C.bord4}` }}>
+                  <div className="gc-intake-nav" style={{ display:"flex", alignItems:"center", gap:14, marginTop:34, paddingTop:22, borderTop:`1px solid ${C.bord4}` }}>
                     {step > 0 && (
                       <button onClick={goBack} style={{ padding:"13px 20px", borderRadius:12, border:`1.5px solid ${C.bord5}`, background:"transparent", color:C.muted4, font:`600 15px ${BODY}`, cursor:"pointer" }}>
                         ← {tr.back}
