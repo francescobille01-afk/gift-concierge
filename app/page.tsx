@@ -1244,13 +1244,15 @@ export default function Home() {
         .gc-tip:hover .gc-tip-box{opacity:1;transform:translateY(0)}
         .gc-tip-badge{width:30px;height:30px;border-radius:50%;border:1.5px solid #d8c4b0;background:#fff;color:#7c3f3f;font-size:14px;cursor:default;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(124,63,63,.12);transition:border-color .15s,box-shadow .15s}
         .gc-tip:hover .gc-tip-badge{border-color:#7c3f3f;box-shadow:0 4px 14px rgba(124,63,63,.22)}
-        /* Keep Continue/Back always reachable without scrolling — on ANY screen
-           size, not just mobile: a laptop window shorter than the panel's
-           content (e.g. step 4's long sub-questions) hides it just as badly.
-           position:sticky anchors it to the bottom of .gc-main's own scroll
-           area, so on desktop it never overlaps the left brand panel. */
-        .gc-intake-wrap{padding-bottom:20px}
-        .gc-intake-nav{position:sticky;bottom:0;background:${C.bg};padding:14px 0 calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(124,63,63,.08);z-index:40}
+        /* Shorter laptop windows (not phones — those use the width query
+           below): tighten vertical spacing so the Continue button fits on
+           screen without needing a sticky bar or scrolling. */
+        @media(min-width:901px) and (max-height:820px){
+          .gc-main{padding-top:22px!important;padding-bottom:26px!important}
+          .gc-progress{margin-bottom:16px!important}
+          .gc-bubble{margin-bottom:14px!important}
+          .gc-intake-nav{margin-top:16px!important;padding-top:14px!important}
+        }
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
           .gc-mobile-header{display:flex!important}
           .gc-topnav{flex-wrap:nowrap!important}
@@ -1258,7 +1260,6 @@ export default function Home() {
           .gc-topnav nav::-webkit-scrollbar{display:none}
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
-          .gc-intake-nav{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}
         }
       `}</style>
 
@@ -1391,7 +1392,7 @@ export default function Home() {
               {screen === "intake" && (
                 <div className="gc-intake-wrap" style={{ maxWidth:640, width:"100%", margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
                   {/* Progress */}
-                  <div style={{ marginBottom:30 }}>
+                  <div className="gc-progress" style={{ marginBottom:30 }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:9 }}>
                       <span style={{ fontSize:13, fontWeight:600, letterSpacing:".04em", textTransform:"uppercase" as const, color:C.muted3 }}>{tr.stepWord} {step+1} {tr.ofWord} 4</span>
                     </div>
@@ -1401,7 +1402,7 @@ export default function Home() {
                   </div>
 
                   {/* Concierge bubble */}
-                  <div key={`bubble-${stepKey}`} className="gc-fade" style={{ display:"flex", gap:14, marginBottom:26, alignItems:"flex-start" }}>
+                  <div key={`bubble-${stepKey}`} className="gc-fade gc-bubble" style={{ display:"flex", gap:14, marginBottom:26, alignItems:"flex-start" }}>
                     <div style={{ flexShrink:0, width:46, height:46, borderRadius:"50%", background:"linear-gradient(140deg,#7c3f3f,#a8694a)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f3e7d8", fontFamily:DISPLAY, fontWeight:600, fontSize:19, boxShadow:"0 4px 12px rgba(124,63,63,.25)" }}>G</div>
                     <div style={{ background:"#fff", border:`1px solid ${C.border}`, borderRadius:"4px 18px 18px 18px", padding:"15px 19px", boxShadow:"0 2px 10px rgba(124,63,63,.05)" }}>
                       <div style={{ fontSize:12, fontWeight:600, color:C.gold, letterSpacing:".03em", marginBottom:3 }}>{tr.conciergeLabel}</div>
