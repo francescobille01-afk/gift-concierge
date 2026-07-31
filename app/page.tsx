@@ -1302,6 +1302,11 @@ export default function Home() {
         @keyframes gcorbit { to{transform:rotate(360deg)} }
         @keyframes gcpulse { 0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1)} }
         @keyframes gcbob   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
+        @keyframes gcbarglow {
+          0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.25),0 10px 26px rgba(124,63,63,.25); }
+          50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
+        }
+        .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
         .gc-bob   {animation:gcbob 2s ease-in-out infinite}
@@ -1600,7 +1605,7 @@ export default function Home() {
                     transition:"border-radius .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), padding .3s cubic-bezier(.4,0,.2,1)",
                   }}>
                   <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
-                  <div style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                  <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
                     <input
                       type="text" autoComplete="off" autoCorrect="off" name="gc-landing-relationship"
                       value={g.relationship}
