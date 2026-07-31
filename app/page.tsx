@@ -969,6 +969,10 @@ export default function Home() {
   const [screen,      setScreen]      = useState<"landing"|"intake"|"loading"|"results">("intake");
   const [landingBarFocused, setLandingBarFocused] = useState(false);
   const [landingDisclaimerOpen, setLandingDisclaimerOpen] = useState(false);
+  // Set when the mobile landing bar's free-text answer is used to fill
+  // g.relationship directly — step 0 then skips its own relationship
+  // picker since it's already answered.
+  const [skipRelPicker, setSkipRelPicker] = useState(false);
   const gcMainRef = useRef<HTMLElement>(null);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
@@ -1089,7 +1093,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null);
+    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1588,26 +1592,43 @@ export default function Home() {
               nested inside a custom overflow:auto scroller (here .gc-main),
               so we sidestep that entirely rather than fight it. */}
           {screen === "landing" && typeof document !== "undefined" && createPortal(
-            <div
-              onClick={() => { setLandingBarFocused(true); setTimeout(() => setScreen("intake"), 260); }}
-              style={{
-                position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
-                borderRadius: landingBarFocused ? "32px 32px 0 0" : "26px 26px 0 0",
-                boxShadow: landingBarFocused ? "0 -14px 32px rgba(0,0,0,.22)" : "0 -10px 24px rgba(0,0,0,.15)",
-                padding: landingBarFocused
-                  ? "28px 16px calc(30px + env(safe-area-inset-bottom))"
-                  : "18px 16px calc(20px + env(safe-area-inset-bottom))",
-                zIndex:200, cursor:"pointer",
-                transition:"border-radius .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), padding .3s cubic-bezier(.4,0,.2,1)",
-              }}>
-              <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
-              <div style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", textAlign:"left" as const, transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
-                <span style={{ flex:1, fontSize:15, color:"#9a8674" }}>{tr.chatBarLabel}</span>
-                <span style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </span>
-              </div>
-            </div>,
+            (() => {
+              const submitLandingAnswer = () => {
+                if (!g.relationship.trim()) return;
+                setSkipRelPicker(true);
+                setScreen("intake");
+              };
+              return (
+                <div
+                  style={{
+                    position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
+                    borderRadius: landingBarFocused ? "32px 32px 0 0" : "26px 26px 0 0",
+                    boxShadow: landingBarFocused ? "0 -14px 32px rgba(0,0,0,.22)" : "0 -10px 24px rgba(0,0,0,.15)",
+                    padding: landingBarFocused
+                      ? "28px 16px calc(30px + env(safe-area-inset-bottom))"
+                      : "18px 16px calc(20px + env(safe-area-inset-bottom))",
+                    zIndex:200,
+                    transition:"border-radius .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), padding .3s cubic-bezier(.4,0,.2,1)",
+                  }}>
+                  <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
+                  <div style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                    <input
+                      type="text" autoComplete="off" autoCorrect="off" name="gc-landing-relationship"
+                      value={g.relationship}
+                      onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
+                      onFocus={() => setLandingBarFocused(true)}
+                      onKeyDown={e => { if (e.key === "Enter") submitLandingAnswer(); }}
+                      placeholder={tr.chatBarLabel}
+                      style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:15, fontFamily:BODY, color:C.ink }}
+                    />
+                    <button onClick={submitLandingAnswer} aria-label={tr.continue} disabled={!g.relationship.trim()}
+                      style={{ width:44, height:44, borderRadius:"50%", border:"none", background: g.relationship.trim() ? "linear-gradient(150deg,#8c4f4f,#7c3f3f)" : C.bord3, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor: g.relationship.trim() ? "pointer" : "not-allowed" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              );
+            })(),
             document.body
           )}
 
@@ -1640,23 +1661,27 @@ export default function Home() {
                     {/* Step 0 — Relationship + Gender + Age */}
                     {step === 0 && (
                       <div>
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.relTitle}</div>
-                        <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
-                          {tr.rel.map((r, i) => (
-                            <button key={i} onClick={() => setG(p => ({ ...p, relationship: r, showOtherRel: r === tr.rel[tr.rel.length - 1] }))} style={chipSt(g.relationship === r || (g.showOtherRel && r === tr.rel[tr.rel.length - 1]))}>{r}</button>
-                          ))}
-                        </div>
-                        {g.showOtherRel && (
-                          <input
-                            type="text" autoFocus autoComplete="off" autoCorrect="off" name="gc-relation-other"
-                            value={g.relationship === tr.rel[tr.rel.length - 1] ? "" : g.relationship}
-                            onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
-                            onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
-                            placeholder={tr.relOtherPlaceholder}
-                            style={{ width:"100%", marginTop:14, padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
-                          />
+                        {!skipRelPicker && (
+                          <>
+                            <div style={{ fontSize:14, fontWeight:600, color:C.label, marginBottom:11 }}>{tr.relTitle}</div>
+                            <div style={{ display:"flex", flexWrap:"wrap", gap:9 }}>
+                              {tr.rel.map((r, i) => (
+                                <button key={i} onClick={() => setG(p => ({ ...p, relationship: r, showOtherRel: r === tr.rel[tr.rel.length - 1] }))} style={chipSt(g.relationship === r || (g.showOtherRel && r === tr.rel[tr.rel.length - 1]))}>{r}</button>
+                              ))}
+                            </div>
+                            {g.showOtherRel && (
+                              <input
+                                type="text" autoFocus autoComplete="off" autoCorrect="off" name="gc-relation-other"
+                                value={g.relationship === tr.rel[tr.rel.length - 1] ? "" : g.relationship}
+                                onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
+                                onKeyDown={e => { if (e.key === "Enter" && canContinue()) advance(); }}
+                                placeholder={tr.relOtherPlaceholder}
+                                style={{ width:"100%", marginTop:14, padding:"14px 16px", border:`1.5px solid ${C.bord3}`, borderRadius:14, fontFamily:BODY, fontSize:16, fontWeight:500, color:C.ink, background:"#fff", boxSizing:"border-box" as const }}
+                              />
+                            )}
+                          </>
                         )}
-                        <div style={{ fontSize:14, fontWeight:600, color:C.label, margin:"30px 0 11px" }}>{tr.genderQ}</div>
+                        <div style={{ fontSize:14, fontWeight:600, color:C.label, margin: skipRelPicker ? "0 0 11px" : "30px 0 11px" }}>{tr.genderQ}</div>
                         <div style={{ display:"flex", flexWrap:"wrap", gap:9, marginBottom:30 }}>
                           {tr.genderOpts.map((opt, i) => (
                             <button key={i} onClick={() => setG(p => ({ ...p, gender: opt }))} style={chipSt(g.gender === opt)}>{opt}</button>
