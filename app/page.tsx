@@ -973,6 +973,13 @@ export default function Home() {
   // g.relationship directly — step 0 then skips its own relationship
   // picker since it's already answered.
   const [skipRelPicker, setSkipRelPicker] = useState(false);
+  // "How it works" hopping dot: driven by measured badge centers (not CSS
+  // % keyframes) so it lands exactly on each badge regardless of how tall
+  // the rows render (description text length/wrapping varies per language).
+  const [stepActiveIdx, setStepActiveIdx] = useState(0);
+  const [stepDotTop, setStepDotTop] = useState<number | null>(null);
+  const stepListRef = useRef<HTMLDivElement>(null);
+  const stepBadgeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const gcMainRef = useRef<HTMLElement>(null);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
@@ -1010,6 +1017,30 @@ export default function Home() {
   useEffect(() => {
     if (window.innerWidth <= 900) setScreen("landing");
   }, []);
+
+  /* ── Landing "how it works" dot: measure each badge's vertical center
+     relative to the list container, then cycle the active index on a
+     timer. Re-measures on resize (rotation / dynamic-viewport changes). ── */
+  useEffect(() => {
+    if (screen !== "landing") return;
+    const measure = () => {
+      const list = stepListRef.current;
+      const badge = stepBadgeRefs.current[stepActiveIdx];
+      if (!list || !badge) return;
+      const listRect = list.getBoundingClientRect();
+      const badgeRect = badge.getBoundingClientRect();
+      setStepDotTop(badgeRect.top - listRect.top + badgeRect.height / 2 - 5);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [screen, stepActiveIdx]);
+
+  useEffect(() => {
+    if (screen !== "landing") return;
+    const id = setInterval(() => setStepActiveIdx(i => (i + 1) % 3), 1500);
+    return () => clearInterval(id);
+  }, [screen]);
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
@@ -1307,26 +1338,14 @@ export default function Home() {
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
         }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
-        @keyframes gcflowdot {
-          0%   { top:0; opacity:0; transform:scale(1); }
-          5%   { opacity:1; }
-          12%  { transform:scale(1.35); }
-          20%  { transform:scale(1); opacity:1; }
-          40%  { top:calc(50% - 5px); opacity:1; transform:scale(1); }
-          47%  { transform:scale(1.35); }
-          55%  { transform:scale(1); opacity:1; }
-          80%  { top:calc(100% - 10px); opacity:1; transform:scale(1); }
-          87%  { transform:scale(1.35); }
-          95%  { transform:scale(1); opacity:1; }
-          100% { top:calc(100% - 10px); opacity:0; }
+        @keyframes gcdotpulse {
+          0%,100% { transform:scale(1); }
+          50%     { transform:scale(1.4); }
         }
-        .gc-flow-dot { animation:gcflowdot 4s ease-in-out infinite; }
-        @keyframes gcstepbadge {
-          0%,100% { background:rgba(255,255,255,.16); box-shadow:none; transform:scale(1); }
-          15%     { background:rgba(240,217,168,.4); box-shadow:0 0 18px 5px rgba(240,217,168,.45); transform:scale(1.1); }
-          30%     { background:rgba(255,255,255,.16); box-shadow:none; transform:scale(1); }
-        }
-        .gc-step-badge { animation:gcstepbadge 4s ease-in-out infinite; }
+        .gc-flow-dot { transition:top .5s cubic-bezier(.4,0,.2,1); }
+        .gc-flow-dot-pulse { animation:gcdotpulse .5s ease-out; }
+        .gc-step-badge { transition:background .3s ease, box-shadow .3s ease, transform .3s ease; }
+        .gc-step-badge--active { background:rgba(240,217,168,.4) !important; box-shadow:0 0 18px 5px rgba(240,217,168,.45); transform:scale(1.1); }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
         .gc-bob   {animation:gcbob 2s ease-in-out infinite}
@@ -1511,7 +1530,7 @@ export default function Home() {
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
               {/* Top row: icon badge + language pill */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
                 <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <GiftSVG size={18} fill="#4a2a16" />
                 </div>
@@ -1537,9 +1556,9 @@ export default function Home() {
               {/* Title block */}
               <div style={{ textAlign:"center", marginBottom:4 }}>
                 <div style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:40, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:16 }}>{tr.landingKicker}</div>
-                <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 16px", fontSize:14.5 }}>{tr.landingSub}</p>
-                <div style={{ textAlign:"center", marginBottom:28 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:10 }}>{tr.landingKicker}</div>
+                <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 12px", fontSize:14.5 }}>{tr.landingSub}</p>
+                <div style={{ textAlign:"center", marginBottom:18 }}>
                   <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
                 </div>
               </div>
@@ -1549,15 +1568,17 @@ export default function Home() {
                   Centered as a group (not edge-to-edge) so the block doesn't
                   pull all the visual weight to the left. */}
               <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
-                <div style={{ position:"relative" }}>
-                  <div className="gc-flow-dot" style={{ position:"absolute", left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
+                <div ref={stepListRef} style={{ position:"relative" }}>
+                  {stepDotTop != null && (
+                    <div className="gc-flow-dot" style={{ position:"absolute", top:stepDotTop, left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
+                  )}
                   {[
                     [1, tr.howStep1Title, tr.howStep1Desc],
                     [2, tr.howStep2Title, tr.howStep2Desc],
                     [3, tr.howStep3Title, tr.howStep3Desc],
                   ].map(([n, title, desc], i) => (
-                    <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22, position:"relative", maxWidth:280 }}>
-                      <div className="gc-step-badge" style={{ width:36, height:36, borderRadius:"50%", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0, animationDelay:`${i * 1.9}s` }}>{n}</div>
+                    <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 18, position:"relative", maxWidth:280 }}>
+                      <div ref={el => { stepBadgeRefs.current[i] = el; }} className={`gc-step-badge${i === stepActiveIdx ? " gc-step-badge--active" : ""}`} style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.16)", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0 }}>{n}</div>
                       <div style={{ paddingTop:2 }}>
                         <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
                         <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
@@ -1571,7 +1592,7 @@ export default function Home() {
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
                   on mobile). */}
-              <div style={{ textAlign:"center", marginTop:6, position:"relative" }}>
+              <div style={{ textAlign:"center", marginTop:0, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
