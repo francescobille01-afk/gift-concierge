@@ -150,7 +150,6 @@ interface Tr {
   card2Meta: string; card2Title: string; card2Price: string;
   chatBarPrompt: string; chatBarLabel: string;
   stepCaption1: string; stepCaption2: string; stepCaption3: string;
-  stageTag1: string; stageTag2: string; stageTag3: string;
 }
 
 const TR: Record<TKey, Tr> = {
@@ -298,7 +297,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"FOR MARCO · 41 · ANNIVERSARY · LOVES MOTORBIKES", card2Title:"Vintage leather biker jacket", card2Price:"€220",
     chatBarPrompt:"✍️ Start writing below", chatBarLabel:"Who's the gift for? e.g. Girlfriend, friends…",
     stepCaption1:"Help us understand the recipient", stepCaption2:"Gifty analyses and picks from thousands of ideas", stepCaption3:"Choose and gift it via Amazon",
-    stageTag1:"Friend", stageTag2:"23 y/o", stageTag3:"Sporty",
   },
   it: {
     nav:["Home","Preferiti"],
@@ -444,7 +442,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"PER MARCO · 41 ANNI · ANNIVERSARIO · APPASSIONATO DI MOTO", card2Title:"Giacca da moto in pelle vintage", card2Price:"€220",
     chatBarPrompt:"✍️ Inizia scrivendo qui sotto", chatBarLabel:"Per chi è il regalo? Es. Fidanzata/o, amici…",
     stepCaption1:"Aiutaci a comprendere il destinatario", stepCaption2:"Gifty analizza e seleziona tra migliaia di idee", stepCaption3:"Scegli e regala tramite Amazon",
-    stageTag1:"Amico", stageTag2:"23 anni", stageTag3:"Sportivo",
   },
   fr: {
     nav:["Accueil","Favoris"],
@@ -510,7 +507,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"POUR MARCO · 41 ANS · ANNIVERSAIRE DE MARIAGE · AIME LA MOTO", card2Title:"Blouson moto en cuir vintage", card2Price:"220€",
     chatBarPrompt:"✍️ Commencez à écrire ci-dessous", chatBarLabel:"Pour qui est le cadeau ? Ex. Copine/copain, amis…",
     stepCaption1:"Aidez-nous à comprendre le destinataire", stepCaption2:"Gifty analyse et sélectionne parmi des milliers d'idées", stepCaption3:"Choisissez et offrez via Amazon",
-    stageTag1:"Ami", stageTag2:"23 ans", stageTag3:"Sportif",
   },
   de: {
     nav:["Start","Favoriten"],
@@ -576,7 +572,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"FÜR MARCO · 41 · JAHRESTAG · LIEBT MOTORRÄDER", card2Title:"Vintage-Lederjacke für Motorradfahrer", card2Price:"220€",
     chatBarPrompt:"✍️ Schreib unten los", chatBarLabel:"Für wen ist das Geschenk? z. B. Freundin/Freund, Freunde…",
     stepCaption1:"Hilf uns, die beschenkte Person zu verstehen", stepCaption2:"Gifty analysiert und wählt aus Tausenden Ideen aus", stepCaption3:"Auswählen und über Amazon verschenken",
-    stageTag1:"Freund", stageTag2:"23 Jahre", stageTag3:"Sportlich",
   },
   es: {
     nav:["Inicio","Favoritos"],
@@ -642,7 +637,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"PARA MARCO · 41 · ANIVERSARIO · AMA LAS MOTOS", card2Title:"Chaqueta de moto de cuero vintage", card2Price:"220€",
     chatBarPrompt:"✍️ Empieza a escribir aquí abajo", chatBarLabel:"¿Para quién es el regalo? Ej. Novia/o, amigos…",
     stepCaption1:"Ayúdanos a entender al destinatario", stepCaption2:"Gifty analiza y elige entre miles de ideas", stepCaption3:"Elige y regala a través de Amazon",
-    stageTag1:"Amigo", stageTag2:"23 años", stageTag3:"Deportista",
   },
   pt: {
     nav:["Início","Favoritos"],
@@ -708,7 +702,6 @@ const TR: Record<TKey, Tr> = {
     card2Meta:"PARA MARCO · 41 · ANIVERSÁRIO DE CASAMENTO · AMA MOTOS", card2Title:"Jaqueta de moto em couro vintage", card2Price:"€220",
     chatBarPrompt:"✍️ Comece a escrever abaixo", chatBarLabel:"Para quem é o presente? Ex. Namorada/o, amigos…",
     stepCaption1:"Ajude-nos a entender quem vai receber", stepCaption2:"A Gifty analisa e escolhe entre milhares de ideias", stepCaption3:"Escolha e presenteie através da Amazon",
-    stageTag1:"Amigo", stageTag2:"23 anos", stageTag3:"Desportista",
   },
 };
 
@@ -1346,30 +1339,6 @@ export default function Home() {
         .gc-stage-smile { animation:gcSmileDraw 2.4s ease-in-out infinite; }
         .gc-stage-dot { width:9px; height:9px; border-radius:50%; animation:gcDotActive 9s steps(1,end) infinite; }
         .gc-stage-line-fill { height:100%; width:100%; background:#e3c089; transform:scaleX(0); animation:gcLineFill 3s linear infinite; }
-        /* Scene 1 — profile tags pop in/out inside the chat bubble, each
-           taking a ~1s slice of the scene's own 3s active window (absolute
-           timing baked into the keyframe percentages of the shared 9s loop,
-           so no per-instance delay is needed). */
-        @keyframes gcTag1 { 0%,2%{opacity:0;transform:scale(.7) translateY(3px)} 4%{opacity:1;transform:scale(1) translateY(0)} 9%{opacity:1} 11%,100%{opacity:0;transform:scale(.7) translateY(-3px)} }
-        @keyframes gcTag2 { 0%,12%{opacity:0;transform:scale(.7) translateY(3px)} 14%{opacity:1;transform:scale(1) translateY(0)} 20%{opacity:1} 22%,100%{opacity:0;transform:scale(.7) translateY(-3px)} }
-        @keyframes gcTag3 { 0%,23%{opacity:0;transform:scale(.7) translateY(3px)} 25%{opacity:1;transform:scale(1) translateY(0)} 31%{opacity:1} 33%,100%{opacity:0;transform:scale(.7) translateY(-3px)} }
-        .gc-stage-tag1 { animation:gcTag1 9s ease-in-out infinite; }
-        .gc-stage-tag2 { animation:gcTag2 9s ease-in-out infinite; }
-        .gc-stage-tag3 { animation:gcTag3 9s ease-in-out infinite; }
-        /* Scene 2 — two rows of gift emoji scroll like a ticker behind
-           translucent "search bar" pills, suggesting many ideas being
-           scanned. Content is duplicated so translateX(-50%) loops
-           seamlessly. */
-        @keyframes gcTicker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-        .gc-stage-ticker { animation:gcTicker 5s linear infinite; }
-        .gc-stage-ticker--slow { animation:gcTicker 7s linear infinite reverse; }
-        /* Scene 3 — a soft burst ring timed to when the lid finishes
-           opening (absolute ~7s-7.9s of the shared 9s loop), plus two
-           small sparkles orbiting the box. */
-        @keyframes gcBurst { 0%,77.7%{opacity:0;transform:scale(.3)} 79%{opacity:.85;transform:scale(.6)} 88%,100%{opacity:0;transform:scale(1.9)} }
-        .gc-stage-burst { animation:gcBurst 9s ease-out infinite; }
-        @keyframes gcSparkleOrbit { from{transform:rotate(0deg) translateX(19px) rotate(0deg)} to{transform:rotate(360deg) translateX(19px) rotate(-360deg)} }
-        .gc-stage-sparkle { animation:gcSparkleOrbit 3s linear infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
         .gc-bob   {animation:gcbob 2s ease-in-out infinite}
@@ -1595,23 +1564,21 @@ export default function Home() {
                     <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <circle cx="24" cy="26" r="13" stroke="#f0d9a8" strokeWidth="2.2"/>
                       <path d="M8 54c1-10 8-16 16-16s15 6 16 16" stroke="#f0d9a8" strokeWidth="2.2" strokeLinecap="round"/>
-                      <rect x="40" y="6" width="28" height="20" rx="8" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
-                      <path d="M46 26l-3 6 7-6" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
+                      <g>
+                        <rect x="40" y="6" width="28" height="20" rx="8" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
+                        <path d="M46 26l-3 6 7-6" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
+                        <circle className="gc-stage-typing-dot" cx="48" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:"0s", transformOrigin:"48px 16px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="54" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".15s", transformOrigin:"54px 16px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="60" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".3s", transformOrigin:"60px 16px" }}/>
+                      </g>
                     </svg>
-                    {/* Profile tags pop in/out inside the chat bubble,
-                        one at a time — what we actually ask in the wizard. */}
-                    <div style={{ position:"absolute", left:"53%", top:"6%", width:"42%", height:"34%", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span className="gc-stage-tag1" style={{ position:"absolute", fontSize:8.5, fontWeight:700, color:"#4a2a16", background:"#f0d9a8", borderRadius:999, padding:"2.5px 7px", whiteSpace:"nowrap" }}>{tr.stageTag1}</span>
-                      <span className="gc-stage-tag2" style={{ position:"absolute", fontSize:8.5, fontWeight:700, color:"#4a2a16", background:"#f0d9a8", borderRadius:999, padding:"2.5px 7px", whiteSpace:"nowrap" }}>{tr.stageTag2}</span>
-                      <span className="gc-stage-tag3" style={{ position:"absolute", fontSize:8.5, fontWeight:700, color:"#4a2a16", background:"#f0d9a8", borderRadius:999, padding:"2.5px 7px", whiteSpace:"nowrap" }}>{tr.stageTag3}</span>
-                    </div>
                   </div>
                   <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption1}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
-                  <div style={{ position:"relative", width:90, height:52, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="58" height="52" viewBox="0 0 72 64" fill="none">
+                  <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <circle className="gc-stage-node" cx="36" cy="32" r="7" fill="#f0d9a8"/>
                       <circle className="gc-stage-node" cx="14" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".2s" }}/>
                       <circle className="gc-stage-node" cx="58" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".5s" }}/>
@@ -1620,30 +1587,11 @@ export default function Home() {
                       <path className="gc-stage-signal" d="M36 32L14 14M36 32L58 14M36 32L10 46M36 32L62 48" stroke="#e3c089" strokeWidth="1.4" strokeDasharray="4 3"/>
                     </svg>
                   </div>
-                  {/* Semi-transparent "search bar" strips with gift emoji
-                      streaming through, like results being scanned. */}
-                  <div style={{ display:"flex", flexDirection:"column", gap:4, width:96 }}>
-                    <div style={{ position:"relative", height:16, borderRadius:8, background:"rgba(255,255,255,.12)", border:"1px solid rgba(240,217,168,.3)", overflow:"hidden" }}>
-                      <div className="gc-stage-ticker" style={{ position:"absolute", display:"flex", gap:8, fontSize:11, lineHeight:"16px", paddingLeft:6 }}>
-                        <span>🎁</span><span>☕</span><span>👟</span><span>📷</span><span>🧣</span><span>🎧</span>
-                        <span>🎁</span><span>☕</span><span>👟</span><span>📷</span><span>🧣</span><span>🎧</span>
-                      </div>
-                    </div>
-                    <div style={{ position:"relative", height:14, borderRadius:7, background:"rgba(255,255,255,.08)", border:"1px solid rgba(240,217,168,.2)", overflow:"hidden" }}>
-                      <div className="gc-stage-ticker gc-stage-ticker--slow" style={{ position:"absolute", display:"flex", gap:8, fontSize:9.5, lineHeight:"14px", paddingLeft:6, opacity:.75 }}>
-                        <span>🧴</span><span>⌚️</span><span>🎮</span><span>👜</span><span>📚</span><span>🧸</span>
-                        <span>🧴</span><span>⌚️</span><span>🎮</span><span>👜</span><span>📚</span><span>🧸</span>
-                      </div>
-                    </div>
-                  </div>
                   <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:260, lineHeight:1.35 }}>{tr.stepCaption2}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"6s" }}>
                   <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <div className="gc-stage-burst" style={{ position:"absolute", width:44, height:44, borderRadius:"50%", border:"2px solid #e3c089" }}/>
-                    <div className="gc-stage-sparkle" style={{ position:"absolute", width:5, height:5, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 6px 2px rgba(240,217,168,.7)" }}/>
-                    <div className="gc-stage-sparkle" style={{ position:"absolute", width:4, height:4, borderRadius:"50%", background:"#e3c089", boxShadow:"0 0 5px 2px rgba(227,192,137,.6)", animationDelay:"-1.5s" }}/>
                     <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <rect x="21" y="26" width="30" height="26" rx="3" fill="rgba(240,217,168,.14)" stroke="#e3c089" strokeWidth="2"/>
                       <path d="M21 34h30" stroke="#e3c089" strokeWidth="2"/>
