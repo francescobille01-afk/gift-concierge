@@ -1443,7 +1443,7 @@ export default function Home() {
             {/* Mobile-only brand mark — .gc-brand (with the full logo) is hidden
                 below 900px, so without this the mobile header has no branding
                 at all. Shown via CSS only under 900px (see gc-mobile-header). */}
-            <div className="gc-mobile-header" style={{ display:"none", alignItems:"center", gap:10, marginRight:"auto" }}>
+            <button onClick={restart} className="gc-mobile-header" style={{ display:"none", alignItems:"center", gap:10, marginRight:"auto", background:"none", border:"none", padding:0, cursor:"pointer", textAlign:"left" as const }}>
               <div style={{ width:34, height:34, borderRadius:9, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                 <GiftSVG size={19} fill="#4a2a16" />
               </div>
@@ -1451,7 +1451,7 @@ export default function Home() {
                 <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:19, color:C.ink, letterSpacing:"-.01em" }}>Gifty</span>
                 <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".04em", color:C.muted2, textTransform:"uppercase" as const }}>AI Gift Concierge</span>
               </div>
-            </div>
+            </button>
             {/* Language menu */}
             <div ref={langMenuRef} style={{ position:"relative" }}>
               <button onClick={() => setLangMenuOpen(v => !v)}
