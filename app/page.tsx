@@ -1441,13 +1441,7 @@ export default function Home() {
         </aside>
 
         {/* ══ MAIN COLUMN ══════════════════════════════════════ */}
-        <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : "gc-main"} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}
-          onScroll={screen === "landing" ? (e) => {
-            const el = e.currentTarget;
-            const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-            if (nearBottom) setLandingBarFocused(true);
-          } : undefined}
-        >
+        <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : "gc-main"} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}>
 
           {/* Top nav */}
           {screen !== "landing" && (
@@ -1596,13 +1590,10 @@ export default function Home() {
                 <div
                   style={{
                     position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
-                    borderRadius: landingBarFocused ? "32px 32px 0 0" : "26px 26px 0 0",
-                    boxShadow: landingBarFocused ? "0 -14px 32px rgba(0,0,0,.22)" : "0 -10px 24px rgba(0,0,0,.15)",
-                    padding: landingBarFocused
-                      ? "28px 16px calc(30px + env(safe-area-inset-bottom))"
-                      : "18px 16px calc(20px + env(safe-area-inset-bottom))",
+                    borderRadius:"26px 26px 0 0",
+                    boxShadow:"0 -10px 24px rgba(0,0,0,.15)",
+                    padding:"18px 16px calc(20px + env(safe-area-inset-bottom))",
                     zIndex:200,
-                    transition:"border-radius .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), padding .3s cubic-bezier(.4,0,.2,1)",
                   }}>
                   <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
                   <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
@@ -1611,6 +1602,7 @@ export default function Home() {
                       value={g.relationship}
                       onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
                       onFocus={() => setLandingBarFocused(true)}
+                      onBlur={() => setLandingBarFocused(false)}
                       onKeyDown={e => { if (e.key === "Enter") submitLandingAnswer(); }}
                       placeholder={tr.chatBarLabel}
                       style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink }}
