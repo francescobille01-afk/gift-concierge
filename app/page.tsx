@@ -1492,7 +1492,7 @@ export default function Home() {
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
               {/* Top row: icon badge + language pill */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:26 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
                 <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <GiftSVG size={18} fill="#4a2a16" />
                 </div>
