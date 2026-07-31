@@ -1592,7 +1592,7 @@ export default function Home() {
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
                   on mobile). */}
-              <div style={{ textAlign:"center", marginTop:0, position:"relative" }}>
+              <div style={{ textAlign:"center", marginTop:16, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
