@@ -141,6 +141,13 @@ interface Tr {
   orWord: string; termsNote: string; waitMsg: string;
   checkEmail: string; codeSent: string; verifyCode: string; verifying: string;
   disclaimerAmazon: string; disclaimerPrice: string;
+  landingKicker: string; landingSub: string;
+  howStep1Title: string; howStep1Desc: string;
+  howStep2Title: string; howStep2Desc: string;
+  howStep3Title: string; howStep3Desc: string;
+  card1Meta: string; card1Title: string; card1Price: string;
+  card2Meta: string; card2Title: string; card2Price: string;
+  chatBarPrompt: string; chatBarLabel: string;
 }
 
 const TR: Record<TKey, Tr> = {
@@ -279,6 +286,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
     checkEmail:"Check your email", codeSent:"We sent a 6-digit code to", verifyCode:"Verify code", verifying:"Verifying…",
     disclaimerAmazon:"As an Amazon Associate, Gifty receives compensation from qualifying purchases.", disclaimerPrice:"Prices and availability subject to change.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Answer a few quick questions and Gifty will find the perfect gift in seconds",
+    howStep1Title:"Tell us who it's for", howStep1Desc:"Age, tastes, occasion and budget",
+    howStep2Title:"Gifty analyses thousands of ideas", howStep2Desc:"AI matches tastes and budget",
+    howStep3Title:"Pick and gift it", howStep3Desc:"6 ready picks, buyable on Amazon",
+    card1Meta:"FOR ANNA · 28 · BIRTHDAY · LOVES COFFEE", card1Title:"Artisan coffee tasting box", card1Price:"€38",
+    card2Meta:"FOR MARCO · 41 · ANNIVERSARY · LOVES MOTORBIKES", card2Title:"Vintage leather biker jacket", card2Price:"€220",
+    chatBarPrompt:"✍️ Start writing below", chatBarLabel:"Who's the gift for? e.g. Girlfriend, friends…",
   },
   it: {
     nav:["Home","Preferiti"],
@@ -415,6 +430,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
     checkEmail:"Controlla la tua email", codeSent:"Abbiamo inviato un codice a 6 cifre a", verifyCode:"Verifica codice", verifying:"Verifica in corso…",
     disclaimerAmazon:"In qualità di Affiliato Amazon, Gifty riceve compensi dagli acquisti idonei.", disclaimerPrice:"Prezzi e disponibilità soggetti a modifica.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Rispondi a qualche domanda e Gifty troverà il regalo perfetto in pochi secondi",
+    howStep1Title:"Racconta a chi lo regali", howStep1Desc:"Età, gusti, occasione e budget",
+    howStep2Title:"Gifty analizza migliaia di idee", howStep2Desc:"L'AI incrocia gusti e budget",
+    howStep3Title:"Scegli e regala", howStep3Desc:"6 proposte pronte, acquistabili su Amazon",
+    card1Meta:"PER ANNA · 28 ANNI · COMPLEANNO · APPASSIONATA DI CAFFÈ", card1Title:"Box degustazione caffè artigianale", card1Price:"€38",
+    card2Meta:"PER MARCO · 41 ANNI · ANNIVERSARIO · APPASSIONATO DI MOTO", card2Title:"Giacca da moto in pelle vintage", card2Price:"€220",
+    chatBarPrompt:"✍️ Inizia scrivendo qui sotto", chatBarLabel:"Per chi è il regalo? Es. Fidanzata/o, amici…",
   },
   fr: {
     nav:["Accueil","Favoris"],
@@ -471,6 +494,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
     checkEmail:"Vérifiez votre email", codeSent:"Nous avons envoyé un code à 6 chiffres à", verifyCode:"Vérifier le code", verifying:"Vérification…",
     disclaimerAmazon:"En tant que partenaire Amazon, Gifty reçoit des commissions sur les achats éligibles.", disclaimerPrice:"Prix et disponibilité sujets à modification.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Répondez à quelques questions rapides et Gifty trouvera le cadeau parfait en quelques secondes",
+    howStep1Title:"Dites-nous pour qui c'est", howStep1Desc:"Âge, goûts, occasion et budget",
+    howStep2Title:"Gifty analyse des milliers d'idées", howStep2Desc:"L'IA associe goûts et budget",
+    howStep3Title:"Choisissez et offrez", howStep3Desc:"6 idées prêtes, achetables sur Amazon",
+    card1Meta:"POUR ANNA · 28 ANS · ANNIVERSAIRE · AIME LE CAFÉ", card1Title:"Coffret dégustation café artisanal", card1Price:"38€",
+    card2Meta:"POUR MARCO · 41 ANS · ANNIVERSAIRE DE MARIAGE · AIME LA MOTO", card2Title:"Blouson moto en cuir vintage", card2Price:"220€",
+    chatBarPrompt:"✍️ Commencez à écrire ci-dessous", chatBarLabel:"Pour qui est le cadeau ? Ex. Copine/copain, amis…",
   },
   de: {
     nav:["Start","Favoriten"],
@@ -527,6 +558,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
     checkEmail:"Prüfe deine E-Mail", codeSent:"Wir haben einen 6-stelligen Code gesendet an", verifyCode:"Code bestätigen", verifying:"Wird überprüft…",
     disclaimerAmazon:"Als Amazon-Partner erhält Gifty Provisionen von qualifizierten Käufen.", disclaimerPrice:"Preise und Verfügbarkeit können sich ändern.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Beantworte ein paar kurze Fragen und Gifty findet in Sekunden das perfekte Geschenk",
+    howStep1Title:"Erzähl uns, für wen es ist", howStep1Desc:"Alter, Geschmack, Anlass und Budget",
+    howStep2Title:"Gifty analysiert Tausende Ideen", howStep2Desc:"Die KI kombiniert Geschmack und Budget",
+    howStep3Title:"Auswählen und verschenken", howStep3Desc:"6 fertige Vorschläge, kaufbar auf Amazon",
+    card1Meta:"FÜR ANNA · 28 · GEBURTSTAG · LIEBT KAFFEE", card1Title:"Kaffee-Verkostungsbox", card1Price:"38€",
+    card2Meta:"FÜR MARCO · 41 · JAHRESTAG · LIEBT MOTORRÄDER", card2Title:"Vintage-Lederjacke für Motorradfahrer", card2Price:"220€",
+    chatBarPrompt:"✍️ Schreib unten los", chatBarLabel:"Für wen ist das Geschenk? z. B. Freundin/Freund, Freunde…",
   },
   es: {
     nav:["Inicio","Favoritos"],
@@ -583,6 +622,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
     checkEmail:"Revisa tu email", codeSent:"Enviamos un código de 6 dígitos a", verifyCode:"Verificar código", verifying:"Verificando…",
     disclaimerAmazon:"Como afiliado de Amazon, Gifty recibe compensaciones por compras elegibles.", disclaimerPrice:"Precios y disponibilidad sujetos a cambios.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Responde algunas preguntas rápidas y Gifty encontrará el regalo perfecto en segundos",
+    howStep1Title:"Cuéntanos para quién es", howStep1Desc:"Edad, gustos, ocasión y presupuesto",
+    howStep2Title:"Gifty analiza miles de ideas", howStep2Desc:"La IA combina gustos y presupuesto",
+    howStep3Title:"Elige y regala", howStep3Desc:"6 propuestas listas, disponibles en Amazon",
+    card1Meta:"PARA ANA · 28 · CUMPLEAÑOS · AMA EL CAFÉ", card1Title:"Caja de cata de café artesanal", card1Price:"38€",
+    card2Meta:"PARA MARCO · 41 · ANIVERSARIO · AMA LAS MOTOS", card2Title:"Chaqueta de moto de cuero vintage", card2Price:"220€",
+    chatBarPrompt:"✍️ Empieza a escribir aquí abajo", chatBarLabel:"¿Para quién es el regalo? Ej. Novia/o, amigos…",
   },
   pt: {
     nav:["Início","Favoritos"],
@@ -639,6 +686,14 @@ const TR: Record<TKey, Tr> = {
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
     checkEmail:"Verifica o teu email", codeSent:"Enviámos um código de 6 dígitos para", verifyCode:"Verificar código", verifying:"A verificar…",
     disclaimerAmazon:"Como Afiliado Amazon, Gifty recebe compensações de compras elegíveis.", disclaimerPrice:"Preços e disponibilidade sujeitos a alteração.",
+    landingKicker:"AI-Powered Gifting",
+    landingSub:"Responda algumas perguntas rápidas e a Gifty encontrará o presente perfeito em segundos",
+    howStep1Title:"Conte-nos para quem é", howStep1Desc:"Idade, gostos, ocasião e orçamento",
+    howStep2Title:"A Gifty analisa milhares de ideias", howStep2Desc:"A IA combina gostos e orçamento",
+    howStep3Title:"Escolha e presenteie", howStep3Desc:"6 sugestões prontas, disponíveis na Amazon",
+    card1Meta:"PARA ANA · 28 · ANIVERSÁRIO · AMA CAFÉ", card1Title:"Caixa de degustação de café artesanal", card1Price:"€38",
+    card2Meta:"PARA MARCO · 41 · ANIVERSÁRIO DE CASAMENTO · AMA MOTOS", card2Title:"Jaqueta de moto em couro vintage", card2Price:"€220",
+    chatBarPrompt:"✍️ Comece a escrever abaixo", chatBarLabel:"Para quem é o presente? Ex. Namorada/o, amigos…",
   },
 };
 
@@ -910,7 +965,7 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 }
 
 export default function Home() {
-  const [screen,      setScreen]      = useState<"intake"|"loading"|"results">("intake");
+  const [screen,      setScreen]      = useState<"landing"|"intake"|"loading"|"results">("intake");
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
   const [g,           setG]           = useState<Gathered>(EMPTY);
@@ -939,6 +994,14 @@ export default function Home() {
   const lang = LANGS[langIdx];
   const tr   = TR[lang.t as TKey] ?? TR.en;
   const sym  = lang.sym;
+
+  /* ── Mobile landing: show the mobile-only intro screen on first mount.
+     Done in an effect (not the useState initializer) so the very first
+     render always matches the server ("intake"), avoiding a hydration
+     mismatch — window.innerWidth isn't available during SSR. ── */
+  useEffect(() => {
+    if (window.innerWidth <= 900) setScreen("landing");
+  }, []);
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
@@ -1020,7 +1083,10 @@ export default function Home() {
   function goBack() {
     setStep(s => Math.max(0, s - 1)); setStepKey(k => k + 1);
   }
-  function restart() { setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen("intake"); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); }
+  function restart() {
+    const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
+    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null);
+  }
   /* ── API call ── */
   function buildRecipientAndLocale() {
     const budgetMax = g.budget >= 500 ? 2000 : Math.round(g.budget * 1.15);
@@ -1261,6 +1327,10 @@ export default function Home() {
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
         }
+        /* Defensive: the mobile landing screen state ("landing") is only ever
+           reachable below 900px (see the screen useState initializer), but
+           hide it by CSS too in case it's ever forced above that width. */
+        @media(min-width:901px){.gc-landing{display:none!important}}
       `}</style>
 
       <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
@@ -1353,6 +1423,7 @@ export default function Home() {
         <main className="gc-main" style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", height:"100vh" }}>
 
           {/* Top nav */}
+          {screen !== "landing" && (
           <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
             {/* Mobile-only brand mark — .gc-brand (with the full logo) is hidden
                 below 900px, so without this the mobile header has no branding
@@ -1386,6 +1457,109 @@ export default function Home() {
             </div>
 
           </div>
+          )}
+
+          {/* ══ MOBILE LANDING (mobile-only entry screen; gated to ≤900px both
+              via the "landing" screen state — which desktop/tablet never
+              enters — and defensively via CSS below 900px) ══ */}
+          {screen === "landing" && (
+            <div className="gc-landing gc-fade" style={{
+              display:"flex", flexDirection:"column",
+              margin:"-24px -20px 0", padding:"20px 20px 200px",
+              minHeight:"calc(100vh - 16px)",
+              background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
+            }}>
+              {/* Top row: icon badge + language pill */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:26 }}>
+                <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <GiftSVG size={18} fill="#4a2a16" />
+                </div>
+                <div ref={langMenuRef} style={{ position:"relative" }}>
+                  <button onClick={() => setLangMenuOpen(v => !v)}
+                    style={{ padding:"8px 14px", borderRadius:999, border:"1px solid rgba(255,255,255,.3)", background:"rgba(0,0,0,.15)", color:"#f0e3d2", font:`600 13px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
+                    {lang.flag} {lang.code} <span style={{ opacity:.5, fontSize:10 }}>▾</span>
+                  </button>
+                  {langMenuOpen && (
+                    <div style={{ position:"absolute", top:"calc(100% + 6px)", right:0, background:"#fff", border:`1.5px solid ${C.border}`, borderRadius:12, boxShadow:"0 8px 24px rgba(0,0,0,.1)", overflow:"hidden", minWidth:200, zIndex:30 }}>
+                      {LANGS.map((l, i) => (
+                        <button key={i} onClick={() => { setLangIdx(i); setLangMenuOpen(false); }}
+                          style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", padding:"11px 16px", border:"none", background: i === langIdx ? "#fdf6ef" : "#fff", color:C.body, font:`${i===langIdx?600:400} 14px ${BODY}`, cursor:"pointer", textAlign:"left" as const }}>
+                          <span style={{ display:"flex", alignItems:"center", gap:10 }}>{l.flag} {l.name}</span>
+                          <span style={{ fontSize:12, color:C.muted2 }}>{l.currency}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Title block */}
+              <div style={{ textAlign:"center", marginBottom:4 }}>
+                <div style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:40, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:16 }}>{tr.landingKicker}</div>
+                <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 16px", fontSize:14.5 }}>{tr.landingSub}</p>
+                <div style={{ textAlign:"center", marginBottom:28 }}>
+                  <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.bFree}</span>
+                </div>
+              </div>
+
+              {/* How it works */}
+              {[
+                [1, tr.howStep1Title, tr.howStep1Desc],
+                [2, tr.howStep2Title, tr.howStep2Desc],
+                [3, tr.howStep3Title, tr.howStep3Desc],
+              ].map(([n, title, desc], i) => (
+                <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 34 : 22 }}>
+                  <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.16)", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0 }}>{n}</div>
+                  <div style={{ paddingTop:2 }}>
+                    <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
+                    <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Example preview cards */}
+              <div style={{ background:"#fff", border:"1px solid #ece0d2", borderRadius:18, padding:16, boxShadow:"0 8px 24px rgba(0,0,0,.12)", display:"flex", gap:14, alignItems:"center", transform:"rotate(-1.5deg)" }}>
+                <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(140deg,#e8d2c4,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>☕</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:10.5, color:"#b3a292", fontWeight:600, marginBottom:2 }}>{tr.card1Meta}</div>
+                  <div style={{ fontWeight:700, fontSize:14, color:"#2a211d" }}>{tr.card1Title}</div>
+                  <div style={{ fontSize:12.5, color:"#7c3f3f", fontWeight:700, marginTop:3 }}>{tr.card1Price}</div>
+                </div>
+              </div>
+              <div style={{ background:"#fff", border:"1px solid #ece0d2", borderRadius:18, padding:16, boxShadow:"0 8px 24px rgba(0,0,0,.12)", display:"flex", gap:14, alignItems:"center", marginTop:-10, marginLeft:30, transform:"rotate(2deg)" }}>
+                <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(140deg,#dcd0e3,#a49bc0)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🏍️</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:10.5, color:"#b3a292", fontWeight:600, marginBottom:2 }}>{tr.card2Meta}</div>
+                  <div style={{ fontWeight:700, fontSize:14, color:"#2a211d" }}>{tr.card2Title}</div>
+                  <div style={{ fontSize:12.5, color:"#7c3f3f", fontWeight:700, marginTop:3 }}>{tr.card2Price}</div>
+                </div>
+              </div>
+
+              {/* Legal footer: privacy policy link + Amazon/price disclaimer
+                  (not covered by the design handoff — added per explicit request) */}
+              <div style={{ textAlign:"center", marginTop:28 }}>
+                <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
+                  Privacy Policy
+                </a>
+                <p style={{ fontSize:11, lineHeight:1.5, color:"#8a7a6a", margin:"10px 0 0" }}>
+                  {tr.disclaimerAmazon}<br/>{tr.disclaimerPrice}
+                </p>
+              </div>
+
+              {/* Fixed bottom action bar */}
+              <div style={{ position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9", borderRadius:"26px 26px 0 0", boxShadow:"0 -10px 24px rgba(0,0,0,.15)", padding:"20px 16px 24px", zIndex:20 }}>
+                <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
+                <button onClick={() => setScreen("intake")} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow:"0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", cursor:"pointer", textAlign:"left" as const }}>
+                  <span style={{ flex:1, fontSize:15, color:"#9a8674" }}>{tr.chatBarLabel}</span>
+                  <span style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ══ HOME / APP ══ */}
               {/* INTAKE */}
