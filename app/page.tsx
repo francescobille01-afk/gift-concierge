@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import type { GiftSuggestion, ChatResponse, UserLocale, ChatMessage } from "@/lib/types";
 
 /* ─── Design tokens ─────────────────────────────────────────── */
@@ -966,6 +967,9 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 
 export default function Home() {
   const [screen,      setScreen]      = useState<"landing"|"intake"|"loading"|"results">("intake");
+  const [landingBarFocused, setLandingBarFocused] = useState(false);
+  const [landingDisclaimerOpen, setLandingDisclaimerOpen] = useState(false);
+  const gcMainRef = useRef<HTMLElement>(null);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
   const [g,           setG]           = useState<Gathered>(EMPTY);
@@ -1326,6 +1330,7 @@ export default function Home() {
           .gc-topnav nav::-webkit-scrollbar{display:none}
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
+          .gc-main.gc-main--flush{padding:0!important}
         }
         /* Defensive: the mobile landing screen state ("landing") is only ever
            reachable below 900px (see the screen useState initializer), but
@@ -1420,7 +1425,13 @@ export default function Home() {
         </aside>
 
         {/* ══ MAIN COLUMN ══════════════════════════════════════ */}
-        <main className="gc-main" style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", height:"100vh" }}>
+        <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : "gc-main"} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}
+          onScroll={screen === "landing" ? (e) => {
+            const el = e.currentTarget;
+            const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+            if (nearBottom) setLandingBarFocused(true);
+          } : undefined}
+        >
 
           {/* Top nav */}
           {screen !== "landing" && (
@@ -1465,8 +1476,8 @@ export default function Home() {
           {screen === "landing" && (
             <div className="gc-landing gc-fade" style={{
               display:"flex", flexDirection:"column",
-              margin:"-24px -20px 0", padding:"20px 20px 200px",
-              minHeight:"calc(100vh - 16px)",
+              padding:"20px 20px calc(190px + env(safe-area-inset-bottom))",
+              minHeight:"100%",
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
               {/* Top row: icon badge + language pill */}
@@ -1536,29 +1547,68 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Legal footer: privacy policy link + Amazon/price disclaimer
-                  (not covered by the design handoff — added per explicit request) */}
-              <div style={{ textAlign:"center", marginTop:28 }}>
+              {/* Legal footer: privacy policy link + a tap-to-open disclaimer
+                  badge (not covered by the design handoff — added per
+                  explicit request; touch-friendly since hover doesn't exist
+                  on mobile). */}
+              <div style={{ textAlign:"center", marginTop:28, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
                 </a>
-                <p style={{ fontSize:11, lineHeight:1.5, color:"#8a7a6a", margin:"10px 0 0" }}>
-                  {tr.disclaimerAmazon}<br/>{tr.disclaimerPrice}
-                </p>
-              </div>
-
-              {/* Fixed bottom action bar */}
-              <div style={{ position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9", borderRadius:"26px 26px 0 0", boxShadow:"0 -10px 24px rgba(0,0,0,.15)", padding:"20px 16px 24px", zIndex:20 }}>
-                <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
-                <button onClick={() => setScreen("intake")} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow:"0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", cursor:"pointer", textAlign:"left" as const }}>
-                  <span style={{ flex:1, fontSize:15, color:"#9a8674" }}>{tr.chatBarLabel}</span>
-                  <span style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </span>
+                <span style={{ fontSize:12.5, color:"#b3a292", margin:"0 6px" }}>·</span>
+                <button onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}
+                  style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline", background:"none", border:"none", padding:0, cursor:"pointer", font:`inherit` }}>
+                  Preferenze cookie
                 </button>
+                <button onClick={() => setLandingDisclaimerOpen(v => !v)} aria-label="Note legali"
+                  style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:22, height:22, marginLeft:8, verticalAlign:"middle", borderRadius:"50%", border:`1px solid ${C.bord5}`, background:"#fff", cursor:"pointer", padding:0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#7c3f3f" aria-hidden="true">
+                    <circle cx="12" cy="6.4" r="1.8"/>
+                    <rect x="10.3" y="10" width="3.4" height="9.2" rx="1.7"/>
+                  </svg>
+                </button>
+                {landingDisclaimerOpen && (
+                  <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", bottom:"calc(100% + 10px)", width:260, maxWidth:"calc(100vw - 40px)", background:"#fff", border:"1px solid #ece0d2", borderRadius:14, padding:"14px 16px", textAlign:"left" as const, fontSize:11.5, lineHeight:1.5, color:"#3a2e26", boxShadow:"0 12px 32px rgba(0,0,0,.18)", zIndex:25 }}>
+                    <button onClick={() => setLandingDisclaimerOpen(false)} aria-label="Chiudi"
+                      style={{ position:"absolute", top:8, right:8, width:22, height:22, borderRadius:"50%", border:"none", background:C.bg, color:C.muted, fontSize:14, lineHeight:1, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      ×
+                    </button>
+                    <span style={{ display:"block", marginBottom:7, paddingRight:16 }}>{tr.disclaimerAmazon}</span>
+                    <span style={{ display:"block" }}>{tr.disclaimerPrice}</span>
+                  </div>
+                )}
               </div>
             </div>
+          )}
+
+          {/* Fixed bottom action bar — rendered via portal straight into
+              <body>, outside .gc-main's internal scroll container. iOS
+              Safari notoriously mispositions/drags position:fixed elements
+              nested inside a custom overflow:auto scroller (here .gc-main),
+              so we sidestep that entirely rather than fight it. */}
+          {screen === "landing" && typeof document !== "undefined" && createPortal(
+            <div
+              onClick={() => { setLandingBarFocused(true); setTimeout(() => setScreen("intake"), 260); }}
+              style={{
+                position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
+                borderRadius: landingBarFocused ? "32px 32px 0 0" : "26px 26px 0 0",
+                boxShadow: landingBarFocused ? "0 -14px 32px rgba(0,0,0,.22)" : "0 -10px 24px rgba(0,0,0,.15)",
+                padding: landingBarFocused
+                  ? "28px 16px calc(30px + env(safe-area-inset-bottom))"
+                  : "18px 16px calc(20px + env(safe-area-inset-bottom))",
+                zIndex:200, cursor:"pointer",
+                transition:"border-radius .3s cubic-bezier(.4,0,.2,1), box-shadow .3s cubic-bezier(.4,0,.2,1), padding .3s cubic-bezier(.4,0,.2,1)",
+              }}>
+              <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
+              <div style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", textAlign:"left" as const, transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                <span style={{ flex:1, fontSize:15, color:"#9a8674" }}>{tr.chatBarLabel}</span>
+                <span style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </span>
+              </div>
+            </div>,
+            document.body
           )}
 
           {/* ══ HOME / APP ══ */}
