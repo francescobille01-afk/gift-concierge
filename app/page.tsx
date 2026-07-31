@@ -1307,6 +1307,19 @@ export default function Home() {
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
         }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
+        @keyframes gcflowdot {
+          0%   { top:0; opacity:0; }
+          8%   { opacity:1; }
+          92%  { opacity:1; }
+          100% { top:100%; opacity:0; }
+        }
+        .gc-flow-dot { animation:gcflowdot 4s ease-in-out infinite; }
+        @keyframes gcstepbadge {
+          0%,100% { background:rgba(255,255,255,.16); box-shadow:none; transform:scale(1); }
+          15%     { background:rgba(240,217,168,.4); box-shadow:0 0 18px 5px rgba(240,217,168,.45); transform:scale(1.1); }
+          30%     { background:rgba(255,255,255,.16); box-shadow:none; transform:scale(1); }
+        }
+        .gc-step-badge { animation:gcstepbadge 4s ease-in-out infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
         .gc-bob   {animation:gcbob 2s ease-in-out infinite}
@@ -1524,20 +1537,26 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* How it works */}
-              {[
-                [1, tr.howStep1Title, tr.howStep1Desc],
-                [2, tr.howStep2Title, tr.howStep2Desc],
-                [3, tr.howStep3Title, tr.howStep3Desc],
-              ].map(([n, title, desc], i) => (
-                <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22 }}>
-                  <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.16)", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0 }}>{n}</div>
-                  <div style={{ paddingTop:2 }}>
-                    <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
-                    <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
+              {/* How it works — a small glowing dot travels down the
+                  connecting line and each step badge lights up as it
+                  passes, giving the 3-step story a bit of motion. */}
+              <div style={{ position:"relative" }}>
+                <div style={{ position:"absolute", left:17, top:18, bottom:18, width:2, background:"linear-gradient(180deg,rgba(240,217,168,.5),rgba(240,217,168,.15))", borderRadius:2 }} />
+                <div className="gc-flow-dot" style={{ position:"absolute", left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
+                {[
+                  [1, tr.howStep1Title, tr.howStep1Desc],
+                  [2, tr.howStep2Title, tr.howStep2Desc],
+                  [3, tr.howStep3Title, tr.howStep3Desc],
+                ].map(([n, title, desc], i) => (
+                  <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22, position:"relative" }}>
+                    <div className="gc-step-badge" style={{ width:36, height:36, borderRadius:"50%", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0, animationDelay:`${i * 1.9}s` }}>{n}</div>
+                    <div style={{ paddingTop:2 }}>
+                      <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
+                      <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
                   badge (not covered by the design handoff — added per
