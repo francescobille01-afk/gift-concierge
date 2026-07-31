@@ -1548,12 +1548,9 @@ export default function Home() {
 
               {/* Title block */}
               <div style={{ textAlign:"center", marginBottom:4 }}>
-                <div style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:10 }}>{tr.landingKicker}</div>
+                <div style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:700, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
+                <div style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:10 }}>{tr.landingKicker}</div>
                 <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 12px", fontSize:14.5 }}>{tr.landingSub}</p>
-                <div style={{ textAlign:"center", marginBottom:18 }}>
-                  <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
-                </div>
               </div>
 
               {/* How it works — animated 3-scene stage (design handoff:
@@ -1561,10 +1558,10 @@ export default function Home() {
                   loop (3s per step), each with its own SVG micro-animation,
                   plus a dot-stepper below showing the active step. Pure CSS
                   — no JS timers/measurement needed. */}
-              <div style={{ position:"relative", height:118, marginBottom:18 }}>
+              <div style={{ position:"relative", height:150, marginBottom:20 }}>
                 <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
-                  <div className="gc-stage-float" style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                  <div className="gc-stage-float" style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <circle cx="24" cy="26" r="13" stroke="#f0d9a8" strokeWidth="2.2"/>
                       <path d="M8 54c1-10 8-16 16-16s15 6 16 16" stroke="#f0d9a8" strokeWidth="2.2" strokeLinecap="round"/>
                       <g>
@@ -1576,12 +1573,12 @@ export default function Home() {
                       </g>
                     </svg>
                   </div>
-                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:220 }}>{tr.stepCaption1}</div>
+                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption1}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
-                  <div style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                  <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <circle className="gc-stage-node" cx="36" cy="32" r="7" fill="#f0d9a8"/>
                       <circle className="gc-stage-node" cx="14" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".2s" }}/>
                       <circle className="gc-stage-node" cx="58" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".5s" }}/>
@@ -1590,12 +1587,12 @@ export default function Home() {
                       <path className="gc-stage-signal" d="M36 32L14 14M36 32L58 14M36 32L10 46M36 32L62 48" stroke="#e3c089" strokeWidth="1.4" strokeDasharray="4 3"/>
                     </svg>
                   </div>
-                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:230 }}>{tr.stepCaption2}</div>
+                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:260, lineHeight:1.35 }}>{tr.stepCaption2}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"6s" }}>
-                  <div style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                  <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
                       <rect x="21" y="26" width="30" height="26" rx="3" fill="rgba(240,217,168,.14)" stroke="#e3c089" strokeWidth="2"/>
                       <path d="M21 34h30" stroke="#e3c089" strokeWidth="2"/>
                       <path d="M36 26v26" stroke="#e3c089" strokeWidth="2"/>
@@ -1603,11 +1600,11 @@ export default function Home() {
                       <path className="gc-stage-smile" d="M27 44c3 4 15 4 18 0" stroke="#f0d9a8" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="34"/>
                     </svg>
                   </div>
-                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:220 }}>{tr.stepCaption3}</div>
+                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption3}</div>
                 </div>
               </div>
 
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:18 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:20 }}>
                 <div className="gc-stage-dot" style={{ animationDelay:"0s" }}/>
                 <div style={{ width:16, height:1.5, background:"rgba(255,255,255,.25)", overflow:"hidden" }}><div className="gc-stage-line-fill"/></div>
                 <div className="gc-stage-dot" style={{ animationDelay:"3s" }}/>
@@ -1615,11 +1612,15 @@ export default function Home() {
                 <div className="gc-stage-dot" style={{ animationDelay:"6s" }}/>
               </div>
 
+              <div style={{ textAlign:"center", marginBottom:18 }}>
+                <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
+              </div>
+
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
                   on mobile). */}
-              <div style={{ textAlign:"center", marginTop:16, position:"relative" }}>
+              <div style={{ textAlign:"center", marginTop:44, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
