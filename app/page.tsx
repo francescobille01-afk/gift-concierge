@@ -1518,7 +1518,7 @@ export default function Home() {
           {screen === "landing" && (
             <div className="gc-landing gc-fade" style={{
               display:"flex", flexDirection:"column",
-              padding:"calc(16px + env(safe-area-inset-top)) 20px calc(190px + env(safe-area-inset-bottom))",
+              padding:"calc(16px + env(safe-area-inset-top)) 20px calc(148px + env(safe-area-inset-bottom))",
               minHeight:"100%",
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
