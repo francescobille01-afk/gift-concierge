@@ -70,6 +70,45 @@ export interface ChatResponse {
   suggestions: GiftSuggestion[];
 }
 
+/** Free-form signals extracted by the adaptive-question step from the
+ * user's free-text observation (step 3 of the mobile adaptive intake). */
+export interface ProfileSignal {
+  key: string;
+  value: string;
+}
+
+export interface AdaptiveQuestionOption {
+  id: string;
+  label: string;
+}
+
+/** Response shape from POST /api/adaptive-question */
+export interface AdaptiveQuestionResult {
+  signals: ProfileSignal[];
+  incertezza_principale: string;
+  domanda_scelta: string;
+  opzioni: AdaptiveQuestionOption[];
+}
+
+export interface AdaptiveQuestionRequest {
+  recipient: RecipientProfile;
+  observation: string;
+  locale?: UserLocale;
+  /** Set on the second adaptive-question round, after the user answered the first. */
+  previousQuestion?: string;
+  previousAnswer?: string;
+}
+
+/** Gift-direction the user picked in step 5 of the mobile adaptive intake. */
+export type GiftDirection = "usable" | "experience" | "personal" | "curious" | "unsure";
+
+/** How a given suggestion in the 3-result mobile screen is framed to the user. */
+export type ResultFraming = "centered" | "personalized" | "unexpected";
+
+export interface FramedGiftSuggestion extends GiftSuggestion {
+  framing: ResultFraming;
+}
+
 export interface Session {
   id: string;
   createdAt: string;

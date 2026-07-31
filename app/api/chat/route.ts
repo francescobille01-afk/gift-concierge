@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
       const forcePropose = finalSuggestions.length === 0 && i === MAX_LOOP - 1;
 
       const response = await client.messages.create({
-        model: "claude-haiku-4-5",
+        model: "claude-sonnet-4-6",
         max_tokens: 4096,
         system: cachedSystem,
         tools: cachedTools,
@@ -351,9 +351,9 @@ export async function POST(req: NextRequest) {
       break;
     }
 
-    const HAIKU_IN = 1, HAIKU_OUT = 5, HAIKU_CACHE_WRITE = 1.25, HAIKU_CACHE_READ = 0.1; // $ per 1M tokens
+    const SONNET_IN = 3, SONNET_OUT = 15, SONNET_CACHE_WRITE = 3.75, SONNET_CACHE_READ = 0.3; // $ per 1M tokens
     const tokenCost =
-      (totalInput * HAIKU_IN + totalOutput * HAIKU_OUT + totalCacheWrite * HAIKU_CACHE_WRITE + totalCacheRead * HAIKU_CACHE_READ) / 1_000_000;
+      (totalInput * SONNET_IN + totalOutput * SONNET_OUT + totalCacheWrite * SONNET_CACHE_WRITE + totalCacheRead * SONNET_CACHE_READ) / 1_000_000;
     console.log(`[DEBUG-COST] TOTAL in=${totalInput} out=${totalOutput} cacheWrite=${totalCacheWrite} cacheRead=${totalCacheRead} | TOTAL=$${tokenCost.toFixed(4)}`);
 
     const responseBody: ChatResponse = {
