@@ -1335,6 +1335,13 @@ export default function Home() {
           .gc-topnav button{white-space:nowrap}
           .gc-topnav > div{flex-shrink:0}
           .gc-main.gc-main--flush{padding:0!important}
+          /* Use the dynamic viewport height on mobile, not 100vh — 100vh is
+             measured against the tallest possible viewport (browser chrome
+             collapsed), so on load (chrome expanded, address/toolbar bars
+             visible) fixed-height/100vh content overflows further than what's
+             actually visible, and top content ends up starting underneath
+             the browser's own top bar. 100dvh tracks the real visible area. */
+          .gc-shell,.gc-main{height:100dvh!important}
         }
         /* Defensive: the mobile landing screen state ("landing") is only ever
            reachable below 900px (see the screen useState initializer), but
@@ -1342,7 +1349,7 @@ export default function Home() {
         @media(min-width:901px){.gc-landing{display:none!important}}
       `}</style>
 
-      <div style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
+      <div className="gc-shell" style={{ display:"flex", height:"100vh", overflow:"hidden", background:C.bg, color:C.ink, fontFamily:BODY }}>
 
         {/* ══ BRAND PANEL ══════════════════════════════════════ */}
         <aside className="gc-brand" style={{ width:"38%", maxWidth:520, background:C.brand, color:"#f3e7d8", padding:"52px 46px", display:"flex", flexDirection:"column", justifyContent:"space-between", position:"sticky", top:0, height:"100vh", overflow:"hidden", flexShrink:0 }}>
@@ -1480,7 +1487,7 @@ export default function Home() {
           {screen === "landing" && (
             <div className="gc-landing gc-fade" style={{
               display:"flex", flexDirection:"column",
-              padding:"20px 20px calc(190px + env(safe-area-inset-bottom))",
+              padding:"calc(16px + env(safe-area-inset-top)) 20px calc(190px + env(safe-area-inset-bottom))",
               minHeight:"100%",
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
@@ -1524,7 +1531,7 @@ export default function Home() {
                 [2, tr.howStep2Title, tr.howStep2Desc],
                 [3, tr.howStep3Title, tr.howStep3Desc],
               ].map(([n, title, desc], i) => (
-                <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 34 : 22 }}>
+                <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22 }}>
                   <div style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.16)", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0 }}>{n}</div>
                   <div style={{ paddingTop:2 }}>
                     <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
@@ -1537,7 +1544,7 @@ export default function Home() {
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
                   on mobile). */}
-              <div style={{ textAlign:"center", marginTop:28, position:"relative" }}>
+              <div style={{ textAlign:"center", marginTop:6, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
