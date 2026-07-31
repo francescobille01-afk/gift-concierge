@@ -142,7 +142,7 @@ interface Tr {
   orWord: string; termsNote: string; waitMsg: string;
   checkEmail: string; codeSent: string; verifyCode: string; verifying: string;
   disclaimerAmazon: string; disclaimerPrice: string;
-  landingKicker: string; landingSub: string;
+  landingKicker: string; landingSub: string; landingBadge: string;
   howStep1Title: string; howStep1Desc: string;
   howStep2Title: string; howStep2Desc: string;
   howStep3Title: string; howStep3Desc: string;
@@ -287,7 +287,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"or", termsNote:"By continuing you agree to our Terms & Privacy Policy.", waitMsg:"Please wait…",
     checkEmail:"Check your email", codeSent:"We sent a 6-digit code to", verifyCode:"Verify code", verifying:"Verifying…",
     disclaimerAmazon:"As an Amazon Associate, Gifty receives compensation from qualifying purchases.", disclaimerPrice:"Prices and availability subject to change.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Free · No Account · 2 Minutes",
     landingSub:"Answer a few quick questions and Gifty will find the perfect gift in seconds",
     howStep1Title:"Tell us who it's for", howStep1Desc:"Age, tastes, occasion and budget",
     howStep2Title:"Gifty analyses thousands of ideas", howStep2Desc:"AI matches tastes and budget",
@@ -431,7 +431,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"oppure", termsNote:"Continuando accetti i nostri Termini e la Privacy Policy.", waitMsg:"Attendere…",
     checkEmail:"Controlla la tua email", codeSent:"Abbiamo inviato un codice a 6 cifre a", verifyCode:"Verifica codice", verifying:"Verifica in corso…",
     disclaimerAmazon:"In qualità di Affiliato Amazon, Gifty riceve compensi dagli acquisti idonei.", disclaimerPrice:"Prezzi e disponibilità soggetti a modifica.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Gratis · No Account · 2 Minuti",
     landingSub:"Rispondi a qualche domanda e Gifty troverà il regalo perfetto in pochi secondi",
     howStep1Title:"Racconta a chi lo regali", howStep1Desc:"Età, gusti, occasione e budget",
     howStep2Title:"Gifty analizza migliaia di idee", howStep2Desc:"L'AI incrocia gusti e budget",
@@ -495,7 +495,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"ou", termsNote:"En continuant, vous acceptez nos Conditions et notre Politique de confidentialité.", waitMsg:"Veuillez patienter…",
     checkEmail:"Vérifiez votre email", codeSent:"Nous avons envoyé un code à 6 chiffres à", verifyCode:"Vérifier le code", verifying:"Vérification…",
     disclaimerAmazon:"En tant que partenaire Amazon, Gifty reçoit des commissions sur les achats éligibles.", disclaimerPrice:"Prix et disponibilité sujets à modification.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Gratuit · Sans compte · 2 Minutes",
     landingSub:"Répondez à quelques questions rapides et Gifty trouvera le cadeau parfait en quelques secondes",
     howStep1Title:"Dites-nous pour qui c'est", howStep1Desc:"Âge, goûts, occasion et budget",
     howStep2Title:"Gifty analyse des milliers d'idées", howStep2Desc:"L'IA associe goûts et budget",
@@ -559,7 +559,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"oder", termsNote:"Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.", waitMsg:"Bitte warten…",
     checkEmail:"Prüfe deine E-Mail", codeSent:"Wir haben einen 6-stelligen Code gesendet an", verifyCode:"Code bestätigen", verifying:"Wird überprüft…",
     disclaimerAmazon:"Als Amazon-Partner erhält Gifty Provisionen von qualifizierten Käufen.", disclaimerPrice:"Preise und Verfügbarkeit können sich ändern.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Kostenlos · Kein Konto · 2 Minuten",
     landingSub:"Beantworte ein paar kurze Fragen und Gifty findet in Sekunden das perfekte Geschenk",
     howStep1Title:"Erzähl uns, für wen es ist", howStep1Desc:"Alter, Geschmack, Anlass und Budget",
     howStep2Title:"Gifty analysiert Tausende Ideen", howStep2Desc:"Die KI kombiniert Geschmack und Budget",
@@ -623,7 +623,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"o", termsNote:"Al continuar, aceptas nuestros Términos y Política de privacidad.", waitMsg:"Por favor espera…",
     checkEmail:"Revisa tu email", codeSent:"Enviamos un código de 6 dígitos a", verifyCode:"Verificar código", verifying:"Verificando…",
     disclaimerAmazon:"Como afiliado de Amazon, Gifty recibe compensaciones por compras elegibles.", disclaimerPrice:"Precios y disponibilidad sujetos a cambios.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Gratis · Sin Cuenta · 2 Minutos",
     landingSub:"Responde algunas preguntas rápidas y Gifty encontrará el regalo perfecto en segundos",
     howStep1Title:"Cuéntanos para quién es", howStep1Desc:"Edad, gustos, ocasión y presupuesto",
     howStep2Title:"Gifty analiza miles de ideas", howStep2Desc:"La IA combina gustos y presupuesto",
@@ -687,7 +687,7 @@ const TR: Record<TKey, Tr> = {
     orWord:"ou", termsNote:"Ao continuar, aceitas os nossos Termos e Política de Privacidade.", waitMsg:"Por favor aguarda…",
     checkEmail:"Verifica o teu email", codeSent:"Enviámos um código de 6 dígitos para", verifyCode:"Verificar código", verifying:"A verificar…",
     disclaimerAmazon:"Como Afiliado Amazon, Gifty recebe compensações de compras elegíveis.", disclaimerPrice:"Preços e disponibilidade sujeitos a alteração.",
-    landingKicker:"AI-Powered Gifting",
+    landingKicker:"AI-Powered Gifting", landingBadge:"Grátis · Sem Conta · 2 Minutos",
     landingSub:"Responda algumas perguntas rápidas e a Gifty encontrará o presente perfeito em segundos",
     howStep1Title:"Conte-nos para quem é", howStep1Desc:"Idade, gostos, ocasião e orçamento",
     howStep2Title:"A Gifty analisa milhares de ideias", howStep2Desc:"A IA combina gostos e orçamento",
@@ -1308,10 +1308,17 @@ export default function Home() {
         }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
         @keyframes gcflowdot {
-          0%   { top:0; opacity:0; }
-          8%   { opacity:1; }
-          92%  { opacity:1; }
-          100% { top:100%; opacity:0; }
+          0%   { top:0; opacity:0; transform:scale(1); }
+          5%   { opacity:1; }
+          12%  { transform:scale(1.35); }
+          20%  { transform:scale(1); opacity:1; }
+          40%  { top:calc(50% - 5px); opacity:1; transform:scale(1); }
+          47%  { transform:scale(1.35); }
+          55%  { transform:scale(1); opacity:1; }
+          80%  { top:calc(100% - 10px); opacity:1; transform:scale(1); }
+          87%  { transform:scale(1.35); }
+          95%  { transform:scale(1); opacity:1; }
+          100% { top:calc(100% - 10px); opacity:0; }
         }
         .gc-flow-dot { animation:gcflowdot 4s ease-in-out infinite; }
         @keyframes gcstepbadge {
@@ -1533,29 +1540,31 @@ export default function Home() {
                 <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:16 }}>{tr.landingKicker}</div>
                 <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 16px", fontSize:14.5 }}>{tr.landingSub}</p>
                 <div style={{ textAlign:"center", marginBottom:28 }}>
-                  <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.bFree}</span>
+                  <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
                 </div>
               </div>
 
-              {/* How it works — a small glowing dot travels down the
-                  connecting line and each step badge lights up as it
-                  passes, giving the 3-step story a bit of motion. */}
-              <div style={{ position:"relative" }}>
-                <div style={{ position:"absolute", left:17, top:18, bottom:18, width:2, background:"linear-gradient(180deg,rgba(240,217,168,.5),rgba(240,217,168,.15))", borderRadius:2 }} />
-                <div className="gc-flow-dot" style={{ position:"absolute", left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
-                {[
-                  [1, tr.howStep1Title, tr.howStep1Desc],
-                  [2, tr.howStep2Title, tr.howStep2Desc],
-                  [3, tr.howStep3Title, tr.howStep3Desc],
-                ].map(([n, title, desc], i) => (
-                  <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22, position:"relative" }}>
-                    <div className="gc-step-badge" style={{ width:36, height:36, borderRadius:"50%", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0, animationDelay:`${i * 1.9}s` }}>{n}</div>
-                    <div style={{ paddingTop:2 }}>
-                      <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
-                      <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
+              {/* How it works — a small glowing dot hops between the three
+                  step badges on a loop, lighting each one up as it lands.
+                  Centered as a group (not edge-to-edge) so the block doesn't
+                  pull all the visual weight to the left. */}
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
+                <div style={{ position:"relative" }}>
+                  <div className="gc-flow-dot" style={{ position:"absolute", left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
+                  {[
+                    [1, tr.howStep1Title, tr.howStep1Desc],
+                    [2, tr.howStep2Title, tr.howStep2Desc],
+                    [3, tr.howStep3Title, tr.howStep3Desc],
+                  ].map(([n, title, desc], i) => (
+                    <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 22, position:"relative", maxWidth:280 }}>
+                      <div className="gc-step-badge" style={{ width:36, height:36, borderRadius:"50%", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0, animationDelay:`${i * 1.9}s` }}>{n}</div>
+                      <div style={{ paddingTop:2 }}>
+                        <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
+                        <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
