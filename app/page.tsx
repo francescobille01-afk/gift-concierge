@@ -1533,24 +1533,6 @@ export default function Home() {
                 </div>
               ))}
 
-              {/* Example preview cards */}
-              <div style={{ background:"#fff", border:"1px solid #ece0d2", borderRadius:18, padding:16, boxShadow:"0 8px 24px rgba(0,0,0,.12)", display:"flex", gap:14, alignItems:"center", transform:"rotate(-1.5deg)" }}>
-                <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(140deg,#e8d2c4,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>☕</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:10.5, color:"#b3a292", fontWeight:600, marginBottom:2 }}>{tr.card1Meta}</div>
-                  <div style={{ fontWeight:700, fontSize:14, color:"#2a211d" }}>{tr.card1Title}</div>
-                  <div style={{ fontSize:12.5, color:"#7c3f3f", fontWeight:700, marginTop:3 }}>{tr.card1Price}</div>
-                </div>
-              </div>
-              <div style={{ background:"#fff", border:"1px solid #ece0d2", borderRadius:18, padding:16, boxShadow:"0 8px 24px rgba(0,0,0,.12)", display:"flex", gap:14, alignItems:"center", marginTop:-10, marginLeft:30, transform:"rotate(2deg)" }}>
-                <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(140deg,#dcd0e3,#a49bc0)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🏍️</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:10.5, color:"#b3a292", fontWeight:600, marginBottom:2 }}>{tr.card2Meta}</div>
-                  <div style={{ fontWeight:700, fontSize:14, color:"#2a211d" }}>{tr.card2Title}</div>
-                  <div style={{ fontSize:12.5, color:"#7c3f3f", fontWeight:700, marginTop:3 }}>{tr.card2Price}</div>
-                </div>
-              </div>
-
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
