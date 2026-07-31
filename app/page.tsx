@@ -1548,8 +1548,8 @@ export default function Home() {
 
               {/* Title block */}
               <div style={{ textAlign:"center", marginBottom:4 }}>
-                <div style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:700, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
-                <div style={{ fontFamily:"'Bricolage Grotesque',sans-serif", fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:10 }}>{tr.landingKicker}</div>
+                <div style={{ fontFamily:"var(--font-bricolage)", fontWeight:800, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:0, lineHeight:1 }}>Gifty</div>
+                <div style={{ fontFamily:"var(--font-bricolage)", fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginTop:6, marginBottom:10 }}>{tr.landingKicker}</div>
                 <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 12px", fontSize:14.5 }}>{tr.landingSub}</p>
               </div>
 
@@ -1558,7 +1558,7 @@ export default function Home() {
                   loop (3s per step), each with its own SVG micro-animation,
                   plus a dot-stepper below showing the active step. Pure CSS
                   — no JS timers/measurement needed. */}
-              <div style={{ position:"relative", height:150, marginBottom:20 }}>
+              <div style={{ position:"relative", height:150, marginTop:14, marginBottom:20 }}>
                 <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
                   <div className="gc-stage-float" style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
                     <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
@@ -1612,15 +1612,18 @@ export default function Home() {
                 <div className="gc-stage-dot" style={{ animationDelay:"6s" }}/>
               </div>
 
-              <div style={{ textAlign:"center", marginBottom:18 }}>
+              <div style={{ textAlign:"center", marginTop:12, marginBottom:18 }}>
                 <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
               </div>
 
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
                   badge (not covered by the design handoff — added per
                   explicit request; touch-friendly since hover doesn't exist
-                  on mobile). */}
-              <div style={{ textAlign:"center", marginTop:44, position:"relative" }}>
+                  on mobile). marginTop:"auto" (the landing container is a
+                  flex column) pins this just above the reserved bottom-bar
+                  padding on any screen height, instead of a fixed pixel
+                  offset that left a growing gap on taller phones. */}
+              <div style={{ textAlign:"center", marginTop:"auto", paddingTop:16, position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy

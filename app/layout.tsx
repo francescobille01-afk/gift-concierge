@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
+import { Cormorant_Garamond, Plus_Jakarta_Sans, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 
 // Keep this route rendered fresh per-request rather than statically
@@ -24,6 +24,17 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+// Loaded via next/font (not the runtime @import used elsewhere in the app)
+// specifically for the mobile landing's "Gifty" title + kicker, so the font
+// is guaranteed to be present at first paint instead of racing a stylesheet
+// fetch and silently falling back to a generic sans in the meantime.
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Gift Concierge — The perfect gift, every time",
   description:
@@ -36,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${jakarta.variable} ${bricolage.variable}`}>
       <body className="font-sans antialiased">
         {/* iubenda Privacy Controls & Cookie Solution — must load as early as
             possible (iubenda: "all'inizio dell'head"). beforeInteractive lets
