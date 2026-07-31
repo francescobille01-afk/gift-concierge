@@ -1562,7 +1562,7 @@ export default function Home() {
                 </a>
                 <span style={{ fontSize:12.5, color:"#b3a292", margin:"0 6px" }}>·</span>
                 <button onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}
-                  style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline", background:"none", border:"none", padding:0, cursor:"pointer", font:`inherit` }}>
+                  style={{ fontFamily:BODY, fontSize:12.5, color:"#6b5b4d", textDecoration:"underline", background:"none", border:"none", padding:0, cursor:"pointer" }}>
                   Preferenze cookie
                 </button>
                 <button onClick={() => setLandingDisclaimerOpen(v => !v)} aria-label="Note legali"
@@ -1619,7 +1619,7 @@ export default function Home() {
                       onFocus={() => setLandingBarFocused(true)}
                       onKeyDown={e => { if (e.key === "Enter") submitLandingAnswer(); }}
                       placeholder={tr.chatBarLabel}
-                      style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:15, fontFamily:BODY, color:C.ink }}
+                      style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink }}
                     />
                     <button onClick={submitLandingAnswer} aria-label={tr.continue} disabled={!g.relationship.trim()}
                       style={{ width:44, height:44, borderRadius:"50%", border:"none", background: g.relationship.trim() ? "linear-gradient(150deg,#8c4f4f,#7c3f3f)" : C.bord3, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor: g.relationship.trim() ? "pointer" : "not-allowed" }}>
