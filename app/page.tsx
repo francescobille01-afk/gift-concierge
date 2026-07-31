@@ -1555,7 +1555,7 @@ export default function Home() {
 
               {/* Title block */}
               <div style={{ textAlign:"center", marginBottom:4 }}>
-                <div style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:40, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
+                <div style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:4 }}>Gifty</div>
                 <div style={{ fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginBottom:10 }}>{tr.landingKicker}</div>
                 <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 12px", fontSize:14.5 }}>{tr.landingSub}</p>
                 <div style={{ textAlign:"center", marginBottom:18 }}>
@@ -1641,10 +1641,10 @@ export default function Home() {
                     position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
                     borderRadius:"26px 26px 0 0",
                     boxShadow:"0 -10px 24px rgba(0,0,0,.15)",
-                    padding:"18px 16px calc(20px + env(safe-area-inset-bottom))",
+                    padding:"13px 16px calc(20px + env(safe-area-inset-bottom))",
                     zIndex:200,
                   }}>
-                  <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:10 }}>{tr.chatBarPrompt}</div>
+                  <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:12 }}>{tr.chatBarPrompt}</div>
                   <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
                     <input
                       type="text" autoComplete="off" autoCorrect="off" name="gc-landing-relationship"
