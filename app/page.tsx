@@ -149,6 +149,7 @@ interface Tr {
   card1Meta: string; card1Title: string; card1Price: string;
   card2Meta: string; card2Title: string; card2Price: string;
   chatBarPrompt: string; chatBarLabel: string;
+  stepCaption1: string; stepCaption2: string; stepCaption3: string;
 }
 
 const TR: Record<TKey, Tr> = {
@@ -295,6 +296,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"FOR ANNA · 28 · BIRTHDAY · LOVES COFFEE", card1Title:"Artisan coffee tasting box", card1Price:"€38",
     card2Meta:"FOR MARCO · 41 · ANNIVERSARY · LOVES MOTORBIKES", card2Title:"Vintage leather biker jacket", card2Price:"€220",
     chatBarPrompt:"✍️ Start writing below", chatBarLabel:"Who's the gift for? e.g. Girlfriend, friends…",
+    stepCaption1:"Help us understand the recipient", stepCaption2:"Gifty analyses and picks from thousands of ideas", stepCaption3:"Choose and gift it via Amazon",
   },
   it: {
     nav:["Home","Preferiti"],
@@ -439,6 +441,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"PER ANNA · 28 ANNI · COMPLEANNO · APPASSIONATA DI CAFFÈ", card1Title:"Box degustazione caffè artigianale", card1Price:"€38",
     card2Meta:"PER MARCO · 41 ANNI · ANNIVERSARIO · APPASSIONATO DI MOTO", card2Title:"Giacca da moto in pelle vintage", card2Price:"€220",
     chatBarPrompt:"✍️ Inizia scrivendo qui sotto", chatBarLabel:"Per chi è il regalo? Es. Fidanzata/o, amici…",
+    stepCaption1:"Aiutaci a comprendere il destinatario", stepCaption2:"Gifty analizza e seleziona tra migliaia di idee", stepCaption3:"Scegli e regala tramite Amazon",
   },
   fr: {
     nav:["Accueil","Favoris"],
@@ -503,6 +506,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"POUR ANNA · 28 ANS · ANNIVERSAIRE · AIME LE CAFÉ", card1Title:"Coffret dégustation café artisanal", card1Price:"38€",
     card2Meta:"POUR MARCO · 41 ANS · ANNIVERSAIRE DE MARIAGE · AIME LA MOTO", card2Title:"Blouson moto en cuir vintage", card2Price:"220€",
     chatBarPrompt:"✍️ Commencez à écrire ci-dessous", chatBarLabel:"Pour qui est le cadeau ? Ex. Copine/copain, amis…",
+    stepCaption1:"Aidez-nous à comprendre le destinataire", stepCaption2:"Gifty analyse et sélectionne parmi des milliers d'idées", stepCaption3:"Choisissez et offrez via Amazon",
   },
   de: {
     nav:["Start","Favoriten"],
@@ -567,6 +571,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"FÜR ANNA · 28 · GEBURTSTAG · LIEBT KAFFEE", card1Title:"Kaffee-Verkostungsbox", card1Price:"38€",
     card2Meta:"FÜR MARCO · 41 · JAHRESTAG · LIEBT MOTORRÄDER", card2Title:"Vintage-Lederjacke für Motorradfahrer", card2Price:"220€",
     chatBarPrompt:"✍️ Schreib unten los", chatBarLabel:"Für wen ist das Geschenk? z. B. Freundin/Freund, Freunde…",
+    stepCaption1:"Hilf uns, die beschenkte Person zu verstehen", stepCaption2:"Gifty analysiert und wählt aus Tausenden Ideen aus", stepCaption3:"Auswählen und über Amazon verschenken",
   },
   es: {
     nav:["Inicio","Favoritos"],
@@ -631,6 +636,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"PARA ANA · 28 · CUMPLEAÑOS · AMA EL CAFÉ", card1Title:"Caja de cata de café artesanal", card1Price:"38€",
     card2Meta:"PARA MARCO · 41 · ANIVERSARIO · AMA LAS MOTOS", card2Title:"Chaqueta de moto de cuero vintage", card2Price:"220€",
     chatBarPrompt:"✍️ Empieza a escribir aquí abajo", chatBarLabel:"¿Para quién es el regalo? Ej. Novia/o, amigos…",
+    stepCaption1:"Ayúdanos a entender al destinatario", stepCaption2:"Gifty analiza y elige entre miles de ideas", stepCaption3:"Elige y regala a través de Amazon",
   },
   pt: {
     nav:["Início","Favoritos"],
@@ -695,6 +701,7 @@ const TR: Record<TKey, Tr> = {
     card1Meta:"PARA ANA · 28 · ANIVERSÁRIO · AMA CAFÉ", card1Title:"Caixa de degustação de café artesanal", card1Price:"€38",
     card2Meta:"PARA MARCO · 41 · ANIVERSÁRIO DE CASAMENTO · AMA MOTOS", card2Title:"Jaqueta de moto em couro vintage", card2Price:"€220",
     chatBarPrompt:"✍️ Comece a escrever abaixo", chatBarLabel:"Para quem é o presente? Ex. Namorada/o, amigos…",
+    stepCaption1:"Ajude-nos a entender quem vai receber", stepCaption2:"A Gifty analisa e escolhe entre milhares de ideias", stepCaption3:"Escolha e presenteie através da Amazon",
   },
 };
 
@@ -973,13 +980,6 @@ export default function Home() {
   // g.relationship directly — step 0 then skips its own relationship
   // picker since it's already answered.
   const [skipRelPicker, setSkipRelPicker] = useState(false);
-  // "How it works" hopping dot: driven by measured badge centers (not CSS
-  // % keyframes) so it lands exactly on each badge regardless of how tall
-  // the rows render (description text length/wrapping varies per language).
-  const [stepActiveIdx, setStepActiveIdx] = useState(0);
-  const [stepDotTop, setStepDotTop] = useState<number | null>(null);
-  const stepListRef = useRef<HTMLDivElement>(null);
-  const stepBadgeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const gcMainRef = useRef<HTMLElement>(null);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
@@ -1017,30 +1017,6 @@ export default function Home() {
   useEffect(() => {
     if (window.innerWidth <= 900) setScreen("landing");
   }, []);
-
-  /* ── Landing "how it works" dot: measure each badge's vertical center
-     relative to the list container, then cycle the active index on a
-     timer. Re-measures on resize (rotation / dynamic-viewport changes). ── */
-  useEffect(() => {
-    if (screen !== "landing") return;
-    const measure = () => {
-      const list = stepListRef.current;
-      const badge = stepBadgeRefs.current[stepActiveIdx];
-      if (!list || !badge) return;
-      const listRect = list.getBoundingClientRect();
-      const badgeRect = badge.getBoundingClientRect();
-      setStepDotTop(badgeRect.top - listRect.top + badgeRect.height / 2 - 5);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [screen, stepActiveIdx]);
-
-  useEffect(() => {
-    if (screen !== "landing") return;
-    const id = setInterval(() => setStepActiveIdx(i => (i + 1) % 3), 1500);
-    return () => clearInterval(id);
-  }, [screen]);
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
@@ -1338,14 +1314,31 @@ export default function Home() {
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
         }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
-        @keyframes gcdotpulse {
-          0%,100% { transform:scale(1); }
-          50%     { transform:scale(1.4); }
+        /* ── Mobile-landing 3-step animation (design handoff) ── */
+        @keyframes gcStageCycle {
+          0%, 30% { opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
+          33.3%, 96%, 100% { opacity:0; transform:scale(.85) translateY(-6px); filter:blur(4px); }
         }
-        .gc-flow-dot { transition:top .5s cubic-bezier(.4,0,.2,1); }
-        .gc-flow-dot-pulse { animation:gcdotpulse .5s ease-out; }
-        .gc-step-badge { transition:background .3s ease, box-shadow .3s ease, transform .3s ease; }
-        .gc-step-badge--active { background:rgba(240,217,168,.4) !important; box-shadow:0 0 18px 5px rgba(240,217,168,.45); transform:scale(1.1); }
+        @keyframes gcDotActive {
+          0%, 33.3% { background:#e3c089; box-shadow:0 0 0 5px rgba(227,192,137,.3); transform:scale(1.15); }
+          33.4%, 100% { background:rgba(255,255,255,.25); box-shadow:none; transform:scale(1); }
+        }
+        @keyframes gcLineFill { 0%,33.3%{transform:scaleX(0)} 96%,100%{transform:scaleX(1)} }
+        @keyframes gcTypingDot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+        @keyframes gcNodePulse { 0%,100%{opacity:.35;transform:scale(.8)} 50%{opacity:1;transform:scale(1.25)} }
+        @keyframes gcSignalTravel { 0%{stroke-dashoffset:40} 100%{stroke-dashoffset:0} }
+        @keyframes gcLidOpen { 0%,20%{transform:translateY(0) rotate(0)} 55%,100%{transform:translateY(-10px) rotate(-10deg)} }
+        @keyframes gcSmileDraw { 0%,15%{stroke-dashoffset:34} 65%,100%{stroke-dashoffset:0} }
+        @keyframes gcFloatSlow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        .gc-stage-scene { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:gcStageCycle 9s ease-in-out infinite; }
+        .gc-stage-float { animation:gcFloatSlow 2.4s ease-in-out infinite; }
+        .gc-stage-typing-dot { animation:gcTypingDot 1.2s ease-in-out infinite; }
+        .gc-stage-node { animation:gcNodePulse 1.6s ease-in-out infinite; }
+        .gc-stage-signal { animation:gcSignalTravel 1.6s linear infinite; }
+        .gc-stage-lid { transform-origin:36px 26px; animation:gcLidOpen 2.4s ease-in-out infinite; }
+        .gc-stage-smile { animation:gcSmileDraw 2.4s ease-in-out infinite; }
+        .gc-stage-dot { width:9px; height:9px; border-radius:50%; animation:gcDotActive 9s steps(1,end) infinite; }
+        .gc-stage-line-fill { height:100%; width:100%; background:#e3c089; transform:scaleX(0); animation:gcLineFill 3s linear infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
         .gc-bob   {animation:gcbob 2s ease-in-out infinite}
@@ -1563,29 +1556,63 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* How it works — a small glowing dot hops between the three
-                  step badges on a loop, lighting each one up as it lands.
-                  Centered as a group (not edge-to-edge) so the block doesn't
-                  pull all the visual weight to the left. */}
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
-                <div ref={stepListRef} style={{ position:"relative" }}>
-                  {stepDotTop != null && (
-                    <div className="gc-flow-dot" style={{ position:"absolute", top:stepDotTop, left:13, width:10, height:10, borderRadius:"50%", background:"#f0d9a8", boxShadow:"0 0 10px 3px rgba(240,217,168,.8)" }} />
-                  )}
-                  {[
-                    [1, tr.howStep1Title, tr.howStep1Desc],
-                    [2, tr.howStep2Title, tr.howStep2Desc],
-                    [3, tr.howStep3Title, tr.howStep3Desc],
-                  ].map(([n, title, desc], i) => (
-                    <div key={i} style={{ display:"flex", gap:14, marginBottom: i === 2 ? 10 : 18, position:"relative", maxWidth:280 }}>
-                      <div ref={el => { stepBadgeRefs.current[i] = el; }} className={`gc-step-badge${i === stepActiveIdx ? " gc-step-badge--active" : ""}`} style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.16)", border:"1.5px solid rgba(240,217,168,.6)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:DISPLAY, fontWeight:700, fontSize:15, color:"#f8eee0", flexShrink:0 }}>{n}</div>
-                      <div style={{ paddingTop:2 }}>
-                        <div style={{ fontWeight:700, fontSize:15.5, color:"#fff", marginBottom:3, textShadow:"0 1px 3px rgba(0,0,0,.25)" }}>{title}</div>
-                        <div style={{ fontSize:13, color:"#f3e7d8", textShadow:"0 1px 3px rgba(0,0,0,.2)" }}>{desc}</div>
-                      </div>
-                    </div>
-                  ))}
+              {/* How it works — animated 3-scene stage (design handoff:
+                  design_handoff_3step_animation). Scenes cross-fade on a 9s
+                  loop (3s per step), each with its own SVG micro-animation,
+                  plus a dot-stepper below showing the active step. Pure CSS
+                  — no JS timers/measurement needed. */}
+              <div style={{ position:"relative", height:118, marginBottom:18 }}>
+                <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
+                  <div className="gc-stage-float" style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                      <circle cx="24" cy="26" r="13" stroke="#f0d9a8" strokeWidth="2.2"/>
+                      <path d="M8 54c1-10 8-16 16-16s15 6 16 16" stroke="#f0d9a8" strokeWidth="2.2" strokeLinecap="round"/>
+                      <g>
+                        <rect x="40" y="6" width="28" height="20" rx="8" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
+                        <path d="M46 26l-3 6 7-6" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
+                        <circle className="gc-stage-typing-dot" cx="48" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:"0s", transformOrigin:"48px 16px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="54" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".15s", transformOrigin:"54px 16px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="60" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".3s", transformOrigin:"60px 16px" }}/>
+                      </g>
+                    </svg>
+                  </div>
+                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:220 }}>{tr.stepCaption1}</div>
                 </div>
+
+                <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
+                  <div style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                      <circle className="gc-stage-node" cx="36" cy="32" r="7" fill="#f0d9a8"/>
+                      <circle className="gc-stage-node" cx="14" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".2s" }}/>
+                      <circle className="gc-stage-node" cx="58" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".5s" }}/>
+                      <circle className="gc-stage-node" cx="10" cy="46" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".8s" }}/>
+                      <circle className="gc-stage-node" cx="62" cy="48" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:"1.1s" }}/>
+                      <path className="gc-stage-signal" d="M36 32L14 14M36 32L58 14M36 32L10 46M36 32L62 48" stroke="#e3c089" strokeWidth="1.4" strokeDasharray="4 3"/>
+                    </svg>
+                  </div>
+                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:230 }}>{tr.stepCaption2}</div>
+                </div>
+
+                <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"6s" }}>
+                  <div style={{ position:"relative", width:72, height:64, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="72" height="64" viewBox="0 0 72 64" fill="none">
+                      <rect x="21" y="26" width="30" height="26" rx="3" fill="rgba(240,217,168,.14)" stroke="#e3c089" strokeWidth="2"/>
+                      <path d="M21 34h30" stroke="#e3c089" strokeWidth="2"/>
+                      <path d="M36 26v26" stroke="#e3c089" strokeWidth="2"/>
+                      <path className="gc-stage-lid" d="M27 26c0-6 4-10 9-10s9 4 9 10" stroke="#e3c089" strokeWidth="2"/>
+                      <path className="gc-stage-smile" d="M27 44c3 4 15 4 18 0" stroke="#f0d9a8" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="34"/>
+                    </svg>
+                  </div>
+                  <div style={{ fontSize:13, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:220 }}>{tr.stepCaption3}</div>
+                </div>
+              </div>
+
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:18 }}>
+                <div className="gc-stage-dot" style={{ animationDelay:"0s" }}/>
+                <div style={{ width:16, height:1.5, background:"rgba(255,255,255,.25)", overflow:"hidden" }}><div className="gc-stage-line-fill"/></div>
+                <div className="gc-stage-dot" style={{ animationDelay:"3s" }}/>
+                <div style={{ width:16, height:1.5, background:"rgba(255,255,255,.25)", overflow:"hidden" }}><div className="gc-stage-line-fill"/></div>
+                <div className="gc-stage-dot" style={{ animationDelay:"6s" }}/>
               </div>
 
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
