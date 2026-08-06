@@ -1462,6 +1462,10 @@ export default function Home() {
 
   function openFavorites() {
     if (screen !== "favorites" && screen !== "favorite-detail") setFavoritesReturnScreen(screen);
+    setMobileFlow(true);
+    setLandingSheetOpen(false);
+    setLandingBarFocused(false);
+    setLangMenuOpen(false);
     setSelectedFavorite(null);
     setScreen("favorites");
   }
@@ -2085,10 +2089,14 @@ export default function Home() {
               background:"linear-gradient(180deg,#5e2e2e 0%,#7c3f3f 32%,#b8836a 58%,#e4d2ba 78%,#f3ebe1 100%)",
             }}>
               {/* Top row: icon badge + language pill */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
-                <div style={{ width:34, height:34, borderRadius:10, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:2 }}>
+                <div style={{ width:34, height:34, marginRight:"auto", borderRadius:10, background:"linear-gradient(150deg,#e3c089,#c9a26b)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                   <GiftSVG size={18} fill="#4a2a16" />
                 </div>
+                <button type="button" onClick={openFavorites} aria-label={`Apri ${totalFavoriteCount} preferiti salvati`}
+                  style={{ minWidth:37, height:35, padding:"0 9px", borderRadius:999, border:"1px solid rgba(255,255,255,.3)", background:"rgba(0,0,0,.15)", color:"#f0e3d2", display:"flex", alignItems:"center", justifyContent:"center", gap:4, fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                  <span aria-hidden="true">♡</span>{totalFavoriteCount || ""}
+                </button>
                 <div ref={langMenuRef} style={{ position:"relative" }}>
                   <button onClick={() => setLangMenuOpen(v => !v)}
                     style={{ padding:"8px 14px", borderRadius:999, border:"1px solid rgba(255,255,255,.3)", background:"rgba(0,0,0,.15)", color:"#f0e3d2", font:`600 13px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:6 }}>
@@ -2513,7 +2521,7 @@ export default function Home() {
                 </section>
               )}
 
-              {mobileFlow && screen === "favorites" && (
+              {screen === "favorites" && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(100)}
                   <button type="button" onClick={() => setScreen(favoritesReturnScreen)} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Torna indietro</button>
@@ -2550,7 +2558,7 @@ export default function Home() {
                 </section>
               )}
 
-              {mobileFlow && screen === "favorite-detail" && selectedFavoriteGroup && selectedFavoriteGift && (
+              {screen === "favorite-detail" && selectedFavoriteGroup && selectedFavoriteGift && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(100)}
                   <button type="button" onClick={() => setScreen("favorites")} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Tutti i preferiti</button>
