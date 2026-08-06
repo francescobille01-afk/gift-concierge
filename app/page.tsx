@@ -1294,7 +1294,7 @@ export default function Home() {
 
   function normalizeMobileGifts(items: GiftSuggestion[], round: number) {
     const batch = Date.now().toString(36);
-    return items.slice(0, 3).map((gift, index) => ({ ...gift, id:`mobile-${round}-${batch}-${gift.id || index}` }));
+    return items.slice(0, 6).map((gift, index) => ({ ...gift, id:`mobile-${round}-${batch}-${gift.id || index}` }));
   }
 
   function toggleVoiceInput() {
@@ -1728,6 +1728,11 @@ export default function Home() {
         @keyframes gcLoaderCounterTurn { to{transform:rotate(-360deg)} }
         @keyframes gcLoaderGlow { 0%,100%{transform:scale(.94);opacity:.45}50%{transform:scale(1.08);opacity:.8} }
         @keyframes gcLoaderCard { 0%,100%{transform:translateY(2px) rotate(-4deg);opacity:.72}50%{transform:translateY(-7px) rotate(3deg);opacity:1} }
+        @keyframes gcLoaderSweep { to{transform:rotate(360deg)} }
+        @keyframes gcLoaderCore { 0%,100%{transform:translateY(2px) scale(.96);border-radius:24px}45%{transform:translateY(-5px) scale(1.04);border-radius:20px}70%{transform:translateY(-2px) scale(1)} }
+        @keyframes gcLoaderNode { 0%,100%{transform:translateY(2px) scale(.92);opacity:.65}45%{transform:translateY(-5px) scale(1.08);opacity:1} }
+        @keyframes gcLoaderScan { 0%,18%{transform:translateY(-42px);opacity:0}28%{opacity:.8}68%{opacity:.55}82%,100%{transform:translateY(42px);opacity:0} }
+        @keyframes gcLoaderSpark { 0%,100%{transform:scale(.35) rotate(0);opacity:0}42%{transform:scale(1.15) rotate(90deg);opacity:1}68%{transform:scale(.7) rotate(160deg);opacity:.45} }
         @keyframes gcVoicePulse { 0%,100%{box-shadow:0 0 0 0 rgba(124,63,63,.28)}50%{box-shadow:0 0 0 7px rgba(124,63,63,0)} }
         @keyframes gcbarglow {
           0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); }
@@ -1802,8 +1807,13 @@ export default function Home() {
         .gc-loader-counter{animation:gcLoaderCounterTurn 7s linear infinite}
         .gc-loader-glow{animation:gcLoaderGlow 2.2s ease-in-out infinite}
         .gc-loader-card{animation:gcLoaderCard 2.4s ease-in-out infinite}
+        .gc-loader-sweep{animation:gcLoaderSweep 3.8s linear infinite}
+        .gc-loader-core{animation:gcLoaderCore 2.8s cubic-bezier(.4,0,.2,1) infinite}
+        .gc-loader-node{animation:gcLoaderNode 2.5s ease-in-out infinite}
+        .gc-loader-scan{animation:gcLoaderScan 2.8s ease-in-out infinite}
+        .gc-loader-spark{animation:gcLoaderSpark 2.8s ease-in-out infinite}
         .gc-voice-button--active{animation:gcVoicePulse 1.25s ease-in-out infinite}
-        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue,.gc-loader-turn,.gc-loader-counter,.gc-loader-glow,.gc-loader-card,.gc-voice-button--active{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue,.gc-loader-turn,.gc-loader-counter,.gc-loader-glow,.gc-loader-card,.gc-loader-sweep,.gc-loader-core,.gc-loader-node,.gc-loader-scan,.gc-loader-spark,.gc-voice-button--active{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -2417,14 +2427,24 @@ export default function Home() {
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(64)}
                   <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", paddingBottom:42 }}>
-                    <div style={{ position:"relative", width:168, height:168, marginBottom:27 }}>
-                      <div className="gc-loader-glow" style={{ position:"absolute", inset:25, borderRadius:"50%", background:"radial-gradient(circle,rgba(211,157,85,.34),rgba(124,63,63,.03) 70%)" }}/>
-                      <div className="gc-loader-turn" style={{ position:"absolute", inset:5, border:"1px solid rgba(124,63,63,.18)", borderRadius:"50%" }}>
-                        {[{top:-3,left:66,icon:"✦"},{top:112,left:3,icon:"♡"},{top:118,left:126,icon:"⌕"}].map((card,index) => (
-                          <span key={card.icon} className="gc-loader-counter gc-loader-card" style={{ position:"absolute", top:card.top, left:card.left, width:36, height:43, borderRadius:10, display:"grid", placeItems:"center", color:index === 1 ? "#fff7e7" : C.maroon, background:index === 1 ? "linear-gradient(145deg,#a55c58,#7c3f3f)" : "#fff9ef", border:"1px solid #ddc3a6", boxShadow:"0 8px 18px rgba(79,43,35,.15)", fontSize:15, animationDelay:`${index * .3}s` }}>{card.icon}</span>
+                    <div style={{ position:"relative", width:194, height:194, marginBottom:26 }}>
+                      <div className="gc-loader-glow" style={{ position:"absolute", inset:18, borderRadius:"50%", background:"radial-gradient(circle,rgba(224,176,95,.42),rgba(124,63,63,.08) 48%,transparent 72%)", filter:"blur(2px)" }}/>
+                      <div className="gc-loader-sweep" style={{ position:"absolute", inset:8, borderRadius:"50%", background:"conic-gradient(from 30deg,transparent 0 16%,rgba(201,151,79,.8) 22%,transparent 31% 56%,rgba(146,76,74,.65) 63%,transparent 72%)", WebkitMask:"radial-gradient(farthest-side,transparent calc(100% - 2px),#000 0)", mask:"radial-gradient(farthest-side,transparent calc(100% - 2px),#000 0)" }}/>
+                      <div className="gc-loader-turn" style={{ position:"absolute", inset:9, border:"1px dashed rgba(124,63,63,.22)", borderRadius:"50%" }}>
+                        {[{top:-8,left:72,icon:"✦",delay:"0s"},{top:122,left:-1,icon:"♡",delay:".35s"},{top:128,left:141,icon:"⌕",delay:".7s"}].map((node,index) => (
+                          <span key={node.icon} className="gc-loader-counter" style={{ position:"absolute", top:node.top, left:node.left, width:42, height:48, display:"grid", placeItems:"center" }}>
+                            <span className="gc-loader-node" style={{ width:38, height:43, borderRadius:12, display:"grid", placeItems:"center", color:index === 1 ? "#fff7e7" : C.maroon, background:index === 1 ? "linear-gradient(145deg,#a55c58,#7c3f3f)" : "linear-gradient(145deg,#fffdf7,#f1e2ce)", border:"1px solid #d8b98f", boxShadow:"0 10px 22px rgba(79,43,35,.18),inset 0 1px 0 rgba(255,255,255,.8)", fontSize:16, animationDelay:node.delay }}>{node.icon}</span>
+                          </span>
                         ))}
                       </div>
-                      <div className="gc-bob" style={{ position:"absolute", inset:48, borderRadius:24, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#a35a57,#6d3434)", border:"1px solid rgba(255,239,213,.42)", boxShadow:"0 18px 38px rgba(124,63,63,.3),inset 0 1px 0 rgba(255,255,255,.2)" }}><GiftSVG size={31} fill="#f8ead7"/></div>
+                      <div style={{ position:"absolute", left:49, top:59, width:88, height:77, borderRadius:20, background:"#d9c0a6", transform:"rotate(-10deg)", opacity:.55 }}/>
+                      <div style={{ position:"absolute", left:58, top:52, width:88, height:77, borderRadius:20, background:"#ead9c4", border:"1px solid #d6b78f", transform:"rotate(7deg)", boxShadow:"0 10px 25px rgba(86,49,39,.12)" }}/>
+                      <div className="gc-loader-core" style={{ position:"absolute", left:57, top:55, width:82, height:82, overflow:"hidden", display:"grid", placeItems:"center", background:"linear-gradient(145deg,#a65d59 0%,#7c3f3f 58%,#652f31 100%)", border:"1px solid rgba(255,239,213,.5)", boxShadow:"0 20px 42px rgba(124,63,63,.34),inset 0 1px 0 rgba(255,255,255,.22)" }}>
+                        <div className="gc-loader-scan" style={{ position:"absolute", left:8, right:8, top:"50%", height:18, background:"linear-gradient(180deg,transparent,rgba(255,226,167,.25),rgba(255,240,205,.8),transparent)", filter:"blur(.2px)" }}/>
+                        <GiftSVG size={34} fill="#fff0d3"/>
+                      </div>
+                      <span className="gc-loader-spark" style={{ position:"absolute", right:43, top:36, color:"#d8a64d", fontSize:19, textShadow:"0 2px 10px rgba(216,166,77,.55)" }}>✦</span>
+                      <span className="gc-loader-spark" style={{ position:"absolute", left:39, bottom:37, color:"#a75d59", fontSize:12, animationDelay:".7s" }}>✦</span>
                     </div>
                     <div style={{ color:"#a45e5b", fontSize:9, fontWeight:800, letterSpacing:".15em", textTransform:"uppercase", marginBottom:9 }}>Ricerca personale in corso</div>
                     <h2 style={{ margin:"0 0 11px", maxWidth:330, color:C.ink, fontFamily:"var(--font-bricolage)", fontSize:25, fontWeight:700, lineHeight:1.08, letterSpacing:"-.025em" }}>Cerco il regalo giusto per {g.recipientName}.</h2>
