@@ -1337,10 +1337,15 @@ export default function Home() {
         @keyframes gcpulse { 0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1)} }
         @keyframes gcbob   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
         @keyframes gcbarglow {
-          0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.25),0 10px 26px rgba(124,63,63,.25); }
-          50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
+          0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); transform:translateY(0); }
+          50%     { box-shadow:0 0 0 10px rgba(201,162,107,.5),0 12px 32px rgba(124,63,63,.4); transform:translateY(-2px); }
         }
+        @keyframes gcBarShine { 0%,30%{transform:translateX(-150%) skewX(-20deg)} 65%,100%{transform:translateX(420%) skewX(-20deg)} }
+        @keyframes gcStartCue { 0%,100%{transform:translateY(0)} 50%{transform:translateY(3px)} }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
+        .gc-start-bar{position:relative;overflow:hidden}
+        .gc-start-bar:after{content:"";position:absolute;inset:-8px auto -8px -30%;width:18%;background:linear-gradient(90deg,transparent,rgba(255,235,191,.7),transparent);animation:gcBarShine 3.2s ease-in-out infinite;pointer-events:none}
+        .gc-start-cue{animation:gcStartCue 1.5s ease-in-out infinite}
         .gc-landing-sheet{transition:height .38s cubic-bezier(.22,.8,.28,1),border-radius .28s ease,box-shadow .28s ease}
         .gc-landing-sheet-field{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 12px 8px 14px;border:1.5px solid #dec9af;border-radius:15px;background:#fffdf9;transition:border-color .18s ease,box-shadow .18s ease}
         .gc-landing-sheet-field:focus-within{border-color:#c9a26b;box-shadow:0 0 0 3px rgba(201,162,107,.15)}
@@ -1395,7 +1400,7 @@ export default function Home() {
         .gc-p1    {animation:gcpulse 1.2s ease-in-out infinite}
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
-        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-float,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-dot,.gc-stage-line-fill{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-float,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -1611,8 +1616,8 @@ export default function Home() {
                   — no JS timers/measurement needed. */}
               <div style={{ position:"relative", height:150, marginTop:14, marginBottom:20 }}>
                 <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
-                  <div className="gc-stage-float" style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                  <div className="gc-stage-float" style={{ position:"relative", width:126, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="126" height="80" viewBox="0 0 110 80" fill="none">
                       <defs>
                         <linearGradient id="gcProfileCard" x1="18" y1="12" x2="70" y2="67"><stop stopColor="#fff4df"/><stop offset="1" stopColor="#e8c49b"/></linearGradient>
                         <linearGradient id="gcAvatar" x1="24" y1="22" x2="48" y2="48"><stop stopColor="#d88d79"/><stop offset="1" stopColor="#a95f78"/></linearGradient>
@@ -1641,12 +1646,12 @@ export default function Home() {
                       </g>
                     </svg>
                   </div>
-                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption1}</div>
+                  <div style={{ fontSize:15.5, color:"#fff0d4", fontWeight:700, textAlign:"center", maxWidth:310, lineHeight:1.28, letterSpacing:".005em", textShadow:"0 1px 8px rgba(45,20,22,.28)" }}>{tr.stepCaption1}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
-                  <div style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                  <div style={{ position:"relative", width:126, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="126" height="80" viewBox="0 0 110 80" fill="none">
                       <defs>
                         <radialGradient id="gcAiAura"><stop stopColor="#f0d9a8" stopOpacity=".45"/><stop offset="1" stopColor="#f0d9a8" stopOpacity="0"/></radialGradient>
                         <linearGradient id="gcAiCore" x1="38" y1="24" x2="72" y2="58"><stop stopColor="#f7dcaa"/><stop offset=".5" stopColor="#d88976"/><stop offset="1" stopColor="#a95f78"/></linearGradient>
@@ -1669,12 +1674,12 @@ export default function Home() {
                       <path className="gc-stage-spark" d="M31 11v6M28 14h6" stroke="#d88976" strokeWidth="1.6" strokeLinecap="round" style={{ transformOrigin:"31px 14px", animationDelay:".45s" }}/>
                     </svg>
                   </div>
-                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:260, lineHeight:1.35 }}>{tr.stepCaption2}</div>
+                  <div style={{ fontSize:15.5, color:"#fff0d4", fontWeight:700, textAlign:"center", maxWidth:310, lineHeight:1.28, letterSpacing:".005em", textShadow:"0 1px 8px rgba(45,20,22,.28)" }}>{tr.stepCaption2}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"6s" }}>
-                  <div style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                  <div style={{ position:"relative", width:126, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="126" height="80" viewBox="0 0 110 80" fill="none">
                       <defs>
                         <linearGradient id="gcGiftBox" x1="31" y1="32" x2="78" y2="69"><stop stopColor="#f5d99e"/><stop offset="1" stopColor="#d7a65f"/></linearGradient>
                         <linearGradient id="gcGiftRibbon" x1="48" y1="25" x2="64" y2="69"><stop stopColor="#c46f72"/><stop offset="1" stopColor="#8f4967"/></linearGradient>
@@ -1700,7 +1705,7 @@ export default function Home() {
                       <path className="gc-stage-spark" d="M76 14v8M72 18h8" stroke="#f0d9a8" strokeWidth="1.8" strokeLinecap="round" style={{ transformOrigin:"76px 18px", animationDelay:".2s" }}/>
                     </svg>
                   </div>
-                  <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption3}</div>
+                  <div style={{ fontSize:15.5, color:"#fff0d4", fontWeight:700, textAlign:"center", maxWidth:310, lineHeight:1.28, letterSpacing:".005em", textShadow:"0 1px 8px rgba(45,20,22,.28)" }}>{tr.stepCaption3}</div>
                 </div>
               </div>
 
@@ -1712,9 +1717,10 @@ export default function Home() {
                 <div className="gc-stage-dot" style={{ animationDelay:"6s" }}/>
               </div>
 
-              <div style={{ textAlign:"center", marginTop:12, marginBottom:18 }}>
-                <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
-              </div>
+              <div style={{ marginTop:"auto", paddingTop:18 }}>
+                <div style={{ textAlign:"center", marginBottom:12 }}>
+                  <span style={{ fontSize:12, fontWeight:700, letterSpacing:".03em", color:"#f0d9a8", background:"rgba(0,0,0,.14)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"7px 14px", display:"inline-block" }}>{tr.landingBadge}</span>
+                </div>
 
               {/* Legal footer: privacy policy link + a tap-to-open disclaimer
                   badge (not covered by the design handoff — added per
@@ -1723,7 +1729,7 @@ export default function Home() {
                   flex column) pins this just above the reserved bottom-bar
                   padding on any screen height, instead of a fixed pixel
                   offset that left a growing gap on taller phones. */}
-              <div style={{ textAlign:"center", marginTop:"auto", paddingTop:16, position:"relative" }}>
+              <div style={{ textAlign:"center", position:"relative" }}>
                 <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize:12.5, color:"#6b5b4d", textDecoration:"underline" }}>
                   Privacy Policy
@@ -1750,6 +1756,7 @@ export default function Home() {
                     <span style={{ display:"block" }}>{tr.disclaimerPrice}</span>
                   </div>
                 )}
+              </div>
               </div>
             </div>
           )}
@@ -1791,15 +1798,21 @@ export default function Home() {
                     }}>
                     {!landingSheetOpen ? (
                       <>
-                        <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:12 }}>{landingForm.collapsedPrompt}</div>
-                        <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                        <div className="gc-start-cue" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontSize:13, fontWeight:800, letterSpacing:".045em", color:"#6d3434", marginBottom:12 }}>
+                          <span>{landingForm.collapsedPrompt}</span>
+                          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                        <div className={`gc-start-bar ${landingBarFocused ? "" : "gc-bar-pulse"}`} style={{ width:"100%", display:"flex", alignItems:"center", gap:11, background:"#fffdf9", border:"2.5px solid #b98645", borderRadius:999, padding:"9px 15px 9px 10px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.32), 0 10px 26px rgba(124,63,63,.28)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                          <span aria-hidden="true" style={{ width:38, height:38, display:"grid", placeItems:"center", flexShrink:0, borderRadius:"50%", color:"#fff8ea", background:"linear-gradient(145deg,#9a5555,#713737)", boxShadow:"0 4px 10px rgba(113,55,55,.24)" }}>
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                          </span>
                           <input
                             type="text" readOnly autoComplete="off" name="gc-landing-recipient-closed"
                             value={g.recipientName}
                             onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}
                             onFocus={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}
                             placeholder={landingForm.nameLabel}
-                            style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink, cursor:"text" }}
+                            style={{ position:"relative", zIndex:1, flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, fontWeight:600, color:C.ink, cursor:"text" }}
                           />
                         </div>
                       </>
