@@ -1337,15 +1337,15 @@ export default function Home() {
         @keyframes gcpulse { 0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1)} }
         @keyframes gcbob   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
         @keyframes gcbarglow {
-          0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); transform:translateY(0); }
-          50%     { box-shadow:0 0 0 10px rgba(201,162,107,.5),0 12px 32px rgba(124,63,63,.4); transform:translateY(-2px); }
+          0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); }
+          50%     { box-shadow:0 0 0 9px rgba(201,162,107,.48),0 12px 30px rgba(124,63,63,.38); }
         }
-        @keyframes gcBarShine { 0%,30%{transform:translateX(-150%) skewX(-20deg)} 65%,100%{transform:translateX(420%) skewX(-20deg)} }
-        @keyframes gcStartCue { 0%,100%{transform:translateY(0)} 50%{transform:translateY(3px)} }
-        .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
+        @keyframes gcBarShine { 0%,25%{transform:translateX(-150%) skewX(-20deg)} 60%,100%{transform:translateX(420%) skewX(-20deg)} }
+        @keyframes gcStartCue { 0%,100%{transform:translateY(0)} 50%{transform:translateY(2px)} }
+        .gc-bar-pulse { animation:gcbarglow 2.4s ease-in-out infinite; }
         .gc-start-bar{position:relative;overflow:hidden}
-        .gc-start-bar:after{content:"";position:absolute;inset:-8px auto -8px -30%;width:18%;background:linear-gradient(90deg,transparent,rgba(255,235,191,.7),transparent);animation:gcBarShine 3.2s ease-in-out infinite;pointer-events:none}
-        .gc-start-cue{animation:gcStartCue 1.5s ease-in-out infinite}
+        .gc-start-bar:after{content:"";position:absolute;inset:-8px auto -8px -30%;width:18%;background:linear-gradient(90deg,transparent,rgba(255,235,191,.7),transparent);animation:gcBarShine 2.4s ease-in-out infinite;pointer-events:none}
+        .gc-start-cue{animation:gcStartCue 2.4s ease-in-out infinite}
         .gc-landing-sheet{transition:height .38s cubic-bezier(.22,.8,.28,1),border-radius .28s ease,box-shadow .28s ease}
         .gc-landing-sheet-field{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 12px 8px 14px;border:1.5px solid #dec9af;border-radius:15px;background:#fffdf9;transition:border-color .18s ease,box-shadow .18s ease}
         .gc-landing-sheet-field:focus-within{border-color:#c9a26b;box-shadow:0 0 0 3px rgba(201,162,107,.15)}
@@ -1850,7 +1850,7 @@ export default function Home() {
                     }}>
                     {!landingSheetOpen ? (
                       <>
-                        <div className="gc-start-cue" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontSize:13, fontWeight:800, letterSpacing:".045em", color:"#6d3434", marginBottom:12 }}>
+                        <div className="gc-start-cue" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontSize:14, fontWeight:800, letterSpacing:".04em", color:"#6d3434", marginBottom:12 }}>
                           <span>{landingForm.collapsedPrompt}</span>
                           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
