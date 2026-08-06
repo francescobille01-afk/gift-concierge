@@ -794,6 +794,11 @@ function budgetToSliderStep(budget: number) {
 }
 
 type Screen = "landing" | "intake" | "clues" | "signals" | "loading" | "results" | "refine";
+const MOBILE_LOADING_LINES = [
+  "Collego gli indizi più importanti",
+  "Confronto idee davvero acquistabili",
+  "Scelgo le proposte più adatte",
+];
 function sliderStepToBudget(step: number) {
   return step <= 20 ? step * 5 : 100 + (step - 20) * 25;
 }
@@ -1030,6 +1035,7 @@ export default function Home() {
   const [editingSignals, setEditingSignals] = useState(false);
   const [resultIndex, setResultIndex] = useState(0);
   const [favoriteGifts, setFavoriteGifts] = useState<GiftSuggestion[]>([]);
+  const [refineBaseGift, setRefineBaseGift] = useState<GiftSuggestion | null>(null);
   const [refineText, setRefineText] = useState("");
   const [refineChoices, setRefineChoices] = useState<string[]>([]);
   const [refinementRound, setRefinementRound] = useState(0);
@@ -1056,6 +1062,18 @@ export default function Home() {
   useEffect(() => {
     if (window.innerWidth <= 900) setScreen("landing");
   }, []);
+
+  /* iOS Safari keeps the focused field and its zoom across React screens.
+     Release focus and restore the flow to the top whenever the step changes. */
+  useEffect(() => {
+    if (!mobileFlow) return;
+    const activeElement = document.activeElement as HTMLElement | null;
+    if (activeElement?.matches("input, textarea, select")) activeElement.blur();
+    requestAnimationFrame(() => {
+      gcMainRef.current?.scrollTo({ top:0, behavior:"auto" });
+      window.scrollTo({ top:0, behavior:"auto" });
+    });
+  }, [mobileFlow, screen]);
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
@@ -1100,12 +1118,13 @@ export default function Home() {
   const LOADING_LINES = tr.loadingLines;
   useEffect(() => {
     if (screen === "loading") {
-      intervalRef.current = setInterval(() => setLoadingLine(l => (l + 1) % LOADING_LINES.length), 650);
+      const loadingLineCount = mobileFlow ? MOBILE_LOADING_LINES.length : LOADING_LINES.length;
+      intervalRef.current = setInterval(() => setLoadingLine(l => (l + 1) % loadingLineCount), mobileFlow ? 1700 : 650);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [screen, mobileFlow]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Close lang menu on outside click ── */
   useEffect(() => {
@@ -1140,7 +1159,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
+    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1298,19 +1317,44 @@ export default function Home() {
       : [...previous, gift]);
   }
 
+  function openProductRefinement(gift: GiftSuggestion) {
+    setRefineBaseGift(gift);
+    setRefineText("");
+    setRefineChoices([]);
+    setErrorMsg(null);
+    setScreen("refine");
+  }
+
+  function discardMobileGift(gift: GiftSuggestion) {
+    const remaining = gifts.filter(item => item.id !== gift.id);
+    setFavoriteGifts(previous => previous.filter(item => item.id !== gift.id));
+    if (!remaining.length) {
+      restart();
+      return;
+    }
+    setGifts(remaining);
+    setResultIndex(index => Math.min(index, remaining.length - 1));
+  }
+
   async function refineMobileResults() {
     if ((!refineText.trim() && refineChoices.length === 0) || refining) return;
     setRefining(true);
     setErrorMsg(null);
     const { recipient, locale } = buildMobileRecipientAndLocale();
+    const baseGift = refineBaseGift ?? gifts[resultIndex];
+    if (!baseGift) {
+      setRefining(false);
+      return;
+    }
     const kept = favoriteGifts.map(gift => `"${gift.title}"`).join(", ") || "nessun preferito esplicito";
     const shown = gifts.map(gift => `"${gift.title}"`).join(", ");
     const refineMessage = [
-      `Preferiti da conservare come riferimento: ${kept}.`,
-      `Commento dell'utente: ${refineText.trim() || "nessun commento libero"}.`,
-      refineChoices.length ? `Direzione richiesta: ${refineChoices.join(", ")}.` : "",
+      `Prodotto di partenza da usare come riferimento: "${baseGift.title}" — ${baseGift.reason || baseGift.description}.`,
+      `Preferiti da conservare separatamente: ${kept}.`,
+      `Dettagli aggiunti dall'utente per trovare prodotti simili: ${refineText.trim() || "nessun commento libero"}.`,
+      refineChoices.length ? `Come deve cambiare rispetto al prodotto di partenza: ${refineChoices.join(", ")}.` : "",
       `Idee già mostrate da non ripetere: ${shown}.`,
-      "Genera risultati completamente nuovi. Mantieni il pattern dei preferiti, applica il commento come nuova regola ed evita le idee già mostrate.",
+      "Genera prodotti alternativi simili al prodotto di partenza, applicando i nuovi dettagli. Non cambiare categoria senza un motivo esplicito ed evita le idee già mostrate.",
     ].filter(Boolean).join("\n");
     try {
       const reactions = Object.fromEntries(favoriteGifts.map(gift => [gift.id, "love_it"]));
@@ -1329,6 +1373,7 @@ export default function Home() {
       setRefinementRound(round => round + 1);
       setRefineText("");
       setRefineChoices([]);
+      setRefineBaseGift(null);
       pushHistoryEntry(newGifts);
       setScreen("results");
     } catch {
@@ -1531,30 +1576,35 @@ export default function Home() {
     const loved = favoriteGifts.some(item => item.id === gift.id);
     return (
       <article style={{ border:"1px solid #dfc8af", borderRadius:18, background:"#fffaf4", padding:8, boxShadow:"0 12px 28px rgba(91,45,39,.09)" }}>
-        <div style={{ height:165, borderRadius:13, overflow:"hidden", position:"relative", background:"linear-gradient(145deg,#ead8c4,#d8b99b)" }}>
+        <div style={{ height:150, borderRadius:13, overflow:"hidden", position:"relative", background:"linear-gradient(145deg,#ead8c4,#d8b99b)" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={image} alt={gift.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
           <span style={{ position:"absolute", left:10, top:10, padding:"5px 8px", borderRadius:999, color:"#fff8ed", background:"rgba(73,36,39,.55)", backdropFilter:"blur(5px)", fontSize:9, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase" }}>{gift.category || "Scelta personale"}</span>
         </div>
-        <div style={{ padding:"12px 3px 2px" }}>
+        <div style={{ padding:"10px 3px 2px" }}>
           <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:12 }}>
             <div style={{ flex:1 }}>
-              <div style={{ color:"#a15b58", fontSize:9, fontWeight:800, letterSpacing:".1em", textTransform:"uppercase", marginBottom:6 }}>{refinementRound ? "Nuova scelta più centrata" : "Scelta ad alta affinità"}</div>
-              <h2 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:20, lineHeight:1.15, letterSpacing:"-.02em" }}>{gift.title}</h2>
+              <div style={{ color:"#a15b58", fontSize:8.5, fontWeight:800, letterSpacing:".1em", textTransform:"uppercase", marginBottom:5 }}>{refinementRound ? "Nuova alternativa" : "Scelta ad alta affinità"}</div>
+              <h2 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:19, lineHeight:1.12, letterSpacing:"-.02em" }}>{gift.title}</h2>
             </div>
-            <button type="button" onClick={() => toggleFavorite(gift)} aria-label={loved ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
-              style={{ width:35, height:35, flexShrink:0, borderRadius:"50%", border:`1px solid ${loved ? "#9f5959" : "#dec7ae"}`, background:loved ? "#9f5959" : "#fffaf4", color:loved ? "#fff" : "#9f5959", display:"grid", placeItems:"center", cursor:"pointer", fontSize:18 }}>
-              {loved ? "♥" : "♡"}
-            </button>
-          </div>
-          <p style={{ margin:"0 0 7px", color:C.muted4, fontSize:11.5, lineHeight:1.4 }}>{gift.reason || gift.description}</p>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:10 }}>
-            <span style={{ fontSize:11, color:C.muted, lineHeight:1.25 }}>{gift.description}</span>
             <strong style={{ whiteSpace:"nowrap", color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{toPriceBand(gift.priceRange, sym)}</strong>
           </div>
+          <p style={{ margin:"0 0 9px", color:C.muted4, fontSize:11.5, lineHeight:1.38, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{gift.reason || gift.description}</p>
           <a href={amazonLink} target="_blank" rel="noopener noreferrer" style={{ display:"block", width:"100%", padding:"11px 12px", borderRadius:11, boxSizing:"border-box", textAlign:"center", textDecoration:"none", color:"#fff", background:C.maroon, fontSize:12.5, fontWeight:700 }}>
-            Vedi dove acquistarlo
+            Acquista su Amazon
           </a>
+          <button type="button" onClick={() => openProductRefinement(gift)} style={{ width:"100%", minHeight:39, marginTop:7, border:"1px solid #d2b494", borderRadius:10, background:"#fffaf4", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>
+            Trova alternative simili
+          </button>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginTop:7 }}>
+            <button type="button" onClick={() => toggleFavorite(gift)} aria-label={loved ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+              style={{ minHeight:36, borderRadius:10, border:`1px solid ${loved ? "#9f5959" : "#dec7ae"}`, background:loved ? "#f3e2dc" : "transparent", color:C.maroon, cursor:"pointer", fontSize:10.5, fontWeight:700 }}>
+              {loved ? "♥ Nei preferiti" : "♡ Aggiungi ai preferiti"}
+            </button>
+            <button type="button" onClick={() => discardMobileGift(gift)} style={{ minHeight:36, borderRadius:10, border:"1px solid #decfc0", background:"transparent", color:C.muted4, cursor:"pointer", fontSize:10.5, fontWeight:700 }}>
+              ⌫ Scarta
+            </button>
+          </div>
         </div>
       </article>
     );
@@ -1569,6 +1619,10 @@ export default function Home() {
         @keyframes gcorbit { to{transform:rotate(360deg)} }
         @keyframes gcpulse { 0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1)} }
         @keyframes gcbob   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)} }
+        @keyframes gcLoaderTurn { to{transform:rotate(360deg)} }
+        @keyframes gcLoaderCounterTurn { to{transform:rotate(-360deg)} }
+        @keyframes gcLoaderGlow { 0%,100%{transform:scale(.94);opacity:.45}50%{transform:scale(1.08);opacity:.8} }
+        @keyframes gcLoaderCard { 0%,100%{transform:translateY(2px) rotate(-4deg);opacity:.72}50%{transform:translateY(-7px) rotate(3deg);opacity:1} }
         @keyframes gcbarglow {
           0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); }
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.48),0 12px 30px rgba(124,63,63,.38); }
@@ -1583,7 +1637,7 @@ export default function Home() {
         .gc-landing-sheet-field{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 12px 8px 14px;border:1.5px solid #dec9af;border-radius:15px;background:#fffdf9;transition:border-color .18s ease,box-shadow .18s ease}
         .gc-landing-sheet-field:focus-within{border-color:#c9a26b;box-shadow:0 0 0 3px rgba(201,162,107,.15)}
         .gc-landing-sheet-field label{display:block;margin-bottom:2px;color:#7c3f3f;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-        .gc-landing-sheet-field input[type=text]{width:100%;padding:0;border:0!important;outline:none;background:transparent;color:#2a211d;font:500 15px 'Hanken Grotesk',sans-serif}
+        .gc-landing-sheet-field input[type=text]{width:100%;padding:0;border:0!important;outline:none;background:transparent;color:#2a211d;font:500 16px 'Hanken Grotesk',sans-serif}
         .gc-landing-sheet-field input[type=range]{margin:5px 0 1px}
         .gc-landing-sheet-handle{width:38px;height:4px;margin:0 auto 10px;border-radius:99px;background:#cbb8a1}
         /* ── Mobile-landing 3-step animation (design handoff) ── */
@@ -1637,7 +1691,12 @@ export default function Home() {
         .gc-p1    {animation:gcpulse 1.2s ease-in-out infinite}
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
-        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
+        .gc-mobile-textarea::placeholder{color:#9a9698;opacity:1}
+        .gc-loader-turn{animation:gcLoaderTurn 7s linear infinite}
+        .gc-loader-counter{animation:gcLoaderCounterTurn 7s linear infinite}
+        .gc-loader-glow{animation:gcLoaderGlow 2.2s ease-in-out infinite}
+        .gc-loader-card{animation:gcLoaderCard 2.4s ease-in-out infinite}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue,.gc-loader-turn,.gc-loader-counter,.gc-loader-glow,.gc-loader-card{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -1658,6 +1717,7 @@ export default function Home() {
           .gc-intake-nav{margin-top:16px!important;padding-top:14px!important}
         }
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
+          input:not([type=range]),textarea,select{font-size:16px!important}
           .gc-mobile-header{display:flex!important}
           .gc-topnav{flex-wrap:nowrap!important}
           .gc-topnav nav{flex:1 1 auto;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start!important}
@@ -2056,6 +2116,7 @@ export default function Home() {
             (() => {
               const submitLandingAnswer = () => {
                 if (!g.recipientName.trim() || !g.occasion?.trim()) return;
+                (document.activeElement as HTMLElement | null)?.blur();
                 setLandingSheetOpen(false);
                 setLandingBarFocused(false);
                 setMobileFlow(true);
@@ -2175,9 +2236,9 @@ export default function Home() {
                   <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
                   <p style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
                   <label htmlFor="gc-clue-text" style={{ color:C.label, fontSize:10.5, fontWeight:700, marginBottom:6 }}>Quello che sai</label>
-                  <textarea id="gc-clue-text" autoFocus value={clueText} onChange={event => setClueText(event.target.value)}
-                    placeholder={`${g.recipientName || "La persona"} parla spesso di…, ha iniziato a…, possiede già…, non sopporta…`}
-                    style={{ width:"100%", minHeight:170, resize:"none", boxSizing:"border-box", padding:"14px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:14, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
+                  <textarea id="gc-clue-text" className="gc-mobile-textarea" value={clueText} onChange={event => setClueText(event.target.value)}
+                    placeholder={`Esempio: da qualche mese ${g.recipientName || "questa persona"} fa ceramica, salva foto di case da tè giapponesi, ha iniziato a fare trekking e si lamenta di avere troppi oggetti in casa.`}
+                    style={{ width:"100%", minHeight:170, resize:"none", boxSizing:"border-box", padding:"14px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
                   <div style={{ display:"flex", gap:6, overflowX:"auto", padding:"9px 0 4px", scrollbarWidth:"none" }}>
                     {["Parla spesso di…","Ha già…","Non sopporta…"].map(prompt => (
                       <button key={prompt} type="button" onClick={() => setClueText(text => `${text}${text.trim() ? " " : ""}${prompt} `)}
@@ -2242,13 +2303,19 @@ export default function Home() {
               {mobileFlow && screen === "loading" && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(64)}
-                  <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", paddingBottom:30 }}>
-                    <div style={{ position:"relative", width:116, height:116, marginBottom:24 }}>
-                      <div className="gc-orbit" style={{ position:"absolute", inset:0 }}><span style={{ position:"absolute", top:1, left:"50%", width:13, height:13, marginLeft:-6, borderRadius:"50%", background:C.maroon }}/><span style={{ position:"absolute", bottom:4, left:12, width:9, height:9, borderRadius:"50%", background:C.gold }}/></div>
-                      <div className="gc-bob" style={{ position:"absolute", inset:28, borderRadius:22, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#9a5555,#6d3434)", boxShadow:"0 12px 28px rgba(124,63,63,.28)" }}><GiftSVG size={27} fill="#f8ead7"/></div>
+                  <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", paddingBottom:42 }}>
+                    <div style={{ position:"relative", width:168, height:168, marginBottom:27 }}>
+                      <div className="gc-loader-glow" style={{ position:"absolute", inset:25, borderRadius:"50%", background:"radial-gradient(circle,rgba(211,157,85,.34),rgba(124,63,63,.03) 70%)" }}/>
+                      <div className="gc-loader-turn" style={{ position:"absolute", inset:5, border:"1px solid rgba(124,63,63,.18)", borderRadius:"50%" }}>
+                        {[{top:-3,left:66,icon:"✦"},{top:112,left:3,icon:"♡"},{top:118,left:126,icon:"⌕"}].map((card,index) => (
+                          <span key={card.icon} className="gc-loader-counter gc-loader-card" style={{ position:"absolute", top:card.top, left:card.left, width:36, height:43, borderRadius:10, display:"grid", placeItems:"center", color:index === 1 ? "#fff7e7" : C.maroon, background:index === 1 ? "linear-gradient(145deg,#a55c58,#7c3f3f)" : "#fff9ef", border:"1px solid #ddc3a6", boxShadow:"0 8px 18px rgba(79,43,35,.15)", fontSize:15, animationDelay:`${index * .3}s` }}>{card.icon}</span>
+                        ))}
+                      </div>
+                      <div className="gc-bob" style={{ position:"absolute", inset:48, borderRadius:24, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#a35a57,#6d3434)", border:"1px solid rgba(255,239,213,.42)", boxShadow:"0 18px 38px rgba(124,63,63,.3),inset 0 1px 0 rgba(255,255,255,.2)" }}><GiftSVG size={31} fill="#f8ead7"/></div>
                     </div>
-                    <h2 style={{ margin:"0 0 8px", color:C.ink, fontFamily:DISPLAY, fontSize:25 }}>Sto costruendo le scelte per {g.recipientName}.</h2>
-                    <p style={{ margin:0, color:C.muted4, fontSize:13 }}>{LOADING_LINES[loadingLine]}</p>
+                    <div style={{ color:"#a45e5b", fontSize:9, fontWeight:800, letterSpacing:".15em", textTransform:"uppercase", marginBottom:9 }}>Ricerca personale in corso</div>
+                    <h2 style={{ margin:"0 0 11px", maxWidth:330, color:C.ink, fontFamily:DISPLAY, fontSize:28, lineHeight:1.05, letterSpacing:"-.025em" }}>Sto scegliendo ciò che può sorprendere davvero {g.recipientName}.</h2>
+                    <p key={loadingLine} className="gc-fade" style={{ margin:0, color:C.muted4, fontFamily:DISPLAY, fontSize:17, fontStyle:"italic" }}>{MOBILE_LOADING_LINES[loadingLine % MOBILE_LOADING_LINES.length]}</p>
                   </div>
                 </section>
               )}
@@ -2258,7 +2325,6 @@ export default function Home() {
                   {renderMobileFlowHeader(refinementRound ? 100 : 82)}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:5 }}>
                     <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase" }}>{refinementRound ? "Ricerca rifinita" : `Idea ${resultIndex + 1} di ${gifts.length}`}</div>
-                    <button type="button" onClick={() => setScreen("refine")} style={{ padding:"6px 9px", border:"1px solid #d7bca3", borderRadius:999, background:"#fffaf4", color:C.maroon, fontSize:10.5, cursor:"pointer" }}>☷ Rifinisci</button>
                   </div>
                   <h1 style={{ margin:"0 0 8px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.08, letterSpacing:"-.03em" }}>{refinementRound ? `Nuove scelte per ${g.recipientName}` : `Scelte per ${g.recipientName}`}</h1>
                   {refinementRound > 0 && favoriteGifts.length > 0 && (
@@ -2267,14 +2333,13 @@ export default function Home() {
                     </div>
                   )}
                   {renderMobileResultCard(gifts[resultIndex])}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, padding:"8px 0 6px" }}>
+                  <div aria-label={`Risultato ${resultIndex + 1} di ${gifts.length}`} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:13, padding:"10px 0 7px" }}>
                     <button type="button" onClick={() => setResultIndex(index => (index - 1 + gifts.length) % gifts.length)} aria-label="Idea precedente" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>‹</button>
-                    <div style={{ display:"flex", gap:5 }}>{gifts.map((gift, index) => <span key={gift.id} style={{ width:index === resultIndex ? 13 : 5, height:5, borderRadius:99, background:index === resultIndex ? "#a25b5b" : "#d5c2ae", transition:"all .2s" }}/>)}</div>
+                    <div style={{ display:"flex", gap:7 }}>{gifts.map((gift, index) => <button key={gift.id} type="button" onClick={() => setResultIndex(index)} aria-label={`Mostra risultato ${index + 1}`} style={{ width:index === resultIndex ? 22 : 8, height:8, padding:0, border:0, borderRadius:99, background:index === resultIndex ? "#a25b5b" : "#cdb9a5", boxShadow:index === resultIndex ? "0 0 0 3px rgba(162,91,91,.12)" : "none", transition:"all .2s", cursor:"pointer" }}/>)}</div>
                     <button type="button" onClick={() => setResultIndex(index => (index + 1) % gifts.length)} aria-label="Idea successiva" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>›</button>
                   </div>
                   <div style={{ marginTop:"auto", paddingTop:6 }}>
-                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9, marginBottom:7 }}>I preferiti diventano il riferimento del prossimo giro.</div>
-                    <button type="button" onClick={() => setScreen("refine")} style={{ width:"100%", minHeight:44, border:"1px solid #d3b597", borderRadius:12, background:"#fffaf4", color:C.maroon, fontSize:12.5, cursor:"pointer" }}>{refinementRound ? "Rifinisci ancora" : "Rifinisci questi risultati"}</button>
+                    <button type="button" onClick={restart} style={{ width:"100%", minHeight:40, border:0, background:"transparent", color:C.muted4, fontSize:11.5, textDecoration:"underline", cursor:"pointer" }}>Ricomincia da capo</button>
                   </div>
                 </section>
               )}
@@ -2282,18 +2347,18 @@ export default function Home() {
               {mobileFlow && screen === "refine" && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(92)}
-                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginBottom:7 }}>Secondo giro</div>
-                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.06, letterSpacing:"-.03em" }}>Tengo ciò che funziona. Cambio il resto.</h1>
-                  <p style={{ margin:"0 0 11px", color:C.muted4, fontSize:11.5 }}>I preferiti restano fermi; il commento diventa una nuova regola.</p>
+                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginBottom:7 }}>Parto da questa idea</div>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.06, letterSpacing:"-.03em" }}>Troviamo la versione giusta.</h1>
+                  <p style={{ margin:"0 0 11px", color:C.muted4, fontSize:11.5 }}>Uso questo regalo come base e modifico solo ciò che mi indichi.</p>
                   <div style={{ minHeight:54, padding:"9px 11px", border:"1px solid #ddc7b0", borderRadius:13, background:"#fff9f2", marginBottom:10 }}>
-                    <small style={{ display:"block", color:"#a45e5b", fontSize:8, fontWeight:800, letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>{favoriteGifts.length ? "Da mantenere" : "Punto di partenza"}</small>
-                    <div style={{ display:"flex", alignItems:"center", gap:7, color:C.ink, fontSize:11.5 }}><span style={{ color:C.maroon }}>{favoriteGifts.length ? "♥" : "✦"}</span>{favoriteGifts[0]?.title || gifts[resultIndex]?.title}</div>
+                    <small style={{ display:"block", color:"#a45e5b", fontSize:8, fontWeight:800, letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>Regalo di partenza</small>
+                    <div style={{ display:"flex", alignItems:"center", gap:7, color:C.ink, fontSize:11.5 }}><span style={{ color:C.maroon }}>✦</span>{refineBaseGift?.title || gifts[resultIndex]?.title}</div>
                   </div>
-                  <label htmlFor="gc-refine-text" style={{ color:C.label, fontSize:10, fontWeight:700, marginBottom:6 }}>Cosa vuoi cambiare?</label>
-                  <textarea id="gc-refine-text" autoFocus value={refineText} onChange={event => setRefineText(event.target.value)} placeholder="Mi piace questa direzione, ma vorrei qualcosa di più…"
-                    style={{ width:"100%", minHeight:112, resize:"none", boxSizing:"border-box", padding:"12px", border:"1.5px solid #d39d55", borderRadius:14, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:13.5, lineHeight:1.42 }}/>
+                  <label htmlFor="gc-refine-text" style={{ color:C.label, fontSize:10, fontWeight:700, marginBottom:6 }}>Come deve essere l’alternativa?</label>
+                  <textarea id="gc-refine-text" className="gc-mobile-textarea" value={refineText} onChange={event => setRefineText(event.target.value)} placeholder="Esempio: stessa idea, ma più compatta, di qualità migliore e adatta a chi ha appena iniziato."
+                    style={{ width:"100%", minHeight:112, resize:"none", boxSizing:"border-box", padding:"12px", border:"1.5px solid #d39d55", borderRadius:14, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.42 }}/>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:8 }}>
-                    {["Più originale","Niente oggetti","Più economico","Più emozionante"].map(choice => {
+                    {["Più economico","Qualità migliore","Consegna rapida","Più originale"].map(choice => {
                       const active = refineChoices.includes(choice);
                       return <button key={choice} type="button" onClick={() => setRefineChoices(previous => active ? previous.filter(item => item !== choice) : [...previous, choice])}
                         style={{ padding:"7px 9px", border:`1px solid ${active ? "#9d5a58" : "#ddc7b0"}`, borderRadius:999, background:active ? "#9d5a58" : "#fff8ef", color:active ? "#fff" : C.muted4, fontSize:10.5, cursor:"pointer" }}>{choice}</button>;
@@ -2301,11 +2366,12 @@ export default function Home() {
                   </div>
                   {errorMsg && <div style={{ marginTop:9, color:"#963f3d", fontSize:11 }}>{errorMsg}</div>}
                   <div style={{ marginTop:"auto", paddingTop:12 }}>
-                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9, marginBottom:7 }}>Escludo le idee già viste e applico il nuovo commento.</div>
+                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9, marginBottom:7 }}>Cerco alternative simili senza ripetere i prodotti già visti.</div>
                     <button type="button" onClick={refineMobileResults} disabled={refining || (!refineText.trim() && refineChoices.length === 0)}
                       style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:(!refineText.trim() && !refineChoices.length) ? "#ccb9a6" : C.maroon, color:"#fff", fontSize:13, fontWeight:700, cursor:(!refineText.trim() && !refineChoices.length) ? "not-allowed" : "pointer" }}>
-                      {refining ? "Creo nuove scelte…" : "Crea nuovi risultati"}
+                      {refining ? "Cerco alternative…" : "Trova alternative simili"}
                     </button>
+                    <button type="button" onClick={restart} style={{ width:"100%", minHeight:36, marginTop:5, border:0, background:"transparent", color:C.muted4, fontSize:11, textDecoration:"underline", cursor:"pointer" }}>Ricomincia da capo</button>
                   </div>
                 </section>
               )}

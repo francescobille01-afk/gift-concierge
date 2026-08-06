@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Cormorant_Garamond, Plus_Jakarta_Sans, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
@@ -39,6 +39,12 @@ export const metadata: Metadata = {
   title: "Gift Concierge — The perfect gift, every time",
   description:
     "AI-powered gift discovery. Tell us about who you're shopping for, and we'll find what they'll genuinely love.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
