@@ -793,7 +793,22 @@ function budgetToSliderStep(budget: number) {
   return budget <= 100 ? Math.round(budget / 5) : 20 + Math.round((budget - 100) / 25);
 }
 
-type Screen = "landing" | "intake" | "clues" | "signals" | "loading" | "results" | "refine";
+interface FavoriteSearchGroup {
+  id: string;
+  name: string;
+  occasion: string;
+  budget: number;
+  currencySymbol: string;
+  gifts: GiftSuggestion[];
+  gathered: Gathered;
+  clueText: string;
+  signals: ProfileSignal[];
+  conversation: ChatMessage[];
+  languageIndex: number;
+  savedAt: number;
+}
+
+type Screen = "landing" | "intake" | "clues" | "signals" | "loading" | "results" | "refine" | "favorites" | "favorite-detail";
 const MOBILE_LOADING_LINES = [
   "Collego gli indizi più importanti",
   "Confronto idee davvero acquistabili",
@@ -1070,6 +1085,11 @@ export default function Home() {
   const [editingSignals, setEditingSignals] = useState(false);
   const [resultIndex, setResultIndex] = useState(0);
   const [favoriteGifts, setFavoriteGifts] = useState<GiftSuggestion[]>([]);
+  const [favoriteSearches, setFavoriteSearches] = useState<FavoriteSearchGroup[]>([]);
+  const [activeSearchId, setActiveSearchId] = useState("");
+  const [expandedFavoriteSearch, setExpandedFavoriteSearch] = useState<string | null>(null);
+  const [selectedFavorite, setSelectedFavorite] = useState<{ groupId:string; giftId:string } | null>(null);
+  const [favoritesReturnScreen, setFavoritesReturnScreen] = useState<Screen>("results");
   const [refineBaseGift, setRefineBaseGift] = useState<GiftSuggestion | null>(null);
   const [refineText, setRefineText] = useState("");
   const [refineChoices, setRefineChoices] = useState<string[]>([]);
@@ -1081,6 +1101,7 @@ export default function Home() {
   const [contactSent, setContactSent] = useState(false);
 
   const HIST_KEY = "gifty-history";
+  const FAVORITES_KEY = "gifty-favorite-searches";
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const speechRecognitionRef = useRef<SpeechRecognitionController | null>(null);
@@ -1091,6 +1112,9 @@ export default function Home() {
   const tr   = TR[lang.t as TKey] ?? TR.en;
   const sym  = lang.sym;
   const landingForm = LANDING_FORM_COPY[lang.t as TKey] ?? LANDING_FORM_COPY.en;
+  const totalFavoriteCount = favoriteSearches.reduce((total, search) => total + search.gifts.length, 0);
+  const selectedFavoriteGroup = selectedFavorite ? favoriteSearches.find(search => search.id === selectedFavorite.groupId) : undefined;
+  const selectedFavoriteGift = selectedFavoriteGroup?.gifts.find(gift => gift.id === selectedFavorite?.giftId);
 
   /* ── Mobile landing: show the mobile-only intro screen on first mount.
      Done in an effect (not the useState initializer) so the very first
@@ -1155,6 +1179,8 @@ export default function Home() {
     try {
       const hist = localStorage.getItem(HIST_KEY);
       setHistory(hist ? JSON.parse(hist) : []);
+      const savedFavorites = localStorage.getItem(FAVORITES_KEY);
+      setFavoriteSearches(savedFavorites ? JSON.parse(savedFavorites) : []);
     } catch { /* ignore */ }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1203,7 +1229,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    speechRecognitionRef.current?.abort(); setIsListening(false); setVoiceError(""); setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
+    speechRecognitionRef.current?.abort(); setIsListening(false); setVoiceError(""); setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setActiveSearchId(""); setSelectedFavorite(null); setExpandedFavoriteSearch(null); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1400,10 +1426,74 @@ export default function Home() {
     }
   }
 
+  function persistFavoriteSearches(searches: FavoriteSearchGroup[]) {
+    setFavoriteSearches(searches);
+    try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(searches)); } catch { /* ignore */ }
+  }
+
+  function saveCurrentSearchFavorites(nextGifts: GiftSuggestion[]) {
+    const searchId = activeSearchId || `favorite-search-${Date.now()}`;
+    if (!activeSearchId) setActiveSearchId(searchId);
+    const nextGroup: FavoriteSearchGroup = {
+      id:searchId,
+      name:g.recipientName || "Destinatario",
+      occasion:g.occasion || "Occasione non indicata",
+      budget:g.budget,
+      currencySymbol:sym,
+      gifts:nextGifts,
+      gathered:{ ...g, interests:[...g.interests], interestDeepDive:{ ...g.interestDeepDive } },
+      clueText,
+      signals:signals.map(signal => ({ ...signal })),
+      conversation:convo.map(message => ({ ...message })),
+      languageIndex:langIdx,
+      savedAt:Date.now(),
+    };
+    const withoutCurrent = favoriteSearches.filter(search => search.id !== searchId);
+    persistFavoriteSearches(nextGifts.length ? [nextGroup, ...withoutCurrent] : withoutCurrent);
+  }
+
   function toggleFavorite(gift: GiftSuggestion) {
-    setFavoriteGifts(previous => previous.some(item => item.id === gift.id)
-      ? previous.filter(item => item.id !== gift.id)
-      : [...previous, gift]);
+    const nextFavorites = favoriteGifts.some(item => item.id === gift.id)
+      ? favoriteGifts.filter(item => item.id !== gift.id)
+      : [...favoriteGifts, gift];
+    setFavoriteGifts(nextFavorites);
+    saveCurrentSearchFavorites(nextFavorites);
+  }
+
+  function openFavorites() {
+    if (screen !== "favorites" && screen !== "favorite-detail") setFavoritesReturnScreen(screen);
+    setSelectedFavorite(null);
+    setScreen("favorites");
+  }
+
+  function removeFavoriteFromSavedSearch(groupId: string, giftId: string) {
+    const nextSearches = favoriteSearches.flatMap(search => {
+      if (search.id !== groupId) return [search];
+      const remainingGifts = search.gifts.filter(gift => gift.id !== giftId);
+      return remainingGifts.length ? [{ ...search, gifts:remainingGifts }] : [];
+    });
+    persistFavoriteSearches(nextSearches);
+    if (groupId === activeSearchId) setFavoriteGifts(previous => previous.filter(gift => gift.id !== giftId));
+    setSelectedFavorite(null);
+    setScreen("favorites");
+  }
+
+  function refineSavedFavorite(group: FavoriteSearchGroup, gift: GiftSuggestion) {
+    setG(group.gathered);
+    setLangIdx(group.languageIndex);
+    setClueText(group.clueText);
+    setSignals(group.signals);
+    setConvo(group.conversation);
+    setActiveSearchId(group.id);
+    setFavoriteGifts(group.gifts);
+    setGifts([gift]);
+    setResultIndex(0);
+    setMobileFlow(true);
+    setRefineBaseGift(gift);
+    setRefineText("");
+    setRefineChoices([]);
+    setErrorMsg(null);
+    setScreen("refine");
   }
 
   function openProductRefinement(gift: GiftSuggestion) {
@@ -1416,7 +1506,9 @@ export default function Home() {
 
   function discardMobileGift(gift: GiftSuggestion) {
     const remaining = gifts.filter(item => item.id !== gift.id);
-    setFavoriteGifts(previous => previous.filter(item => item.id !== gift.id));
+    const remainingFavorites = favoriteGifts.filter(item => item.id !== gift.id);
+    setFavoriteGifts(remainingFavorites);
+    saveCurrentSearchFavorites(remainingFavorites);
     if (!remaining.length) {
       restart();
       return;
@@ -1647,9 +1739,9 @@ export default function Home() {
             </span>
           </button>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <div aria-label={`${favoriteGifts.length} preferiti`} style={{ minWidth:35, height:34, padding:"0 8px", borderRadius:999, border:"1px solid #d5b995", background:"rgba(255,250,244,.72)", display:"flex", alignItems:"center", justifyContent:"center", gap:3, color:C.maroon, fontSize:12, fontWeight:700 }}>
-              <span aria-hidden="true">♡</span>{favoriteGifts.length || ""}
-            </div>
+            <button type="button" onClick={openFavorites} aria-label={`Apri ${totalFavoriteCount} preferiti salvati`} style={{ minWidth:35, height:34, padding:"0 8px", borderRadius:999, border:"1px solid #d5b995", background:"rgba(255,250,244,.72)", display:"flex", alignItems:"center", justifyContent:"center", gap:3, color:C.maroon, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+              <span aria-hidden="true">♡</span>{totalFavoriteCount || ""}
+            </button>
             <div ref={langMenuRef} style={{ position:"relative" }}>
               <button type="button" onClick={() => setLangMenuOpen(open => !open)} style={{ height:34, padding:"0 10px", borderRadius:999, border:"1px solid #d5b995", background:"rgba(255,250,244,.72)", color:C.label, font:`700 11px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}>
                 {lang.flag} {lang.code} <span style={{ opacity:.5, fontSize:8 }}>▾</span>
@@ -2231,6 +2323,8 @@ export default function Home() {
               const submitLandingAnswer = () => {
                 if (!g.recipientName.trim() || !g.occasion?.trim()) return;
                 (document.activeElement as HTMLElement | null)?.blur();
+                setActiveSearchId(`favorite-search-${Date.now()}`);
+                setFavoriteGifts([]);
                 setLandingSheetOpen(false);
                 setLandingBarFocused(false);
                 setMobileFlow(true);
@@ -2417,6 +2511,61 @@ export default function Home() {
                       Vai ai risultati
                     </button>
                   </div>
+                </section>
+              )}
+
+              {mobileFlow && screen === "favorites" && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(100)}
+                  <button type="button" onClick={() => setScreen(favoritesReturnScreen)} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Torna indietro</button>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>I tuoi preferiti.</h1>
+                  <p style={{ margin:"0 0 14px", color:C.muted4, fontSize:12 }}>Raggruppati in base alla ricerca da cui provengono.</p>
+                  {favoriteSearches.length === 0 ? (
+                    <div style={{ flex:1, display:"grid", placeItems:"center", textAlign:"center", padding:"30px 20px" }}>
+                      <div><div style={{ width:58, height:58, margin:"0 auto 13px", borderRadius:"50%", display:"grid", placeItems:"center", background:"#f2e2d4", color:C.maroon, fontSize:27 }}>♡</div><strong style={{ display:"block", color:C.ink, fontFamily:DISPLAY, fontSize:20 }}>Ancora nessun preferito</strong><span style={{ display:"block", marginTop:5, color:C.muted4, fontSize:11.5 }}>Tocca il cuore su un regalo per ritrovarlo qui.</span></div>
+                    </div>
+                  ) : (
+                    <div style={{ display:"grid", gap:8, overflowY:"auto", paddingBottom:10 }}>
+                      {favoriteSearches.map(search => {
+                        const expanded = expandedFavoriteSearch === search.id;
+                        return (
+                          <div key={search.id} style={{ border:"1px solid #dbc3aa", borderRadius:14, overflow:"hidden", background:"#fffaf4", boxShadow:"0 6px 18px rgba(83,49,36,.06)" }}>
+                            <button type="button" onClick={() => setExpandedFavoriteSearch(current => current === search.id ? null : search.id)} style={{ width:"100%", minHeight:62, padding:"10px 12px", border:0, background:expanded ? "#f0dfc9" : "#fffaf4", display:"flex", alignItems:"center", gap:10, textAlign:"left", cursor:"pointer" }}>
+                              <span style={{ width:34, height:34, flexShrink:0, borderRadius:10, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#e3bc79,#ca9553)", color:C.maroon }}>♥</span>
+                              <span style={{ flex:1, minWidth:0 }}><strong style={{ display:"block", color:C.ink, fontFamily:DISPLAY, fontSize:16 }}>{search.name}</strong><small style={{ display:"block", marginTop:2, color:C.muted4, fontSize:9.5 }}>{search.occasion} · max {fmtBudget(search.budget, search.currencySymbol)} · {search.gifts.length} {search.gifts.length === 1 ? "preferito" : "preferiti"}</small></span>
+                              <span aria-hidden="true" style={{ color:C.maroon, transform:expanded ? "rotate(180deg)" : "none", transition:"transform .2s" }}>⌄</span>
+                            </button>
+                            {expanded && <div style={{ padding:"4px 8px 8px", borderTop:"1px solid #dfcbb5" }}>
+                              {search.gifts.map(gift => (
+                                <button key={gift.id} type="button" onClick={() => { setSelectedFavorite({ groupId:search.id, giftId:gift.id }); setScreen("favorite-detail"); }} style={{ width:"100%", padding:"10px 7px", border:0, borderBottom:"1px solid #eee0d2", background:"transparent", display:"flex", alignItems:"center", gap:9, textAlign:"left", cursor:"pointer" }}>
+                                  <span style={{ width:28, height:28, borderRadius:8, display:"grid", placeItems:"center", background:"#f3e5d8", color:C.maroon, fontSize:12 }}>✦</span><span style={{ flex:1, color:C.ink, fontSize:11.5, fontWeight:700 }}>{gift.title}</span><span style={{ color:C.maroon, fontFamily:DISPLAY, fontSize:13 }}>{toPriceBand(gift.priceRange, search.currencySymbol)}</span><span style={{ color:C.muted2 }}>›</span>
+                                </button>
+                              ))}
+                            </div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <button type="button" onClick={restart} style={{ width:"100%", minHeight:42, marginTop:"auto", border:"1px solid #d3b597", borderRadius:11, background:"#fffaf4", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>Inizia una nuova ricerca</button>
+                </section>
+              )}
+
+              {mobileFlow && screen === "favorite-detail" && selectedFavoriteGroup && selectedFavoriteGift && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(100)}
+                  <button type="button" onClick={() => setScreen("favorites")} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Tutti i preferiti</button>
+                  <div style={{ marginBottom:8, color:"#a45e5b", fontSize:8.5, fontWeight:800, letterSpacing:".1em", textTransform:"uppercase" }}>{selectedFavoriteGroup.name} · {selectedFavoriteGroup.occasion} · max {fmtBudget(selectedFavoriteGroup.budget, selectedFavoriteGroup.currencySymbol)}</div>
+                  <article style={{ border:"1px solid #dfc8af", borderRadius:18, background:"#fffaf4", padding:8, boxShadow:"0 12px 28px rgba(91,45,39,.09)" }}>
+                    <div style={{ height:190, borderRadius:13, overflow:"hidden", background:"linear-gradient(145deg,#ead8c4,#d8b99b)" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}<img src={selectedFavoriteGift.imageUrl || `/api/product-image?q=${encodeURIComponent(selectedFavoriteGift.imageSearchQuery ?? selectedFavoriteGift.title)}`} alt={selectedFavoriteGift.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                    </div>
+                    <div style={{ padding:"12px 4px 4px" }}><div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:10 }}><h1 style={{ margin:"0 0 7px", color:C.ink, fontFamily:DISPLAY, fontSize:22, lineHeight:1.08 }}>{selectedFavoriteGift.title}</h1><strong style={{ whiteSpace:"nowrap", color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{toPriceBand(selectedFavoriteGift.priceRange, selectedFavoriteGroup.currencySymbol)}</strong></div><p style={{ margin:"0 0 12px", color:C.muted4, fontSize:11.5, lineHeight:1.42 }}>{selectedFavoriteGift.reason || selectedFavoriteGift.description}</p>
+                      <a href={addAffiliateTag(selectedFavoriteGift.amazonLink || `https://www.amazon.it/s?k=${encodeURIComponent(selectedFavoriteGift.title)}`)} target="_blank" rel="noopener noreferrer" style={{ display:"block", width:"100%", padding:"11px", borderRadius:10, boxSizing:"border-box", textAlign:"center", textDecoration:"none", background:C.maroon, color:"#fff", fontSize:12, fontWeight:700 }}>Acquista su Amazon</a>
+                      <button type="button" onClick={() => refineSavedFavorite(selectedFavoriteGroup, selectedFavoriteGift)} style={{ width:"100%", minHeight:40, marginTop:7, border:"1px solid #d2b494", borderRadius:10, background:"#fffaf4", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>Rifinisci partendo da questo regalo</button>
+                      <button type="button" onClick={() => removeFavoriteFromSavedSearch(selectedFavoriteGroup.id, selectedFavoriteGift.id)} style={{ width:"100%", minHeight:36, marginTop:5, border:0, background:"transparent", color:C.muted4, fontSize:10.5, cursor:"pointer" }}>⌫ Scarta dai preferiti</button>
+                    </div>
+                  </article>
                 </section>
               )}
 
