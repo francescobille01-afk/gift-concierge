@@ -80,6 +80,25 @@ const LANGS = [
 
 type TKey = "en" | "it" | "fr" | "de" | "es" | "pt";
 
+const LANDING_FORM_COPY: Record<TKey, {
+  collapsedPrompt: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  occasionLabel: string;
+  occasionPlaceholder: string;
+  budgetLabel: string;
+  sheetTitle: string;
+  sheetSub: string;
+  cta: string;
+}> = {
+  en: { collapsedPrompt:"Start here", nameLabel:"Recipient's name", namePlaceholder:"e.g. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"e.g. Birthday", budgetLabel:"Maximum budget", sheetTitle:"Let's start with the essentials", sheetSub:"Three details, then you can tell Gifty everything you know.", cta:"Continue to clues" },
+  it: { collapsedPrompt:"Inizia da qui", nameLabel:"Nome del destinatario", namePlaceholder:"Es. Giulia", occasionLabel:"Occasione", occasionPlaceholder:"Es. Compleanno", budgetLabel:"Budget massimo", sheetTitle:"Partiamo dalle cose essenziali", sheetSub:"Tre informazioni, poi potrai raccontare a Gifty tutto quello che sai.", cta:"Continua agli indizi" },
+  fr: { collapsedPrompt:"Commencez ici", nameLabel:"Prénom du destinataire", namePlaceholder:"Ex. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"Ex. Anniversaire", budgetLabel:"Budget maximum", sheetTitle:"Commençons par l'essentiel", sheetSub:"Trois informations, puis racontez à Gifty tout ce que vous savez.", cta:"Continuer vers les indices" },
+  de: { collapsedPrompt:"Hier starten", nameLabel:"Name der Person", namePlaceholder:"z. B. Giulia", occasionLabel:"Anlass", occasionPlaceholder:"z. B. Geburtstag", budgetLabel:"Maximales Budget", sheetTitle:"Beginnen wir mit dem Wesentlichen", sheetSub:"Drei Angaben, danach kannst du Gifty alles erzählen, was du weißt.", cta:"Weiter zu den Hinweisen" },
+  es: { collapsedPrompt:"Empieza aquí", nameLabel:"Nombre del destinatario", namePlaceholder:"Ej. Giulia", occasionLabel:"Ocasión", occasionPlaceholder:"Ej. Cumpleaños", budgetLabel:"Presupuesto máximo", sheetTitle:"Empecemos por lo esencial", sheetSub:"Tres datos y después podrás contarle a Gifty todo lo que sabes.", cta:"Continuar a las pistas" },
+  pt: { collapsedPrompt:"Comece aqui", nameLabel:"Nome do destinatário", namePlaceholder:"Ex. Giulia", occasionLabel:"Ocasião", occasionPlaceholder:"Ex. Aniversário", budgetLabel:"Orçamento máximo", sheetTitle:"Vamos começar pelo essencial", sheetSub:"Três dados e depois pode contar à Gifty tudo o que sabe.", cta:"Continuar para as pistas" },
+};
+
 interface InterestDeepDiveConfig {
   detailQ: string; detailPlaceholder: string;
   contextQ: string; contextOpts: string[];
@@ -975,6 +994,7 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 export default function Home() {
   const [screen,      setScreen]      = useState<"landing"|"intake"|"loading"|"results">("intake");
   const [landingBarFocused, setLandingBarFocused] = useState(false);
+  const [landingSheetOpen, setLandingSheetOpen] = useState(false);
   const [landingDisclaimerOpen, setLandingDisclaimerOpen] = useState(false);
   // Set when the mobile landing bar's free-text answer is used to fill
   // g.relationship directly — step 0 then skips its own relationship
@@ -1009,6 +1029,7 @@ export default function Home() {
   const lang = LANGS[langIdx];
   const tr   = TR[lang.t as TKey] ?? TR.en;
   const sym  = lang.sym;
+  const landingForm = LANDING_FORM_COPY[lang.t as TKey] ?? LANDING_FORM_COPY.en;
 
   /* ── Mobile landing: show the mobile-only intro screen on first mount.
      Done in an effect (not the useState initializer) so the very first
@@ -1100,7 +1121,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false);
+    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1314,6 +1335,13 @@ export default function Home() {
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.4),0 10px 30px rgba(124,63,63,.35); }
         }
         .gc-bar-pulse { animation:gcbarglow 2.2s ease-in-out infinite; }
+        .gc-landing-sheet{transition:height .38s cubic-bezier(.22,.8,.28,1),border-radius .28s ease,box-shadow .28s ease}
+        .gc-landing-sheet-field{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:8px 12px 8px 14px;border:1.5px solid #dec9af;border-radius:15px;background:#fffdf9;transition:border-color .18s ease,box-shadow .18s ease}
+        .gc-landing-sheet-field:focus-within{border-color:#c9a26b;box-shadow:0 0 0 3px rgba(201,162,107,.15)}
+        .gc-landing-sheet-field label{display:block;margin-bottom:2px;color:#7c3f3f;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+        .gc-landing-sheet-field input[type=text]{width:100%;padding:0;border:0!important;outline:none;background:transparent;color:#2a211d;font:500 15px 'Hanken Grotesk',sans-serif}
+        .gc-landing-sheet-field input[type=range]{margin:5px 0 1px}
+        .gc-landing-sheet-handle{width:38px;height:4px;margin:0 auto 10px;border-radius:99px;background:#cbb8a1}
         /* ── Mobile-landing 3-step animation (design handoff) ── */
         @keyframes gcStageCycle {
           0%, 30% { opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
@@ -1662,37 +1690,103 @@ export default function Home() {
           {screen === "landing" && typeof document !== "undefined" && createPortal(
             (() => {
               const submitLandingAnswer = () => {
-                if (!g.relationship.trim()) return;
+                if (!g.recipientName.trim() || !g.occasion?.trim()) return;
                 setSkipRelPicker(true);
+                setLandingSheetOpen(false);
                 setScreen("intake");
               };
               return (
-                <div
-                  style={{
-                    position:"fixed", left:0, right:0, bottom:0, background:"#e9dcc9",
-                    borderRadius:"26px 26px 0 0",
-                    boxShadow:"0 -10px 24px rgba(0,0,0,.15)",
-                    padding:"13px 16px calc(20px + env(safe-area-inset-bottom))",
-                    zIndex:200,
-                  }}>
-                  <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:12 }}>{tr.chatBarPrompt}</div>
-                  <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
-                    <input
-                      type="text" autoComplete="off" autoCorrect="off" name="gc-landing-relationship"
-                      value={g.relationship}
-                      onChange={e => setG(p => ({ ...p, relationship: e.target.value }))}
-                      onFocus={() => setLandingBarFocused(true)}
-                      onBlur={() => setLandingBarFocused(false)}
-                      onKeyDown={e => { if (e.key === "Enter") submitLandingAnswer(); }}
-                      placeholder={tr.chatBarLabel}
-                      style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink }}
+                <>
+                  {landingSheetOpen && (
+                    <button
+                      type="button"
+                      aria-label="Chiudi il pannello"
+                      onClick={() => { setLandingSheetOpen(false); setLandingBarFocused(false); }}
+                      style={{ position:"fixed", inset:0, zIndex:190, border:"none", background:"rgba(45,25,20,.18)", backdropFilter:"blur(1.5px)", cursor:"default" }}
                     />
-                    <button onClick={submitLandingAnswer} aria-label={tr.continue} disabled={!g.relationship.trim()}
-                      style={{ width:44, height:44, borderRadius:"50%", border:"none", background: g.relationship.trim() ? "linear-gradient(150deg,#8c4f4f,#7c3f3f)" : C.bord3, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor: g.relationship.trim() ? "pointer" : "not-allowed" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </button>
+                  )}
+                  <div
+                    className="gc-landing-sheet"
+                    style={{
+                      position:"fixed", left:0, right:0, bottom:0,
+                      height: landingSheetOpen ? "min(56dvh,470px)" : "auto",
+                      overflow:"hidden",
+                      background:"#e9dcc9",
+                      borderRadius: landingSheetOpen ? "30px 30px 0 0" : "26px 26px 0 0",
+                      boxShadow: landingSheetOpen ? "0 -18px 42px rgba(55,28,22,.24)" : "0 -10px 24px rgba(0,0,0,.15)",
+                      padding: landingSheetOpen ? "10px 17px calc(18px + env(safe-area-inset-bottom))" : "13px 16px calc(20px + env(safe-area-inset-bottom))",
+                      zIndex:200,
+                    }}>
+                    {!landingSheetOpen ? (
+                      <>
+                        <div style={{ textAlign:"center", fontSize:12.5, fontWeight:700, letterSpacing:".04em", color:"#7c3f3f", marginBottom:12 }}>{landingForm.collapsedPrompt}</div>
+                        <div className={landingBarFocused ? undefined : "gc-bar-pulse"} style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"#fff", border:"2px solid #c9a26b", borderRadius:999, padding:"11px 11px 11px 20px", boxShadow: landingBarFocused ? "0 0 0 7px rgba(201,162,107,.3), 0 12px 30px rgba(124,63,63,.3)" : "0 0 0 5px rgba(201,162,107,.25), 0 10px 26px rgba(124,63,63,.25)", transition:"box-shadow .3s cubic-bezier(.4,0,.2,1)" }}>
+                          <input
+                            type="text" readOnly autoComplete="off" name="gc-landing-recipient-closed"
+                            value={g.recipientName}
+                            onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}
+                            onFocus={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}
+                            placeholder={landingForm.nameLabel}
+                            style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink, cursor:"text" }}
+                          />
+                          <button type="button" onClick={() => setLandingSheetOpen(true)} aria-label={landingForm.nameLabel}
+                            style={{ width:44, height:44, borderRadius:"50%", border:"none", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor:"pointer" }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ height:"100%", display:"flex", flexDirection:"column" }}>
+                        <button type="button" className="gc-landing-sheet-handle" aria-label="Riduci il pannello" onClick={() => { setLandingSheetOpen(false); setLandingBarFocused(false); }} style={{ border:"none", padding:0, cursor:"pointer" }}/>
+                        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:14, marginBottom:12 }}>
+                          <div>
+                            <div style={{ fontFamily:DISPLAY, fontSize:22, fontWeight:700, letterSpacing:"-.02em", color:C.ink, lineHeight:1.08 }}>{landingForm.sheetTitle}</div>
+                            <div style={{ marginTop:4, fontSize:12.5, lineHeight:1.35, color:C.muted4 }}>{landingForm.sheetSub}</div>
+                          </div>
+                          <button type="button" onClick={() => { setLandingSheetOpen(false); setLandingBarFocused(false); }} aria-label="Chiudi"
+                            style={{ width:30, height:30, flexShrink:0, border:`1px solid ${C.bord5}`, borderRadius:"50%", background:"rgba(255,255,255,.55)", color:C.maroon, fontSize:19, lineHeight:1, cursor:"pointer" }}>×</button>
+                        </div>
+
+                        <div style={{ display:"grid", gap:8 }}>
+                          <div className="gc-landing-sheet-field">
+                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5", fontSize:15 }}>♡</span>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <label htmlFor="gc-landing-recipient">{landingForm.nameLabel}</label>
+                              <input id="gc-landing-recipient" autoFocus type="text" autoComplete="off" value={g.recipientName} onChange={e => setG(p => ({ ...p, recipientName:e.target.value }))} placeholder={landingForm.namePlaceholder}/>
+                            </div>
+                          </div>
+
+                          <div className="gc-landing-sheet-field">
+                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5", fontSize:14 }}>◇</span>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <label htmlFor="gc-landing-occasion">{landingForm.occasionLabel}</label>
+                              <input id="gc-landing-occasion" type="text" autoComplete="off" value={g.occasion ?? ""} onChange={e => setG(p => ({ ...p, occasion:e.target.value }))} placeholder={landingForm.occasionPlaceholder}/>
+                            </div>
+                          </div>
+
+                          <div className="gc-landing-sheet-field">
+                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5", fontSize:13, fontWeight:700 }}>{sym}</span>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between" }}>
+                                <label htmlFor="gc-landing-budget">{landingForm.budgetLabel}</label>
+                                <strong style={{ color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{fmtBudget(g.budget, sym)}</strong>
+                              </div>
+                              <input id="gc-landing-budget" type="range" min={20} max={500} step={10} value={g.budget} onChange={e => setG(p => ({ ...p, budget:+e.target.value }))}
+                                style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${((g.budget-20)/480)*100}%,#ddcbb6 ${((g.budget-20)/480)*100}%)` }}/>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop:"auto" }}>
+                          <button type="button" onClick={submitLandingAnswer} disabled={!g.recipientName.trim() || !g.occasion?.trim()}
+                            style={{ width:"100%", minHeight:47, border:"none", borderRadius:14, background: g.recipientName.trim() && g.occasion?.trim() ? "linear-gradient(150deg,#8c4f4f,#7c3f3f)" : "#ccb9a6", color:"#fff", font:`700 14px ${BODY}`, cursor: g.recipientName.trim() && g.occasion?.trim() ? "pointer" : "not-allowed", boxShadow: g.recipientName.trim() && g.occasion?.trim() ? "0 7px 18px rgba(124,63,63,.24)" : "none" }}>
+                            {landingForm.cta} →
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                </>
               );
             })(),
             document.body
