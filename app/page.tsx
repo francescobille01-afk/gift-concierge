@@ -1400,7 +1400,7 @@ export default function Home() {
         .gc-stage-scan { animation:gcScanSweep 2.6s ease-in-out infinite; }
         .gc-stage-card-reveal { transform-origin:center; animation:gcCardReveal 2.7s ease-out infinite; }
         .gc-stage-facet { animation:gcFacetGlow 1.7s ease-in-out infinite; }
-        .gc-stage-dot { width:9px; height:9px; border-radius:50%; animation:gcDotActive 9s steps(1,end) infinite; }
+        .gc-stage-dot { width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.25); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); animation:gcDotActive 9s steps(1,end) infinite; }
         .gc-stage-line-fill { height:100%; width:100%; background:#e3c089; transform:scaleX(0); animation:gcLineFill 3s linear infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
         .gc-orbit {animation:gcorbit 2.4s linear infinite}
