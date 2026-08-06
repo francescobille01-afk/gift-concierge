@@ -1905,10 +1905,10 @@ export default function Home() {
         .gc-v2-benefits{display:flex;align-items:center;gap:11px;margin-top:25px;color:#d7e1df;font-size:13px;font-weight:650}.gc-v2-benefits i{width:4px;height:4px;border-radius:50%;background:#ffc19f}.gc-v2-scroll-cue{display:flex;align-items:center;gap:9px;margin:28px 0 0;color:#91aaa9;font-size:11px}.gc-v2-scroll-cue b{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#ffc19f}
         .gc-v2-story{position:relative;height:430px;align-self:center}.gc-v2-route{position:absolute;left:0;right:0;top:36px;width:100%;height:210px;overflow:visible}.gc-v2-route path:last-child{transition:stroke-dashoffset .12s linear;filter:drop-shadow(0 0 6px rgba(239,115,95,.45))}
         @keyframes gcShowcaseScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-        .gc-v3-marquee{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;flex:1 1 auto;min-height:0;display:flex;align-items:center;margin-top:clamp(18px,3vh,32px);overflow:hidden;perspective:1400px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-        .gc-v3-marquee-track{display:flex;align-items:center;gap:22px;width:max-content;animation:gcShowcaseScroll 42s linear infinite}
+        .gc-v3-marquee{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;margin-top:clamp(22px,4vh,40px);overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+        .gc-v3-marquee-track{display:flex;gap:18px;width:max-content;animation:gcShowcaseScroll 42s linear infinite}
         .gc-v3-marquee:hover .gc-v3-marquee-track{animation-play-state:paused}
-        .gc-v3-marquee-card{position:relative;flex:0 0 auto;width:clamp(160px,20vw,300px);height:clamp(260px,60vh,600px);border-radius:24px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 26px 60px rgba(0,0,0,.45);transition:transform .3s ease}
+        .gc-v3-marquee-card{position:relative;flex:0 0 auto;width:clamp(140px,16vw,240px);height:clamp(200px,40vh,400px);border-radius:22px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 20px 46px rgba(0,0,0,.4)}
         .gc-v3-marquee-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 40%,rgba(21,43,56,.94) 100%)}
         .gc-v3-marquee-cat{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(3px);color:#fff4e8;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
         .gc-v3-marquee-body{position:absolute;left:12px;right:12px;bottom:12px;color:#fff4e8}
@@ -2039,9 +2039,9 @@ export default function Home() {
         .gc-landing-v2{position:relative!important;top:auto!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:0!important;background:linear-gradient(180deg,#17303e 0%,#203746 48%,#294b59 100%)!important}
         .gc-landing-v2-header{position:sticky!important;top:0;z-index:80;box-sizing:border-box;max-width:none!important;height:58px;padding:8px clamp(18px,4vw,56px);background:linear-gradient(180deg,rgba(21,43,56,.96),rgba(21,43,56,.76),transparent);backdrop-filter:blur(12px)}
         .gc-v3-journey{position:relative;margin-top:-58px;color:#fff4e8;background:radial-gradient(circle at 15% 18%,rgba(239,115,95,.1),transparent 20%),linear-gradient(180deg,#17303e,#203746 38%,#274956 72%,#17303e)}
-        .gc-v3-hero{position:relative;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:78px 24px 64px;box-sizing:border-box;overflow:hidden;text-align:center}
+        .gc-v3-hero{position:relative;min-height:100dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;overflow:hidden;text-align:center}
         .gc-v3-hero-glow{position:absolute;width:min(70vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(239,115,95,.2),rgba(255,193,159,.05) 42%,transparent 70%);filter:blur(4px);animation:gcLoaderGlow 4s ease-in-out infinite}
-        .gc-v3-hero-copy{position:relative;z-index:2;flex:0 0 auto}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(38px,5.2vw,72px);font-weight:650;line-height:.96;letter-spacing:-.06em}.gc-v3-hero h1 em{display:inline-block;margin-top:6px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
+        .gc-v3-hero-copy{position:relative;z-index:2}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(52px,7vw,100px);font-weight:650;line-height:.94;letter-spacing:-.06em}.gc-v3-hero h1 em{display:inline-block;margin-top:10px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
         .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:28px}
         .gc-v3-scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:11px}
         .gc-v3-scroll-cue span{padding:8px 18px;border-radius:999px;background:rgba(239,115,95,.18);border:1px solid rgba(255,193,159,.4);color:#fff4e8;font-size:12.5px;font-weight:800;letter-spacing:.03em;white-space:nowrap}
@@ -2232,7 +2232,7 @@ export default function Home() {
                     <div className="gc-v3-marquee" aria-label="Esempi di regali trovati da Gifty">
                       <div className="gc-v3-marquee-track">
                         {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
-                          <div key={i} className="gc-v3-marquee-card" style={{ transform:`perspective(1300px) rotateY(${i % 2 === 0 ? "10deg" : "-10deg"}) translateY(${i % 3 === 1 ? "-16px" : "10px"})`, backgroundImage:`url(${item.photo})` }}>
+                          <div key={i} className="gc-v3-marquee-card" style={{ transform:`rotate(${i % 2 === 0 ? "-2.5deg" : "2.5deg"})`, backgroundImage:`url(${item.photo})` }}>
                             <div className="gc-v3-marquee-fade" />
                             <span className="gc-v3-marquee-cat">{item.category}</span>
                             <div className="gc-v3-marquee-body">
