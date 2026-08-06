@@ -1365,9 +1365,9 @@ export default function Home() {
         @keyframes gcLineFill { 0%,33.3%{transform:scaleX(0)} 96%,100%{transform:scaleX(1)} }
         @keyframes gcTypingDot { 0%,60%,100%{transform:translateY(0);opacity:.45} 30%{transform:translateY(-3px);opacity:1} }
         @keyframes gcFloatSlow { 0%,100%{transform:translateY(1px) rotate(-1deg)} 50%{transform:translateY(-4px) rotate(1deg)} }
-        @keyframes gcProfileIn { 0%,12%{opacity:0;transform:translateX(-10px) scale(.92)} 35%,100%{opacity:1;transform:none} }
-        @keyframes gcBubbleIn { 0%,25%{opacity:0;transform:translate(8px,5px) scale(.88)} 48%,100%{opacity:1;transform:none} }
-        @keyframes gcChipPop { 0%,35%{opacity:0;transform:scale(.4)} 55%{opacity:1;transform:scale(1.14)} 70%,100%{opacity:1;transform:scale(1)} }
+        @keyframes gcProfileIn { 0%,3%{opacity:0;transform:translateX(-10px) scale(.92)} 12%,100%{opacity:1;transform:none} }
+        @keyframes gcBubbleIn { 0%,5%{opacity:0;transform:translate(8px,5px) scale(.88)} 16%,100%{opacity:1;transform:none} }
+        @keyframes gcChipPop { 0%,8%{opacity:0;transform:scale(.4)} 15%{opacity:1;transform:scale(1.14)} 20%,100%{opacity:1;transform:scale(1)} }
         @keyframes gcAura { 0%,100%{opacity:.35;transform:scale(.86)} 50%{opacity:.75;transform:scale(1.08)} }
         @keyframes gcOrbitSlow { to{transform:rotate(360deg)} }
         @keyframes gcCorePulse { 0%,100%{filter:drop-shadow(0 0 2px rgba(240,217,168,.25));transform:scale(.94)} 50%{filter:drop-shadow(0 0 9px rgba(240,217,168,.75));transform:scale(1.04)} }
@@ -1384,9 +1384,9 @@ export default function Home() {
         .gc-stage-scene { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:gcStageCycle 9s ease-in-out infinite; }
         .gc-stage-float { animation:gcFloatSlow 2.4s ease-in-out infinite; }
         .gc-stage-typing-dot { animation:gcTypingDot 1.2s ease-in-out infinite; }
-        .gc-stage-profile { transform-origin:center; animation:gcProfileIn 3s ease-out infinite; }
-        .gc-stage-bubble { transform-origin:center; animation:gcBubbleIn 3s ease-out infinite; }
-        .gc-stage-chip { transform-origin:center; animation:gcChipPop 3s ease-out infinite; }
+        .gc-stage-profile { transform-origin:center; animation:gcProfileIn 9s ease-out infinite; }
+        .gc-stage-bubble { transform-origin:center; animation:gcBubbleIn 9s ease-out infinite; }
+        .gc-stage-chip { transform-origin:center; animation:gcChipPop 9s ease-out infinite; }
         .gc-stage-aura { transform-origin:center; animation:gcAura 1.8s ease-in-out infinite; }
         .gc-stage-orbit { transform-origin:55px 38px; animation:gcOrbitSlow 5.5s linear infinite; }
         .gc-stage-core { transform-origin:center; animation:gcCorePulse 1.7s ease-in-out infinite; }
@@ -1672,7 +1672,7 @@ export default function Home() {
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
                   <div style={{ position:"relative", width:150, height:100, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="150" height="100" viewBox="0 0 150 100" fill="none">
+                    <svg width="150" height="100" viewBox="0 0 150 100" fill="none" style={{ overflow:"visible" }}>
                       <defs>
                         <radialGradient id="gcAiAura"><stop stopColor="#f4d497" stopOpacity=".62"/><stop offset=".55" stopColor="#bd7e86" stopOpacity=".18"/><stop offset="1" stopColor="#6d3c59" stopOpacity="0"/></radialGradient>
                         <linearGradient id="gcAiGlass" x1="51" y1="22" x2="100" y2="79"><stop stopColor="#fff1d1" stopOpacity=".9"/><stop offset=".38" stopColor="#d28c8a" stopOpacity=".88"/><stop offset="1" stopColor="#704265" stopOpacity=".95"/></linearGradient>
