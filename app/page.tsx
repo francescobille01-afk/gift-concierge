@@ -1771,8 +1771,8 @@ export default function Home() {
                                 <label htmlFor="gc-landing-budget">{landingForm.budgetLabel}</label>
                                 <strong style={{ color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{fmtBudget(g.budget, sym)}</strong>
                               </div>
-                              <input id="gc-landing-budget" type="range" min={20} max={500} step={10} value={g.budget} onChange={e => setG(p => ({ ...p, budget:+e.target.value }))}
-                                style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${((g.budget-20)/480)*100}%,#ddcbb6 ${((g.budget-20)/480)*100}%)` }}/>
+                              <input id="gc-landing-budget" type="range" min={0} max={500} step={10} value={g.budget} onChange={e => setG(p => ({ ...p, budget:+e.target.value }))}
+                                style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${(g.budget/500)*100}%,#ddcbb6 ${(g.budget/500)*100}%)` }}/>
                             </div>
                           </div>
                         </div>
