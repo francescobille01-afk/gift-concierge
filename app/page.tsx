@@ -43,12 +43,12 @@ const BODY    = "'Hanken Grotesk', sans-serif";
    Picsum's stable photo-CDN (seeded per card so the same real photo shows
    every load), not icons or illustrations. ─── */
 const GIFT_SHOWCASE = [
-  { photo:"https://picsum.photos/seed/gifty-coffee/440/560", category:"Caffè", title:"Set da degustazione specialty", description:"Tre origini rare con moka in ceramica artigianale.", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
-  { photo:"https://picsum.photos/seed/gifty-hike/440/560", category:"Outdoor", title:"Zaino da trekking tecnico", description:"Impermeabile, leggero, pensato per uscite di un giorno.", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
-  { photo:"https://picsum.photos/seed/gifty-camera/440/560", category:"Foto", title:"Fotocamera istantanea vintage", description:"Per chi ama i ricordi stampati, non solo salvati.", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
-  { photo:"https://picsum.photos/seed/gifty-ceramics/440/560", category:"Casa", title:"Kit di ceramica per iniziare", description:"Tornio da tavolo e argilla per i primi vasi.", budget:"€50-80", occasion:"Compleanno", interest:"Ceramica" },
-  { photo:"https://picsum.photos/seed/gifty-headphones/440/560", category:"Tech", title:"Cuffie over-ear minimal", description:"Audio caldo, design pulito, batteria lunghissima.", budget:"€120-160", occasion:"Natale", interest:"Musica" },
-  { photo:"https://picsum.photos/seed/gifty-plant/440/560", category:"Casa", title:"Pianta rara in vaso di design", description:"Facile da curare, per chi ama vivere tra il verde.", budget:"€30-45", occasion:"Nuova casa", interest:"Giardinaggio" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Fancy%20a%20cupper.jpg?width=440", category:"Caffè", title:"Set da degustazione specialty", description:"Tre origini rare con moka in ceramica artigianale.", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/A%20backpack%20with%20trekking%20poles%20and%20shoes.jpg?width=440", category:"Outdoor", title:"Zaino da trekking tecnico", description:"Impermeabile, leggero, pensato per uscite di un giorno.", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Polaroid%20636%20Close%20Up%20instant%20camera.jpg?width=440", category:"Foto", title:"Fotocamera istantanea vintage", description:"Per chi ama i ricordi stampati, non solo salvati.", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Pottery%20wheel.JPG?width=440", category:"Casa", title:"Kit di ceramica per iniziare", description:"Tornio da tavolo e argilla per i primi vasi.", budget:"€50-80", occasion:"Compleanno", interest:"Ceramica" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Sennheiser%20HD%20598%20over-ear%20headphones%20(31514940057).jpg?width=440", category:"Tech", title:"Cuffie over-ear minimal", description:"Audio caldo, design pulito, batteria lunghissima.", budget:"€120-160", occasion:"Natale", interest:"Musica" },
+  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Fruit%20Salad%20Plant%20(Monstera%20deliciosa%20'Albo-Variegata').jpg?width=440", category:"Casa", title:"Pianta rara in vaso di design", description:"Facile da curare, per chi ama vivere tra il verde.", budget:"€30-45", occasion:"Nuova casa", interest:"Giardinaggio" },
 ];
 
 const AMAZON_TAG = "gifty0de-21";
@@ -1140,6 +1140,10 @@ export default function Home() {
   const selectedFavoriteGroup = selectedFavorite ? favoriteSearches.find(search => search.id === selectedFavorite.groupId) : undefined;
   const selectedFavoriteGift = selectedFavoriteGroup?.gifts.find(gift => gift.id === selectedFavorite?.giftId);
   const landingStep = landingProgress < .34 ? 0 : landingProgress < .68 ? 1 : 2;
+  const scrollPhase = (start: number, end: number) => Math.min(1, Math.max(0, (landingProgress - start) / (end - start)));
+  const landingPhase1 = scrollPhase(.12, .34);
+  const landingPhase2 = scrollPhase(.32, .56);
+  const landingPhase3 = scrollPhase(.54, .79);
 
   useEffect(() => setHasMounted(true), []);
 
@@ -2029,6 +2033,27 @@ export default function Home() {
            reachable below 900px (see the screen useState initializer), but
            hide it by CSS too in case it's ever forced above that width. */
         @media(min-width:901px){.gc-landing{display:block!important}}
+
+        /* Real scroll journey: every phase occupies physical page space. */
+        .gc-landing{min-height:0!important;background:#17303e!important}
+        .gc-landing-v2{position:relative!important;top:auto!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:0!important;background:linear-gradient(180deg,#17303e 0%,#203746 48%,#294b59 100%)!important}
+        .gc-landing-v2-header{position:sticky!important;top:0;z-index:80;box-sizing:border-box;max-width:none!important;height:72px;padding:12px clamp(18px,4vw,56px);background:linear-gradient(180deg,rgba(21,43,56,.96),rgba(21,43,56,.76),transparent);backdrop-filter:blur(12px)}
+        .gc-v3-journey{position:relative;margin-top:-72px;color:#fff4e8;background:radial-gradient(circle at 15% 18%,rgba(239,115,95,.1),transparent 20%),linear-gradient(180deg,#17303e,#203746 38%,#274956 72%,#17303e)}
+        .gc-v3-hero{position:relative;min-height:100dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;overflow:hidden;text-align:center}
+        .gc-v3-hero-glow{position:absolute;width:min(70vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(239,115,95,.2),rgba(255,193,159,.05) 42%,transparent 70%);filter:blur(4px);animation:gcLoaderGlow 4s ease-in-out infinite}
+        .gc-v3-hero-copy{position:relative;z-index:2}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(52px,7vw,100px);font-weight:650;line-height:.94;letter-spacing:-.06em}.gc-v3-hero h1 em{display:inline-block;margin-top:10px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
+        .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:28px}.gc-v3-scroll-cue{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:12px;color:#b8cac7;font-size:12px;font-weight:700;letter-spacing:.04em}.gc-v3-scroll-cue b,.gc-v3-next span{width:31px;height:31px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.22);border-radius:50%;color:#ffc19f;animation:gcbob 1.7s ease-in-out infinite}
+        .gc-v3-phase{position:relative;min-height:118dvh;border-top:1px solid rgba(255,255,255,.06)}.gc-v3-phase:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(239,115,95,.45) 18%,rgba(239,115,95,.45) 82%,transparent)}
+        .gc-v3-phase-inner{position:sticky;top:72px;min-height:calc(100dvh - 72px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
+        .gc-v3-copy{position:relative;z-index:3}.gc-v3-copy small{color:#ef735f;font-size:10px;font-weight:800;letter-spacing:.2em}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
+        .gc-v3-art{position:relative;z-index:3;min-height:410px;transition:transform .12s linear,opacity .12s linear;will-change:transform,opacity}.gc-v3-message-art{display:grid;place-items:center}.gc-v3-message-card{position:relative;width:min(470px,88%);min-height:210px;box-sizing:border-box;padding:34px;border:1px solid rgba(255,193,159,.35);border-radius:30px;background:linear-gradient(145deg,rgba(255,244,232,.98),rgba(239,225,213,.95));box-shadow:0 35px 80px rgba(3,18,27,.36);color:#203746;font-family:Georgia,serif;font-size:clamp(21px,2.3vw,31px);line-height:1.25}.gc-v3-message-card i{position:absolute;bottom:22px;width:7px;height:7px;border-radius:50%;background:#ef735f}.gc-v3-message-card i:nth-child(2){left:34px}.gc-v3-message-card i:nth-child(3){left:48px;opacity:.6}.gc-v3-message-card i:nth-child(4){left:62px;opacity:.3}
+        .gc-v3-float-chip,.gc-v3-signal{position:absolute;padding:9px 13px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(21,43,56,.92);box-shadow:0 12px 28px rgba(0,0,0,.26);color:#ffd2bb;font-size:12px;font-weight:800}.gc-v3-chip-a{left:2%;top:16%;transform:rotate(-8deg)}.gc-v3-chip-b{right:0;top:27%;transform:rotate(7deg)}.gc-v3-chip-c{right:12%;bottom:10%;transform:rotate(-4deg)}
+        .gc-v3-signal-art{display:grid;place-items:center}.gc-v3-ai-core{position:absolute;width:128px;height:128px;display:grid;place-items:center;border-radius:35px;background:linear-gradient(145deg,#ffc19f,#ef735f 58%,#c94f48);box-shadow:0 0 0 16px rgba(239,115,95,.08),0 30px 70px rgba(3,18,27,.4);transform:rotate(45deg)}.gc-v3-ai-core span{color:#17303e;font-size:42px;transform:rotate(-45deg)}.gc-v3-orbit{position:absolute;border:1px solid rgba(255,193,159,.28);border-radius:50%;animation:gcorbit 10s linear infinite}.gc-v3-orbit-one{width:300px;height:190px;transform:rotate(18deg)}.gc-v3-orbit-two{width:390px;height:270px;transform:rotate(-23deg);animation-direction:reverse;animation-duration:14s}.gc-v3-signal-a{left:8%;top:22%}.gc-v3-signal-b{right:4%;top:34%}.gc-v3-signal-c{left:19%;bottom:14%}
+        .gc-v3-result-art{display:flex;align-items:center;justify-content:center;perspective:1000px}.gc-v3-result-art article{position:absolute;width:220px;height:300px;box-sizing:border-box;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.35);border-radius:24px;background:linear-gradient(160deg,#f8eadc 0 46%,#df7c68 46% 70%,#203746 70%);box-shadow:0 30px 60px rgba(3,18,27,.35);color:#fff4e8}.gc-v3-result-art article:nth-child(1){transform:translateX(-145px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){z-index:2;transform:translateY(-20px)}.gc-v3-result-art article:nth-child(3){transform:translateX(145px) rotate(12deg)}.gc-v3-result-art article span{position:absolute;top:16px;right:17px;color:#203746;font-size:11px;font-weight:900}.gc-v3-result-art article div{color:#ffc19f;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.gc-v3-result-art article strong{margin-top:5px;font:700 19px/1.1 'Bricolage Grotesque',sans-serif}
+        .gc-v3-next{position:absolute;left:50%;bottom:30px;z-index:6;transform:translateX(-50%);display:flex;align-items:center;gap:11px;color:#9fb6b3;font-size:11px;font-weight:700;white-space:nowrap}
+        .gc-v3-start{min-height:92dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;width:min(620px,100%);text-align:center}.gc-v3-start-mark{width:68px;height:68px;margin:0 auto 22px;display:grid;place-items:center;border-radius:21px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 18px 40px rgba(4,20,29,.3)}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:relative;margin-top:28px;display:flex;align-items:center;justify-content:center;gap:8px;color:#9fb6b3;font-size:11px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
+        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:90px 20px 72px}.gc-v3-hero h1{font-size:clamp(43px,12vw,58px)}.gc-v3-hero .gc-v2-benefits{margin-top:20px;font-size:11px}.gc-v3-scroll-cue{bottom:24px;width:100%;justify-content:center;font-size:10.5px}.gc-v3-phase{min-height:125dvh}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:64px;min-height:calc(100dvh - 64px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{width:145px;height:220px;padding:12px;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-art article strong{font-size:14px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
+        @media(prefers-reduced-motion:reduce){.gc-v3-hero-glow,.gc-v3-scroll-cue b,.gc-v3-next span,.gc-v3-orbit{animation:none!important}.gc-v3-art{transition:none!important}}
       `}</style>
 
       <div className="gc-shell" style={{ display:"flex", height:"100vh", overflow:"hidden", background:mobileFlow ? "linear-gradient(155deg,#edf1ec 0%,#f6e9dd 55%,#f3e2d5 100%)" : C.bg, color:C.ink, fontFamily:BODY }}>
@@ -2192,61 +2217,61 @@ export default function Home() {
                   </div>
                 </header>
 
-                <div className="gc-v2-layout">
-                  <section className="gc-v2-hero">
-                    <p className="gc-v2-eyebrow">IL REGALO PARTE DA CHI LO RICEVE</p>
-                    <h1>Raccontaci chi è.<br/><em>Gifty trova il regalo giusto.</em></h1>
-                    <div className="gc-v2-benefits"><span>Gratis</span><i/> <span>Nessun account</span><i/> <span>2 minuti</span></div>
-                    <p className="gc-v2-scroll-cue"><span>Scorri per vedere come funziona</span><b>↓</b></p>
+                <main className="gc-v3-journey">
+                  <section className="gc-v3-hero">
+                    <div className="gc-v3-hero-glow" aria-hidden="true"/>
+                    <div className="gc-v3-hero-copy">
+                      <p className="gc-v2-eyebrow">IL REGALO PARTE DA CHI LO RICEVE</p>
+                      <h1>Raccontaci chi è.<br/><em>Gifty trova il regalo giusto.</em></h1>
+                      <div className="gc-v2-benefits"><span>Gratis</span><i/> <span>Nessun account</span><i/> <span>2 minuti</span></div>
+                    </div>
+                    <div className="gc-v3-scroll-cue"><span>Scorri in basso per iniziare la ricerca</span><b>↓</b></div>
                   </section>
 
-                  <section className="gc-v2-showcase" aria-label="Esempi di regali trovati da Gifty">
-                    <div className="gc-v2-showcase-track">
-                      {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
-                        <div key={i} className="gc-v2-showcase-card" style={{ transform:`rotate(${i % 2 === 0 ? "-2.5deg" : "2.5deg"})`, backgroundImage:`url(${item.photo})` }}>
-                          <div className="gc-v2-showcase-fade" />
-                          <span className="gc-v2-showcase-cat">{item.category}</span>
-                          <div className="gc-v2-showcase-body">
-                            <strong>{item.title}</strong>
-                            <p>{item.description}</p>
-                            <div className="gc-v2-showcase-criteria"><span>{item.budget}</span><i/><span>{item.occasion}</span><i/><span>{item.interest}</span></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <section className="gc-v3-phase gc-v3-phase-one">
+                    <div className="gc-v3-phase-inner">
+                      <div className="gc-v3-copy"><small>PASSAGGIO 01</small><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
+                      <div className="gc-v3-art gc-v3-message-art" style={{ opacity:.35 + landingPhase1 * .65, transform:`translateY(${34 - landingPhase1 * 34}px) scale(${.9 + landingPhase1 * .1})` }}>
+                        <div className="gc-v3-message-card"><span>“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”</span><i/><i/><i/></div>
+                        <span className="gc-v3-float-chip gc-v3-chip-a">Trekking</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Pratico</span>
+                      </div>
+                    </div><div className="gc-v3-next">Continua a scorrere <span>↓</span></div>
                   </section>
 
-                  <section className="gc-v2-story" aria-label="Come funziona Gifty">
-                    <svg className="gc-v2-route" viewBox="0 0 900 210" fill="none" preserveAspectRatio="none" aria-hidden="true">
-                      <path d="M64 132 C160 25 260 27 348 108 S536 196 624 88 S770 24 844 72" stroke="rgba(255,255,255,.13)" strokeWidth="4" strokeLinecap="round"/>
-                      <path d="M64 132 C160 25 260 27 348 108 S536 196 624 88 S770 24 844 72" stroke={N.coral} strokeWidth="4" strokeLinecap="round" pathLength="1" strokeDasharray="1" strokeDashoffset={1 - landingProgress}/>
-                    </svg>
-                    <div className="gc-v2-node gc-v2-node-1" data-active="true"><span><GiftSVG size={24} fill={N.navy3}/></span></div>
-                    <div className="gc-v2-node gc-v2-node-2" data-active={landingProgress >= .28}><span>✦</span></div>
-                    <div className="gc-v2-node gc-v2-node-3" data-active={landingProgress >= .62}><span>✓</span></div>
+                  <section className="gc-v3-phase gc-v3-phase-two">
+                    <div className="gc-v3-phase-inner gc-v3-reverse">
+                      <div className="gc-v3-copy"><small>PASSAGGIO 02</small><h2>Gifty collega gli indizi.</h2><p>L’AI distingue passioni, vincoli e dettagli utili. Poi cerca direzioni diverse, senza perdere il filo.</p></div>
+                      <div className="gc-v3-art gc-v3-signal-art" style={{ opacity:.3 + landingPhase2 * .7, transform:`rotate(${(1 - landingPhase2) * -8}deg) scale(${.84 + landingPhase2 * .16})` }}>
+                        <div className="gc-v3-orbit gc-v3-orbit-one"/><div className="gc-v3-orbit gc-v3-orbit-two"/><div className="gc-v3-ai-core"><span>✦</span></div>
+                        <span className="gc-v3-signal gc-v3-signal-a">passione</span><span className="gc-v3-signal gc-v3-signal-b">vincolo</span><span className="gc-v3-signal gc-v3-signal-c">stile</span>
+                      </div>
+                    </div><div className="gc-v3-next">Un ultimo passaggio <span>↓</span></div>
+                  </section>
 
-                    <div className="gc-v2-step gc-v2-step-1" data-visible="true" data-current={landingStep === 0}>
-                      <small>01</small><h2>Raccontaci com’è</h2><p>Scrivi interessi, abitudini e cose che evita.</p>
-                      <div className="gc-v2-example">“Fa trekking, cucina spesso e odia gli oggetti inutili.”</div>
-                    </div>
-                    <div className="gc-v2-step gc-v2-step-2" data-visible={landingProgress >= .28} data-current={landingStep === 1}>
-                      <small>02</small><h2>Gifty trova gli indizi</h2><p>Capisce cosa conta davvero per la ricerca.</p>
-                      <div className="gc-v2-signals"><span>Trekking</span><span>Cucina</span><span>Niente oggetti inutili</span></div>
-                    </div>
-                    <div className="gc-v2-step gc-v2-step-3" data-visible={landingProgress >= .62} data-current={landingStep === 2}>
-                      <small>03</small><h2>Scegli il regalo</h2><p>Da 4 a 6 prodotti, tutti acquistabili.</p>
-                      <div className="gc-v2-products"><span>🎒</span><span>🔪</span><span>🧭</span></div>
+                  <section className="gc-v3-phase gc-v3-phase-three">
+                    <div className="gc-v3-phase-inner">
+                      <div className="gc-v3-copy"><small>PASSAGGIO 03</small><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
+                      <div className="gc-v3-art gc-v3-result-art" style={{ opacity:.28 + landingPhase3 * .72, transform:`translateY(${40 - landingPhase3 * 40}px)` }}>
+                        <article><span>01</span><div>Esperienza</div><strong>Workshop di cucina</strong></article><article><span>02</span><div>Prodotto</div><strong>Set da trekking</strong></article><article><span>03</span><div>Personale</div><strong>Kit su misura</strong></article>
+                      </div>
+                    </div><div className="gc-v3-next">Ci siamo <span>↓</span></div>
+                  </section>
+
+                  <section className="gc-v3-start">
+                    <div className="gc-v3-start-inner">
+                      <span className="gc-v3-start-mark"><GiftSVG size={30} fill={N.navy3}/></span><p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
+                      <span className="gc-v3-start-sub">Partiamo dal nome. Occasione e budget compariranno subito dopo.</span>
+                      <button type="button" className="gc-v3-search-bar" onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}>
+                        <span aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></span><strong>{g.recipientName || landingForm.nameLabel}</strong><b>›</b>
+                      </button>
+                      <div className="gc-v3-legal">
+                        <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer">Privacy Policy</a><span>·</span><button onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}>Preferenze cookie</button>
+                        <button className="gc-v2-info" onClick={() => setLandingDisclaimerOpen(open => !open)} aria-label="Note legali">i</button>
+                        {landingDisclaimerOpen && <div className="gc-v2-disclaimer"><button onClick={() => setLandingDisclaimerOpen(false)}>×</button><span>{tr.disclaimerAmazon}</span><span>{tr.disclaimerPrice}</span></div>}
+                      </div>
                     </div>
                   </section>
-                </div>
-
-                <footer className="gc-v2-legal">
-                  <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                  <span>·</span>
-                  <button onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}>Preferenze cookie</button>
-                  <button className="gc-v2-info" onClick={() => setLandingDisclaimerOpen(open => !open)} aria-label="Note legali">i</button>
-                  {landingDisclaimerOpen && <div className="gc-v2-disclaimer"><button onClick={() => setLandingDisclaimerOpen(false)}>×</button><span>{tr.disclaimerAmazon}</span><span>{tr.disclaimerPrice}</span></div>}
-                </footer>
+                </main>
               </div>
               <div className="gc-landing-legacy" aria-hidden="true">
               {/* Top row: icon badge + language pill */}
@@ -2488,7 +2513,7 @@ export default function Home() {
               Safari notoriously mispositions/drags position:fixed elements
               nested inside a custom overflow:auto scroller (here .gc-main),
               so we sidestep that entirely rather than fight it. */}
-          {screen === "landing" && hasMounted && createPortal(
+          {screen === "landing" && hasMounted && landingSheetOpen && createPortal(
             (() => {
               const submitLandingAnswer = () => {
                 if (!g.recipientName.trim() || !g.occasion?.trim()) return;
