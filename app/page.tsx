@@ -799,6 +799,39 @@ const MOBILE_LOADING_LINES = [
   "Confronto idee davvero acquistabili",
   "Scelgo le proposte più adatte",
 ];
+const SPEECH_LOCALES: Record<TKey, string> = {
+  en:"en-US", fr:"fr-FR", it:"it-IT", de:"de-DE", es:"es-ES", pt:"pt-PT",
+};
+
+type SpeechRecognitionResultLike = {
+  isFinal: boolean;
+  0: { transcript: string };
+};
+type SpeechRecognitionEventLike = Event & {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+};
+type SpeechRecognitionController = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: Event & { error?: string }) => void) | null;
+};
+type SpeechRecognitionConstructor = new () => SpeechRecognitionController;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
 function sliderStepToBudget(step: number) {
   return step <= 20 ? step * 5 : 100 + (step - 20) * 25;
 }
@@ -1032,6 +1065,8 @@ export default function Home() {
   const [clueText,    setClueText]    = useState("");
   const [signals,     setSignals]     = useState<ProfileSignal[]>([]);
   const [signalsBusy, setSignalsBusy] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
   const [editingSignals, setEditingSignals] = useState(false);
   const [resultIndex, setResultIndex] = useState(0);
   const [favoriteGifts, setFavoriteGifts] = useState<GiftSuggestion[]>([]);
@@ -1048,6 +1083,8 @@ export default function Home() {
   const HIST_KEY = "gifty-history";
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionController | null>(null);
+  const speechBaseTextRef = useRef("");
   const langMenuRef = useRef<HTMLDivElement>(null);
 
   const lang = LANGS[langIdx];
@@ -1067,6 +1104,11 @@ export default function Home() {
      Release focus and restore the flow to the top whenever the step changes. */
   useEffect(() => {
     if (!mobileFlow) return;
+    if (screen !== "clues" && speechRecognitionRef.current) {
+      speechRecognitionRef.current.stop();
+      speechRecognitionRef.current = null;
+      setIsListening(false);
+    }
     const activeElement = document.activeElement as HTMLElement | null;
     if (activeElement?.matches("input, textarea, select")) activeElement.blur();
     requestAnimationFrame(() => {
@@ -1074,6 +1116,8 @@ export default function Home() {
       window.scrollTo({ top:0, behavior:"auto" });
     });
   }, [mobileFlow, screen]);
+
+  useEffect(() => () => speechRecognitionRef.current?.abort(), []);
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
@@ -1159,7 +1203,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
+    speechRecognitionRef.current?.abort(); setIsListening(false); setVoiceError(""); setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1251,6 +1295,51 @@ export default function Home() {
   function normalizeMobileGifts(items: GiftSuggestion[], round: number) {
     const batch = Date.now().toString(36);
     return items.slice(0, 3).map((gift, index) => ({ ...gift, id:`mobile-${round}-${batch}-${gift.id || index}` }));
+  }
+
+  function toggleVoiceInput() {
+    if (isListening) {
+      speechRecognitionRef.current?.stop();
+      return;
+    }
+    const Recognition = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    if (!Recognition) {
+      setVoiceError("La dettatura non è disponibile in questo browser. Puoi usare il microfono della tastiera.");
+      return;
+    }
+    setVoiceError("");
+    speechBaseTextRef.current = clueText.trim();
+    const recognition = new Recognition();
+    recognition.lang = SPEECH_LOCALES[lang.t as TKey] ?? "it-IT";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = event => {
+      let transcript = "";
+      for (let index = 0; index < event.results.length; index += 1) {
+        transcript += event.results[index][0]?.transcript ?? "";
+      }
+      const base = speechBaseTextRef.current;
+      setClueText(`${base}${base && transcript.trim() ? " " : ""}${transcript.trimStart()}`);
+    };
+    recognition.onerror = event => {
+      setIsListening(false);
+      setVoiceError(event.error === "not-allowed" || event.error === "service-not-allowed"
+        ? "Per registrare, consenti a Gifty di usare il microfono."
+        : "Non ho capito bene. Tocca il microfono e riprova.");
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      speechRecognitionRef.current = null;
+    };
+    speechRecognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setVoiceError("Il microfono è già in uso. Riprova tra un momento.");
+    }
   }
 
   async function organizeClues() {
@@ -1548,8 +1637,8 @@ export default function Home() {
 
   function renderMobileFlowHeader(progress: number) {
     return (
-      <div style={{ marginBottom:14 }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, marginBottom:10 }}>
+      <div style={{ margin:"-24px -20px 16px", padding:"15px 20px 12px", background:"linear-gradient(135deg,#ead8c0 0%,#f4e8d8 58%,#efe0ca 100%)", borderBottom:"1px solid #ddc7ab", boxShadow:"0 7px 22px rgba(83,49,36,.08)" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:11 }}>
           <button onClick={restart} style={{ display:"flex", alignItems:"center", gap:9, border:0, padding:0, background:"transparent", cursor:"pointer", textAlign:"left" }}>
             <span style={{ width:34, height:34, borderRadius:10, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#e4bc78,#c79452)", boxShadow:"0 4px 12px rgba(91,45,39,.16)" }}><GiftSVG size={18} fill="#5e2e2e"/></span>
             <span>
@@ -1557,8 +1646,24 @@ export default function Home() {
               <small style={{ color:C.muted4, fontSize:9.5 }}>{g.recipientName} · {g.occasion} · max {fmtBudget(g.budget, sym)}</small>
             </span>
           </button>
-          <div aria-label={`${favoriteGifts.length} preferiti`} style={{ minWidth:38, height:34, padding:"0 9px", borderRadius:999, border:"1px solid #dfc7ae", background:"#fffaf4", display:"flex", alignItems:"center", justifyContent:"center", gap:4, color:C.maroon, fontSize:12.5, fontWeight:700 }}>
-            <span aria-hidden="true">♡</span>{favoriteGifts.length || ""}
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <div aria-label={`${favoriteGifts.length} preferiti`} style={{ minWidth:35, height:34, padding:"0 8px", borderRadius:999, border:"1px solid #d5b995", background:"rgba(255,250,244,.72)", display:"flex", alignItems:"center", justifyContent:"center", gap:3, color:C.maroon, fontSize:12, fontWeight:700 }}>
+              <span aria-hidden="true">♡</span>{favoriteGifts.length || ""}
+            </div>
+            <div ref={langMenuRef} style={{ position:"relative" }}>
+              <button type="button" onClick={() => setLangMenuOpen(open => !open)} style={{ height:34, padding:"0 10px", borderRadius:999, border:"1px solid #d5b995", background:"rgba(255,250,244,.72)", color:C.label, font:`700 11px ${BODY}`, cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}>
+                {lang.flag} {lang.code} <span style={{ opacity:.5, fontSize:8 }}>▾</span>
+              </button>
+              {langMenuOpen && (
+                <div style={{ position:"absolute", top:"calc(100% + 7px)", right:0, minWidth:195, overflow:"hidden", border:`1px solid ${C.border}`, borderRadius:12, background:"#fff", boxShadow:"0 12px 28px rgba(50,28,22,.16)", zIndex:60 }}>
+                  {LANGS.map((language, index) => (
+                    <button key={language.code} type="button" onClick={() => { setLangIdx(index); setLangMenuOpen(false); }} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", padding:"10px 13px", border:0, background:index === langIdx ? "#f7eee3" : "#fff", color:C.body, font:`${index === langIdx ? 700 : 500} 13px ${BODY}`, cursor:"pointer", textAlign:"left" }}>
+                      <span>{language.flag} {language.name}</span><span style={{ color:C.muted2, fontSize:10 }}>{language.currency}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div style={{ height:4, borderRadius:99, overflow:"hidden", background:"#ddcdb9" }}>
@@ -1623,6 +1728,7 @@ export default function Home() {
         @keyframes gcLoaderCounterTurn { to{transform:rotate(-360deg)} }
         @keyframes gcLoaderGlow { 0%,100%{transform:scale(.94);opacity:.45}50%{transform:scale(1.08);opacity:.8} }
         @keyframes gcLoaderCard { 0%,100%{transform:translateY(2px) rotate(-4deg);opacity:.72}50%{transform:translateY(-7px) rotate(3deg);opacity:1} }
+        @keyframes gcVoicePulse { 0%,100%{box-shadow:0 0 0 0 rgba(124,63,63,.28)}50%{box-shadow:0 0 0 7px rgba(124,63,63,0)} }
         @keyframes gcbarglow {
           0%,100% { box-shadow:0 0 0 5px rgba(201,162,107,.32),0 10px 26px rgba(124,63,63,.28); }
           50%     { box-shadow:0 0 0 9px rgba(201,162,107,.48),0 12px 30px rgba(124,63,63,.38); }
@@ -1696,7 +1802,8 @@ export default function Home() {
         .gc-loader-counter{animation:gcLoaderCounterTurn 7s linear infinite}
         .gc-loader-glow{animation:gcLoaderGlow 2.2s ease-in-out infinite}
         .gc-loader-card{animation:gcLoaderCard 2.4s ease-in-out infinite}
-        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue,.gc-loader-turn,.gc-loader-counter,.gc-loader-glow,.gc-loader-card{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
+        .gc-voice-button--active{animation:gcVoicePulse 1.25s ease-in-out infinite}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue,.gc-loader-turn,.gc-loader-counter,.gc-loader-glow,.gc-loader-card,.gc-voice-button--active{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -2232,13 +2339,20 @@ export default function Home() {
               {mobileFlow && screen === "clues" && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(18)}
-                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginTop:2, marginBottom:8 }}>Un solo messaggio</div>
                   <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
                   <p style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
                   <label htmlFor="gc-clue-text" style={{ color:C.label, fontSize:10.5, fontWeight:700, marginBottom:6 }}>Quello che sai</label>
-                  <textarea id="gc-clue-text" className="gc-mobile-textarea" value={clueText} onChange={event => setClueText(event.target.value)}
-                    placeholder={`Esempio: da qualche mese ${g.recipientName || "questa persona"} fa ceramica, salva foto di case da tè giapponesi, ha iniziato a fare trekking e si lamenta di avere troppi oggetti in casa.`}
-                    style={{ width:"100%", minHeight:170, resize:"none", boxSizing:"border-box", padding:"14px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
+                  <div style={{ position:"relative" }}>
+                    <textarea id="gc-clue-text" className="gc-mobile-textarea" value={clueText} onChange={event => setClueText(event.target.value)}
+                      placeholder={`Esempio: ${g.recipientName || "Luca"} gioca a padel due volte a settimana, lavora spesso in viaggio e si lamenta che il borsone è sempre disordinato. Ha già racchetta e scarpe; preferisce cose pratiche e non ama i regali decorativi.`}
+                      style={{ width:"100%", minHeight:158, resize:"none", boxSizing:"border-box", padding:"14px 14px 52px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
+                    <button type="button" onClick={toggleVoiceInput} aria-label={isListening ? "Interrompi registrazione" : "Parla invece di scrivere"}
+                      className={isListening ? "gc-voice-button gc-voice-button--active" : "gc-voice-button"}
+                      style={{ position:"absolute", right:10, bottom:10, minHeight:34, padding:"0 11px", border:`1px solid ${isListening ? C.maroon : "#d8b991"}`, borderRadius:999, background:isListening ? C.maroon : "#f5e8d8", color:isListening ? "#fff" : C.maroon, display:"flex", alignItems:"center", gap:6, fontSize:10.5, fontWeight:800, cursor:"pointer", boxShadow:"0 4px 12px rgba(91,45,39,.12)" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.8"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>{isListening ? "Ferma" : "Parla"}
+                    </button>
+                  </div>
+                  <div style={{ minHeight:17, paddingTop:5, color:voiceError ? "#963f3d" : isListening ? C.maroon : C.muted2, fontSize:10.5 }}>{voiceError || (isListening ? "Ti ascolto… il testo apparirà qui sopra." : "Puoi anche parlare: l’AI riordina la trascrizione.")}</div>
                   <div style={{ display:"flex", gap:6, overflowX:"auto", padding:"9px 0 4px", scrollbarWidth:"none" }}>
                     {["Parla spesso di…","Ha già…","Non sopporta…"].map(prompt => (
                       <button key={prompt} type="button" onClick={() => setClueText(text => `${text}${text.trim() ? " " : ""}${prompt} `)}
@@ -2258,8 +2372,7 @@ export default function Home() {
               {mobileFlow && screen === "signals" && (
                 <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(42)}
-                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginTop:2, marginBottom:8 }}>Quello che ho capito</div>
-                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:26, lineHeight:1.08, letterSpacing:"-.03em" }}>Segnali diversi, già organizzati.</h1>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:26, lineHeight:1.08, letterSpacing:"-.03em" }}>Conferma i criteri rilevati.</h1>
                   <p style={{ margin:"0 0 13px", color:C.muted4, fontSize:12, lineHeight:1.4 }}>Puoi correggerli prima che influenzino la ricerca.</p>
                   {errorMsg && <div style={{ marginBottom:10, padding:"9px 11px", borderRadius:10, background:"#f8dfd9", color:"#8d413e", fontSize:11.5 }}>{errorMsg}</div>}
                   <div style={{ display:"grid", gap:7 }}>
@@ -2314,7 +2427,7 @@ export default function Home() {
                       <div className="gc-bob" style={{ position:"absolute", inset:48, borderRadius:24, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#a35a57,#6d3434)", border:"1px solid rgba(255,239,213,.42)", boxShadow:"0 18px 38px rgba(124,63,63,.3),inset 0 1px 0 rgba(255,255,255,.2)" }}><GiftSVG size={31} fill="#f8ead7"/></div>
                     </div>
                     <div style={{ color:"#a45e5b", fontSize:9, fontWeight:800, letterSpacing:".15em", textTransform:"uppercase", marginBottom:9 }}>Ricerca personale in corso</div>
-                    <h2 style={{ margin:"0 0 11px", maxWidth:330, color:C.ink, fontFamily:DISPLAY, fontSize:28, lineHeight:1.05, letterSpacing:"-.025em" }}>Sto scegliendo ciò che può sorprendere davvero {g.recipientName}.</h2>
+                    <h2 style={{ margin:"0 0 11px", maxWidth:330, color:C.ink, fontFamily:"var(--font-bricolage)", fontSize:25, fontWeight:700, lineHeight:1.08, letterSpacing:"-.025em" }}>Cerco il regalo giusto per {g.recipientName}.</h2>
                     <p key={loadingLine} className="gc-fade" style={{ margin:0, color:C.muted4, fontFamily:DISPLAY, fontSize:17, fontStyle:"italic" }}>{MOBILE_LOADING_LINES[loadingLine % MOBILE_LOADING_LINES.length]}</p>
                   </div>
                 </section>
