@@ -38,17 +38,18 @@ const N = {
 const DISPLAY = "'Outfit', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
-/* ─── Desktop landing showcase — real photography, standing in for real
-   product/lifestyle shots until proper photography is sourced. Uses
-   Picsum's stable photo-CDN (seeded per card so the same real photo shows
-   every load), not icons or illustrations. ─── */
+/* ─── Landing hero carousel — real editorial photography (Unsplash CDN),
+   picked per card so the shot actually matches the gift described. Portrait
+   4:5 crops, served pre-sized so the cards stay sharp at hero scale. ─── */
 const GIFT_SHOWCASE = [
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Fancy%20a%20cupper.jpg?width=440", category:"Caffè", title:"Set da degustazione specialty", description:"Tre origini rare con moka in ceramica artigianale.", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/A%20backpack%20with%20trekking%20poles%20and%20shoes.jpg?width=440", category:"Outdoor", title:"Zaino da trekking tecnico", description:"Impermeabile, leggero, pensato per uscite di un giorno.", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Polaroid%20636%20Close%20Up%20instant%20camera.jpg?width=440", category:"Foto", title:"Fotocamera istantanea vintage", description:"Per chi ama i ricordi stampati, non solo salvati.", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Pottery%20wheel.JPG?width=440", category:"Casa", title:"Kit di ceramica per iniziare", description:"Tornio da tavolo e argilla per i primi vasi.", budget:"€50-80", occasion:"Compleanno", interest:"Ceramica" },
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Sennheiser%20HD%20598%20over-ear%20headphones%20(31514940057).jpg?width=440", category:"Tech", title:"Cuffie over-ear minimal", description:"Audio caldo, design pulito, batteria lunghissima.", budget:"€120-160", occasion:"Natale", interest:"Musica" },
-  { photo:"https://commons.wikimedia.org/wiki/Special:FilePath/Fruit%20Salad%20Plant%20(Monstera%20deliciosa%20'Albo-Variegata').jpg?width=440", category:"Casa", title:"Pianta rara in vaso di design", description:"Facile da curare, per chi ama vivere tra il verde.", budget:"€30-45", occasion:"Nuova casa", interest:"Giardinaggio" },
+  { photo:"https://plus.unsplash.com/premium_photo-1664970900335-a7c99062bc51?auto=format&fit=crop&w=760&h=950&q=80", category:"Caffè", title:"Set da degustazione specialty", description:"Tre origini rare, macinatura fresca, tazza in ceramica.", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
+  { photo:"https://images.unsplash.com/photo-1622260614153-03223fb72052?auto=format&fit=crop&w=760&h=950&q=80", category:"Outdoor", title:"Zaino da trekking tecnico", description:"Impermeabile e leggero, per uscite di un giorno.", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
+  { photo:"https://images.unsplash.com/photo-1701115109838-c4a72a2b0de4?auto=format&fit=crop&w=760&h=950&q=80", category:"Foto", title:"Fotocamera istantanea", description:"Per chi ama i ricordi stampati, non solo salvati.", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
+  { photo:"https://images.unsplash.com/photo-1760018890645-28c8312cd7cb?auto=format&fit=crop&w=760&h=950&q=80", category:"Corsi", title:"Corso di ceramica al tornio", description:"Quattro serate in laboratorio, argilla inclusa.", budget:"€50-80", occasion:"Compleanno", interest:"Ceramica" },
+  { photo:"https://images.unsplash.com/photo-1764557159396-419b85356035?auto=format&fit=crop&w=760&h=950&q=80", category:"Tech", title:"Cuffie over-ear minimal", description:"Audio caldo, design pulito, batteria lunghissima.", budget:"€120-160", occasion:"Natale", interest:"Musica" },
+  { photo:"https://images.unsplash.com/photo-1762755647813-017e128a4ba0?auto=format&fit=crop&w=760&h=950&q=80", category:"Casa", title:"Monstera in vaso di terracotta", description:"Facile da curare, per chi ama vivere tra il verde.", budget:"€30-45", occasion:"Nuova casa", interest:"Piante" },
+  { photo:"https://images.unsplash.com/photo-1601148071764-8c3f50e9ab20?auto=format&fit=crop&w=760&h=950&q=80", category:"Musica", title:"Giradischi da salotto", description:"Per chi colleziona vinili e ascolta un disco intero.", budget:"€150-220", occasion:"Anniversario", interest:"Vinili" },
+  { photo:"https://images.unsplash.com/photo-1743110727935-0dc8abf01509?auto=format&fit=crop&w=760&h=950&q=80", category:"Cucina", title:"Coltello da chef forgiato", description:"Un solo pezzo, bilanciato, che dura vent'anni.", budget:"€80-120", occasion:"Nuova casa", interest:"Cucina" },
 ];
 
 const AMAZON_TAG = "gifty0de-21";
@@ -1087,6 +1088,7 @@ export default function Home() {
   // picker since it's already answered.
   const [skipRelPicker, setSkipRelPicker] = useState(false);
   const gcMainRef = useRef<HTMLElement>(null);
+  const heroTrackRef = useRef<HTMLDivElement>(null);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
   const [g,           setG]           = useState<Gathered>(EMPTY);
@@ -1162,6 +1164,77 @@ export default function Home() {
     updateLandingProgress();
     scroller.addEventListener("scroll", updateLandingProgress, { passive:true });
     return () => scroller.removeEventListener("scroll", updateLandingProgress);
+  }, [screen]);
+
+  /* ── Hero carousel: a real 3D coverflow, same construction as the
+     Bending Spoons hero (a `perspective` wrapper with each card placed on
+     an arc, not a flat CSS marquee). Positions are written straight to the
+     DOM on every frame — putting the offset in React state would re-render
+     the whole page 60×/second. Each card sits at a signed slot distance `a`
+     from centre and gets, from that: an x offset, a z push-back, and a
+     rotateY so it angles back toward the middle of the screen. ── */
+  useEffect(() => {
+    if (screen !== "landing") return;
+    const track = heroTrackRef.current;
+    if (!track) return;
+    const cards = Array.from(track.children) as HTMLElement[];
+    const n = cards.length;
+    if (!n) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Slots the arc actually curves over; past this the z stops receding so
+    // far cards keep travelling outward in a straight line and leave the
+    // screen, instead of being squashed back toward the centre by the
+    // perspective divide.
+    const ARC_SLOTS = 3.4;
+    const TILT = 13;          // degrees of rotateY per slot from centre
+    const DEPTH = 100;        // px of z push-back per slot from centre
+    const SECONDS_PER_CARD = 3.6;
+
+    let offset = 0;
+    let last = performance.now();
+    let raf = 0;
+
+    const layout = () => {
+      const step = cards[0].offsetWidth * 0.72; // slight overlap, like BS
+      for (let i = 0; i < n; i++) {
+        // Signed distance from the centre slot, wrapped into -n/2 … +n/2 so
+        // cards recycle round the back of the loop while off-screen.
+        let a = (((i - offset) % n) + n) % n;
+        if (a > n / 2) a -= n;
+        const dist = Math.abs(a);
+        const curved = Math.min(dist, ARC_SLOTS);
+        const z = -Math.pow(curved, 1.2) * DEPTH;
+        const rot = Math.sign(a) * curved * TILT;
+        const opacity = Math.max(0, Math.min(1, 1 - (dist - 2.6) / 1.1));
+        const el = cards[i];
+        el.style.transform = `translate3d(${a * step}px,0,${z}px) rotateY(${rot}deg)`;
+        el.style.zIndex = String(100 - Math.round(dist * 10));
+        el.style.opacity = String(opacity);
+        // Cards that have looped round the back are fully transparent but
+        // would still be composited every frame — take them out entirely.
+        el.style.visibility = opacity === 0 ? "hidden" : "visible";
+      }
+    };
+
+    // Place the arc synchronously on mount. Without this the cards sit in a
+    // single stack until the first animation frame — and a backgrounded or
+    // non-compositing tab never gets one, so the hero would render as one
+    // card-shaped pile.
+    layout();
+
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - last);
+      last = now;
+      if (!reduced) offset += dt / (SECONDS_PER_CARD * 1000);
+      layout();
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    const onResize = () => layout();
+    window.addEventListener("resize", onResize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
   }, [screen]);
 
   /* iOS Safari keeps the focused field and its zoom across React screens.
@@ -1904,19 +1977,25 @@ export default function Home() {
         .gc-v2-hero{align-self:center;padding-bottom:34px}.gc-v2-eyebrow{margin:0 0 17px;color:#a9bfbd;font-size:10px;font-weight:800;letter-spacing:.18em}.gc-v2-hero h1{max-width:560px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(43px,5vw,76px);font-weight:650;line-height:.98;letter-spacing:-.055em}.gc-v2-hero h1 em{display:inline-block;margin-top:8px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
         .gc-v2-benefits{display:flex;align-items:center;gap:11px;margin-top:25px;color:#d7e1df;font-size:13px;font-weight:650}.gc-v2-benefits i{width:4px;height:4px;border-radius:50%;background:#ffc19f}.gc-v2-scroll-cue{display:flex;align-items:center;gap:9px;margin:28px 0 0;color:#91aaa9;font-size:11px}.gc-v2-scroll-cue b{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#ffc19f}
         .gc-v2-story{position:relative;height:430px;align-self:center}.gc-v2-route{position:absolute;left:0;right:0;top:36px;width:100%;height:210px;overflow:visible}.gc-v2-route path:last-child{transition:stroke-dashoffset .12s linear;filter:drop-shadow(0 0 6px rgba(239,115,95,.45))}
-        @keyframes gcShowcaseScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-        .gc-v3-marquee{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;margin-top:clamp(22px,4vh,40px);overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-        .gc-v3-marquee-track{display:flex;gap:18px;width:max-content;animation:gcShowcaseScroll 42s linear infinite}
-        .gc-v3-marquee:hover .gc-v3-marquee-track{animation-play-state:paused}
-        .gc-v3-marquee-card{position:relative;flex:0 0 auto;width:clamp(140px,16vw,240px);height:clamp(200px,40vh,400px);border-radius:22px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 20px 46px rgba(0,0,0,.4)}
-        .gc-v3-marquee-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 40%,rgba(21,43,56,.94) 100%)}
-        .gc-v3-marquee-cat{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(3px);color:#fff4e8;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-        .gc-v3-marquee-body{position:absolute;left:12px;right:12px;bottom:12px;color:#fff4e8}
-        .gc-v3-marquee-body strong{display:block;font-size:clamp(12px,1.3vw,15px);font-weight:650;letter-spacing:-.01em;margin-bottom:3px}
-        .gc-v3-marquee-body p{display:none;margin:0 0 6px;font-size:11px;line-height:1.3;color:#d7e1df}
-        .gc-v3-marquee-criteria{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:#ffc19f;flex-wrap:wrap}
+        /* Hero coverflow. The wrapper owns the perspective; the track is a
+           zero-size anchor at dead centre and every card is absolutely
+           placed on the arc from JS (see the hero-carousel effect). Edge to
+           edge on purpose — the lane is 100vw regardless of page padding. */
+        .gc-v3-marquee{position:relative;width:100vw;max-width:100vw;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;perspective:1250px;perspective-origin:50% 50%;overflow-x:clip;-webkit-mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent);mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent)}
+        .gc-v3-marquee-track{position:relative;width:0;height:0;transform-style:preserve-3d}
+        .gc-v3-marquee-card{position:absolute;top:0;left:0;height:min(58vh,600px);aspect-ratio:4/5;margin-top:calc(min(58vh,600px) / -2);margin-left:calc(min(58vh,600px) * 0.4 * -1);border-radius:28px;overflow:hidden;background:#1b2f3c;box-shadow:0 34px 80px rgba(0,0,0,.55);will-change:transform,opacity;backface-visibility:hidden}
+        .gc-v3-marquee-card>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+        .gc-v3-marquee-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 38%,rgba(16,33,43,.93) 100%)}
+        .gc-v3-marquee-cat{position:absolute;top:16px;left:16px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);color:#fff4e8;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+        .gc-v3-marquee-body{position:absolute;left:20px;right:20px;bottom:18px;color:#fff4e8}
+        .gc-v3-marquee-body strong{display:block;font-size:clamp(15px,1.5vw,20px);font-weight:650;letter-spacing:-.015em;margin-bottom:5px}
+        .gc-v3-marquee-body p{margin:0 0 9px;font-size:clamp(11.5px,1.05vw,13.5px);line-height:1.35;color:#cfdcda}
+        .gc-v3-marquee-criteria{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;color:#ffc19f;flex-wrap:wrap}
         .gc-v3-marquee-criteria i{width:3px;height:3px;border-radius:50%;background:#ffc19f;flex-shrink:0}
-        @media(min-width:641px){.gc-v3-marquee-body p{display:block}}
+        @media(max-width:640px){
+          .gc-v3-marquee-card{height:min(50vh,460px);margin-top:calc(min(50vh,460px) / -2);margin-left:calc(min(50vh,460px) * 0.4 * -1);border-radius:24px}
+          .gc-v3-marquee{perspective:900px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+        }
         .gc-v2-node{position:absolute;z-index:3;width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#294b59;border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 24px rgba(3,18,27,.28);opacity:.38;transform:scale(.86);transition:.42s cubic-bezier(.2,.8,.2,1)}.gc-v2-node[data-active=true]{opacity:1;transform:scale(1);background:linear-gradient(145deg,#ffc19f,#ef735f);color:#17303e;box-shadow:0 0 0 7px rgba(239,115,95,.12),0 12px 28px rgba(3,18,27,.34)}.gc-v2-node-1{left:4.5%;top:144px}.gc-v2-node-2{left:67%;top:98px}.gc-v2-node-3{right:2%;top:82px}
         .gc-v2-step{position:absolute;z-index:2;width:29%;padding:16px 17px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(15,39,51,.65);box-shadow:0 16px 38px rgba(4,20,29,.22);backdrop-filter:blur(9px);opacity:.18;transform:translateY(12px);transition:.52s cubic-bezier(.2,.8,.2,1)}.gc-v2-step[data-visible=true]{opacity:1;transform:none}.gc-v2-step small{color:#ef735f;font-size:9px;font-weight:800;letter-spacing:.18em}.gc-v2-step h2{margin:5px 0 5px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(18px,1.7vw,24px);font-weight:700;line-height:1.05;letter-spacing:-.03em}.gc-v2-step p{margin:0;color:#b9ccca;font-size:12px;line-height:1.35}.gc-v2-step-1{left:0;bottom:8px}.gc-v2-step-2{left:35.5%;bottom:8px}.gc-v2-step-3{right:0;bottom:8px}
         .gc-v2-example{margin-top:12px;padding:9px 10px;border-left:2px solid #ef735f;background:rgba(255,255,255,.05);color:#f1ddd1;font-size:10.5px;line-height:1.35}.gc-v2-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}.gc-v2-signals span{padding:5px 7px;border-radius:999px;background:rgba(255,193,159,.12);border:1px solid rgba(255,193,159,.2);color:#ffd3bb;font-size:9px;font-weight:700}.gc-v2-products{display:flex;gap:6px;margin-top:10px}.gc-v2-products span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#fff4e8;box-shadow:0 5px 14px rgba(0,0,0,.18);font-size:16px}
@@ -2039,11 +2118,15 @@ export default function Home() {
         .gc-landing-v2{position:relative!important;top:auto!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:0!important;background:linear-gradient(180deg,#17303e 0%,#203746 48%,#294b59 100%)!important}
         .gc-landing-v2-header{position:sticky!important;top:0;z-index:80;box-sizing:border-box;max-width:none!important;height:58px;padding:8px clamp(18px,4vw,56px);background:linear-gradient(180deg,rgba(21,43,56,.96),rgba(21,43,56,.76),transparent);backdrop-filter:blur(12px)}
         .gc-v3-journey{position:relative;margin-top:-58px;color:#fff4e8;background:radial-gradient(circle at 15% 18%,rgba(239,115,95,.1),transparent 20%),linear-gradient(180deg,#17303e,#203746 38%,#274956 72%,#17303e)}
-        .gc-v3-hero{position:relative;min-height:100dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;overflow:hidden;text-align:center}
-        .gc-v3-hero-glow{position:absolute;width:min(70vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(239,115,95,.2),rgba(255,193,159,.05) 42%,transparent 70%);filter:blur(4px);animation:gcLoaderGlow 4s ease-in-out infinite}
-        .gc-v3-hero-copy{position:relative;z-index:2}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(52px,7vw,100px);font-weight:650;line-height:.94;letter-spacing:-.06em}.gc-v3-hero h1 em{display:inline-block;margin-top:10px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
-        .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:28px}
-        .gc-v3-scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:11px}
+        /* Column, not a centred grid: the headline and the scroll cue take
+           only the height they need and the carousel claims everything left
+           over, so the cards run the full height of the screen instead of
+           sitting in a band in the middle. */
+        .gc-v3-hero{position:relative;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:78px 0 22px;box-sizing:border-box;overflow:hidden;text-align:center}
+        .gc-v3-hero-glow{position:absolute;top:34%;width:min(70vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(239,115,95,.2),rgba(255,193,159,.05) 42%,transparent 70%);filter:blur(4px);animation:gcLoaderGlow 4s ease-in-out infinite}
+        .gc-v3-hero-copy{position:relative;z-index:2;flex:0 0 auto;padding:0 24px}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(30px,4.2vw,58px);font-weight:650;line-height:1.03;letter-spacing:-.05em}.gc-v3-hero h1 em{display:inline-block;margin-top:4px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.04em}
+        .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:14px}
+        .gc-v3-scroll-cue{position:relative;z-index:5;flex:0 0 auto;margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:11px}
         .gc-v3-scroll-cue span{padding:8px 18px;border-radius:999px;background:rgba(239,115,95,.18);border:1px solid rgba(255,193,159,.4);color:#fff4e8;font-size:12.5px;font-weight:800;letter-spacing:.03em;white-space:nowrap}
         .gc-v3-scroll-cue b,.gc-v3-next span{width:34px;height:34px;display:grid;place-items:center;border:1.5px solid rgba(255,193,159,.55);border-radius:50%;color:#ffc19f;font-size:15px;animation:gcScrollPulse 1.8s ease-in-out infinite}
         @keyframes gcScrollPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,115,95,.45);transform:translateY(0)}45%{transform:translateY(7px)}55%{box-shadow:0 0 0 12px rgba(239,115,95,0)}}
@@ -2056,7 +2139,7 @@ export default function Home() {
         .gc-v3-result-art{display:flex;align-items:center;justify-content:center;perspective:1000px}.gc-v3-result-art article{position:absolute;width:220px;height:300px;box-sizing:border-box;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.35);border-radius:24px;background:linear-gradient(160deg,#f8eadc 0 46%,#df7c68 46% 70%,#203746 70%);box-shadow:0 30px 60px rgba(3,18,27,.35);color:#fff4e8}.gc-v3-result-art article:nth-child(1){transform:translateX(-145px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){z-index:2;transform:translateY(-20px)}.gc-v3-result-art article:nth-child(3){transform:translateX(145px) rotate(12deg)}.gc-v3-result-art article span{position:absolute;top:16px;right:17px;color:#203746;font-size:11px;font-weight:900}.gc-v3-result-art article div{color:#ffc19f;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.gc-v3-result-art article strong{margin-top:5px;font:700 19px/1.1 'Bricolage Grotesque',sans-serif}
         .gc-v3-next{position:absolute;left:50%;bottom:30px;z-index:6;transform:translateX(-50%);display:flex;align-items:center;gap:11px;color:#9fb6b3;font-size:11px;font-weight:700;white-space:nowrap}
         .gc-v3-start{min-height:92dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;width:min(620px,100%);text-align:center}.gc-v3-start-mark{width:68px;height:68px;margin:0 auto 22px;display:grid;place-items:center;border-radius:21px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 18px 40px rgba(4,20,29,.3)}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:relative;margin-top:28px;display:flex;align-items:center;justify-content:center;gap:8px;color:#9fb6b3;font-size:11px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
-        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:90px 20px 72px}.gc-v3-hero h1{font-size:clamp(43px,12vw,58px)}.gc-v3-hero .gc-v2-benefits{margin-top:20px;font-size:11px}.gc-v3-scroll-cue{bottom:24px;width:100%;justify-content:center;font-size:10.5px}.gc-v3-phase{min-height:125dvh}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:64px;min-height:calc(100dvh - 64px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{width:145px;height:220px;padding:12px;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-art article strong{font-size:14px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:10px;width:100%;justify-content:center;font-size:10.5px}.gc-v3-phase{min-height:125dvh}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:64px;min-height:calc(100dvh - 64px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{width:145px;height:220px;padding:12px;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-art article strong{font-size:14px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
         @media(prefers-reduced-motion:reduce){.gc-v3-hero-glow,.gc-v3-scroll-cue b,.gc-v3-next span,.gc-v3-orbit{animation:none!important}.gc-v3-art{transition:none!important}}
       `}</style>
 
@@ -2230,9 +2313,14 @@ export default function Home() {
                     </div>
 
                     <div className="gc-v3-marquee" aria-label="Esempi di regali trovati da Gifty">
-                      <div className="gc-v3-marquee-track">
+                      <div className="gc-v3-marquee-track" ref={heroTrackRef}>
+                        {/* Doubled so the arc always has cards queued on both
+                            sides — a duplicate sits 8 slots away, far past
+                            the edge of the visible fan, so it never shows
+                            twice at once. */}
                         {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
-                          <div key={i} className="gc-v3-marquee-card" style={{ transform:`rotate(${i % 2 === 0 ? "-2.5deg" : "2.5deg"})`, backgroundImage:`url(${item.photo})` }}>
+                          <div key={i} className="gc-v3-marquee-card">
+                            <img src={item.photo} alt="" loading={i < 4 ? "eager" : "lazy"} decoding="async" />
                             <div className="gc-v3-marquee-fade" />
                             <span className="gc-v3-marquee-cat">{item.category}</span>
                             <div className="gc-v3-marquee-body">
