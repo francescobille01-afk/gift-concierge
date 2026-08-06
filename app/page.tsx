@@ -1364,7 +1364,6 @@ export default function Home() {
         }
         @keyframes gcLineFill { 0%,33.3%{transform:scaleX(0)} 96%,100%{transform:scaleX(1)} }
         @keyframes gcTypingDot { 0%,60%,100%{transform:translateY(0);opacity:.45} 30%{transform:translateY(-3px);opacity:1} }
-        @keyframes gcFloatSlow { 0%,100%{transform:translateY(1px) rotate(-1deg)} 50%{transform:translateY(-4px) rotate(1deg)} }
         @keyframes gcProfileIn { 0%,12%{opacity:0;transform:translateX(-10px) scale(.92)} 35%,100%{opacity:1;transform:none} }
         @keyframes gcBubbleIn { 0%,25%{opacity:0;transform:translate(8px,5px) scale(.88)} 48%,100%{opacity:1;transform:none} }
         @keyframes gcChipPop { 0%,35%{opacity:0;transform:scale(.4)} 55%{opacity:1;transform:scale(1.14)} 70%,100%{opacity:1;transform:scale(1)} }
@@ -1377,12 +1376,10 @@ export default function Home() {
         @keyframes gcGiftRise { 0%,18%{transform:translateY(7px) scale(.92)} 55%,82%{transform:translateY(0) scale(1.04)} 100%{transform:translateY(7px) scale(.92)} }
         @keyframes gcConfetti { 0%,25%{opacity:0;transform:translateY(8px) scale(.3) rotate(0)} 55%{opacity:1;transform:translateY(-7px) scale(1) rotate(150deg)} 85%,100%{opacity:0;transform:translateY(-13px) scale(.7) rotate(260deg)} }
         @keyframes gcHeartRise { 0%,28%{opacity:0;transform:translateY(7px) scale(.5)} 55%,78%{opacity:1;transform:translateY(-6px) scale(1)} 100%{opacity:0;transform:translateY(-12px) scale(.8)} }
-        @keyframes gcSceneTilt { 0%,100%{transform:perspective(420px) rotateY(-4deg) rotateX(1deg) translateY(1px)} 50%{transform:perspective(420px) rotateY(4deg) rotateX(-1deg) translateY(-3px)} }
         @keyframes gcScanSweep { 0%,18%{opacity:0;transform:translateY(-24px)} 35%{opacity:.9} 75%{opacity:.65} 100%{opacity:0;transform:translateY(35px)} }
         @keyframes gcCardReveal { 0%,18%{opacity:0;transform:translateY(13px) scale(.88)} 48%,82%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-5px) scale(.96)} }
         @keyframes gcFacetGlow { 0%,100%{opacity:.55;filter:brightness(.9)} 50%{opacity:1;filter:brightness(1.25)} }
         .gc-stage-scene { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:gcStageCycle 9s ease-in-out infinite; }
-        .gc-stage-float { animation:gcFloatSlow 2.4s ease-in-out infinite; }
         .gc-stage-typing-dot { animation:gcTypingDot 1.2s ease-in-out infinite; }
         .gc-stage-profile { transform-origin:center; animation:gcProfileIn 1.35s ease-out both; }
         .gc-stage-bubble { transform-origin:center; animation:gcBubbleIn 1.45s ease-out both; }
@@ -1396,7 +1393,6 @@ export default function Home() {
         .gc-stage-lid { transform-origin:55px 31px; animation:gcLidOpen 2.7s ease-in-out infinite; }
         .gc-stage-confetti { transform-origin:center; animation:gcConfetti 2.7s ease-out infinite; }
         .gc-stage-heart { transform-origin:center; animation:gcHeartRise 2.7s ease-out infinite; }
-        .gc-stage-tilt { transform-origin:center; animation:gcSceneTilt 4.2s ease-in-out infinite; }
         .gc-stage-scan { animation:gcScanSweep 2.6s ease-in-out infinite; }
         .gc-stage-card-reveal { transform-origin:center; animation:gcCardReveal 2.7s ease-out infinite; }
         .gc-stage-facet { animation:gcFacetGlow 1.7s ease-in-out infinite; }
@@ -1408,7 +1404,7 @@ export default function Home() {
         .gc-p1    {animation:gcpulse 1.2s ease-in-out infinite}
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
-        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-float,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-tilt,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-scan,.gc-stage-card-reveal,.gc-stage-facet,.gc-stage-dot,.gc-stage-line-fill,.gc-bar-pulse,.gc-start-bar:after,.gc-start-cue{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -1614,7 +1610,12 @@ export default function Home() {
               <div style={{ textAlign:"center", marginBottom:4 }}>
                 <div style={{ fontFamily:"var(--font-bricolage)", fontWeight:800, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:0, lineHeight:1 }}>Gifty</div>
                 <div style={{ fontFamily:"var(--font-bricolage)", fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginTop:6, marginBottom:10 }}>{tr.landingKicker}</div>
-                <p style={{ fontWeight:400, color:"#f3e7d8", margin:"0 0 12px", fontSize:14.5 }}>{tr.landingSub}</p>
+                <div style={{ width:"min(330px,100%)", margin:"0 auto 10px", padding:"8px 12px 8px 9px", display:"flex", alignItems:"center", gap:9, textAlign:"left", border:"1px solid rgba(255,245,224,.24)", borderRadius:15, background:"linear-gradient(135deg,rgba(255,250,240,.14),rgba(255,255,255,.06))", boxShadow:"inset 0 1px 0 rgba(255,255,255,.14),0 7px 22px rgba(55,23,28,.12)", backdropFilter:"blur(8px)" }}>
+                  <span aria-hidden="true" style={{ width:28, height:28, flexShrink:0, display:"grid", placeItems:"center", borderRadius:10, color:"#5e2e2e", background:"linear-gradient(145deg,#f5dba8,#d9a863)", boxShadow:"0 4px 10px rgba(49,20,26,.2)" }}>
+                    <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="m10 2 1.8 5.1L17 9l-5.2 1.9L10 16l-1.8-5.1L3 9l5.2-1.9L10 2Z" fill="currentColor"/><circle cx="16.5" cy="3.5" r="1.5" fill="#fff7df"/></svg>
+                  </span>
+                  <p style={{ fontWeight:500, color:"#fff1df", margin:0, fontSize:14, lineHeight:1.32, textShadow:"0 1px 8px rgba(45,20,22,.25)" }}>{tr.landingSub}</p>
+                </div>
               </div>
 
               {/* How it works — animated 3-scene stage (design handoff:
@@ -1624,7 +1625,7 @@ export default function Home() {
                   — no JS timers/measurement needed. */}
               <div style={{ position:"relative", height:178, marginTop:8, marginBottom:12 }}>
                 <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
-                  <div className="gc-stage-float" style={{ position:"relative", width:150, height:100, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <div style={{ position:"relative", width:150, height:100, display:"flex", alignItems:"center", justifyContent:"center" }}>
                     <svg width="150" height="100" viewBox="0 0 150 100" fill="none">
                       <defs>
                         <linearGradient id="gcProfileGlass" x1="34" y1="12" x2="117" y2="88"><stop stopColor="#fffaf0"/><stop offset=".45" stopColor="#f0dbc0"/><stop offset="1" stopColor="#c99a77"/></linearGradient>
@@ -1635,7 +1636,7 @@ export default function Home() {
                         <clipPath id="gcPortraitClip"><rect x="38" y="21" width="39" height="50" rx="13"/></clipPath>
                       </defs>
                       <ellipse cx="75" cy="54" rx="58" ry="31" fill="#e9ba8c" fillOpacity=".18" filter="url(#gcProfileBlur)"/>
-                      <g className="gc-stage-tilt" style={{ transformOrigin:"75px 50px" }}>
+                      <g style={{ transformOrigin:"75px 50px" }}>
                         <rect x="18" y="20" width="101" height="65" rx="17" fill="#6f4058" fillOpacity=".38" transform="rotate(-7 18 20)"/>
                         <rect x="27" y="12" width="101" height="70" rx="18" fill="#be7d73" fillOpacity=".42" transform="rotate(5 27 12)"/>
                         <g className="gc-stage-profile" filter="url(#gcProfileShadow)" style={{ transformOrigin:"76px 51px" }}>
