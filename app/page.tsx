@@ -1904,8 +1904,19 @@ export default function Home() {
         .gc-v2-hero{align-self:center;padding-bottom:34px}.gc-v2-eyebrow{margin:0 0 17px;color:#a9bfbd;font-size:10px;font-weight:800;letter-spacing:.18em}.gc-v2-hero h1{max-width:560px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(43px,5vw,76px);font-weight:650;line-height:.98;letter-spacing:-.055em}.gc-v2-hero h1 em{display:inline-block;margin-top:8px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
         .gc-v2-benefits{display:flex;align-items:center;gap:11px;margin-top:25px;color:#d7e1df;font-size:13px;font-weight:650}.gc-v2-benefits i{width:4px;height:4px;border-radius:50%;background:#ffc19f}.gc-v2-scroll-cue{display:flex;align-items:center;gap:9px;margin:28px 0 0;color:#91aaa9;font-size:11px}.gc-v2-scroll-cue b{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#ffc19f}
         .gc-v2-story{position:relative;height:430px;align-self:center}.gc-v2-route{position:absolute;left:0;right:0;top:36px;width:100%;height:210px;overflow:visible}.gc-v2-route path:last-child{transition:stroke-dashoffset .12s linear;filter:drop-shadow(0 0 6px rgba(239,115,95,.45))}
-        .gc-v2-showcase{display:none}
         @keyframes gcShowcaseScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        .gc-v3-marquee{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;margin-top:clamp(22px,4vh,40px);overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+        .gc-v3-marquee-track{display:flex;gap:18px;width:max-content;animation:gcShowcaseScroll 42s linear infinite}
+        .gc-v3-marquee:hover .gc-v3-marquee-track{animation-play-state:paused}
+        .gc-v3-marquee-card{position:relative;flex:0 0 auto;width:clamp(140px,16vw,240px);height:clamp(200px,40vh,400px);border-radius:22px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 20px 46px rgba(0,0,0,.4)}
+        .gc-v3-marquee-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 40%,rgba(21,43,56,.94) 100%)}
+        .gc-v3-marquee-cat{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);backdrop-filter:blur(3px);color:#fff4e8;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+        .gc-v3-marquee-body{position:absolute;left:12px;right:12px;bottom:12px;color:#fff4e8}
+        .gc-v3-marquee-body strong{display:block;font-size:clamp(12px,1.3vw,15px);font-weight:650;letter-spacing:-.01em;margin-bottom:3px}
+        .gc-v3-marquee-body p{display:none;margin:0 0 6px;font-size:11px;line-height:1.3;color:#d7e1df}
+        .gc-v3-marquee-criteria{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:#ffc19f;flex-wrap:wrap}
+        .gc-v3-marquee-criteria i{width:3px;height:3px;border-radius:50%;background:#ffc19f;flex-shrink:0}
+        @media(min-width:641px){.gc-v3-marquee-body p{display:block}}
         .gc-v2-node{position:absolute;z-index:3;width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#294b59;border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 24px rgba(3,18,27,.28);opacity:.38;transform:scale(.86);transition:.42s cubic-bezier(.2,.8,.2,1)}.gc-v2-node[data-active=true]{opacity:1;transform:scale(1);background:linear-gradient(145deg,#ffc19f,#ef735f);color:#17303e;box-shadow:0 0 0 7px rgba(239,115,95,.12),0 12px 28px rgba(3,18,27,.34)}.gc-v2-node-1{left:4.5%;top:144px}.gc-v2-node-2{left:67%;top:98px}.gc-v2-node-3{right:2%;top:82px}
         .gc-v2-step{position:absolute;z-index:2;width:29%;padding:16px 17px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(15,39,51,.65);box-shadow:0 16px 38px rgba(4,20,29,.22);backdrop-filter:blur(9px);opacity:.18;transform:translateY(12px);transition:.52s cubic-bezier(.2,.8,.2,1)}.gc-v2-step[data-visible=true]{opacity:1;transform:none}.gc-v2-step small{color:#ef735f;font-size:9px;font-weight:800;letter-spacing:.18em}.gc-v2-step h2{margin:5px 0 5px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(18px,1.7vw,24px);font-weight:700;line-height:1.05;letter-spacing:-.03em}.gc-v2-step p{margin:0;color:#b9ccca;font-size:12px;line-height:1.35}.gc-v2-step-1{left:0;bottom:8px}.gc-v2-step-2{left:35.5%;bottom:8px}.gc-v2-step-3{right:0;bottom:8px}
         .gc-v2-example{margin-top:12px;padding:9px 10px;border-left:2px solid #ef735f;background:rgba(255,255,255,.05);color:#f1ddd1;font-size:10.5px;line-height:1.35}.gc-v2-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}.gc-v2-signals span{padding:5px 7px;border-radius:999px;background:rgba(255,193,159,.12);border:1px solid rgba(255,193,159,.2);color:#ffd3bb;font-size:9px;font-weight:700}.gc-v2-products{display:flex;gap:6px;margin-top:10px}.gc-v2-products span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#fff4e8;box-shadow:0 5px 14px rgba(0,0,0,.18);font-size:16px}
@@ -1918,17 +1929,6 @@ export default function Home() {
         @media(max-width:900px){.gc-v2-legal{bottom:142px}}
         @media(min-width:901px){.gc-main.gc-main--flush{padding:0!important}.gc-landing{display:block!important;min-height:calc(100vh + 900px)!important}.gc-landing-v2{min-height:680px;padding-bottom:122px}.gc-landing-sheet{left:50%!important;right:auto!important;bottom:24px!important;width:min(720px,calc(100vw - 64px));transform:translateX(-50%);border-radius:24px!important}.gc-main section[style*="max-width: 430px"]{max-width:620px!important}
           .gc-v2-story{display:none}
-          .gc-v2-showcase{display:block;position:relative;height:430px;align-self:center;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-          .gc-v2-showcase-track{display:flex;gap:22px;align-items:center;height:100%;width:max-content;animation:gcShowcaseScroll 34s linear infinite}
-          .gc-v2-showcase:hover .gc-v2-showcase-track{animation-play-state:paused}
-          .gc-v2-showcase-card{position:relative;flex:0 0 auto;width:230px;height:320px;border-radius:20px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 18px 40px rgba(0,0,0,.35)}
-          .gc-v2-showcase-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 35%,rgba(21,43,56,.92) 100%)}
-          .gc-v2-showcase-cat{position:absolute;top:14px;left:14px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(3px);color:#fff4e8;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-          .gc-v2-showcase-body{position:absolute;left:14px;right:14px;bottom:14px;color:#fff4e8}
-          .gc-v2-showcase-body strong{display:block;font-size:15px;font-weight:650;letter-spacing:-.01em;margin-bottom:4px}
-          .gc-v2-showcase-body p{margin:0 0 8px;font-size:11.5px;line-height:1.35;color:#d7e1df}
-          .gc-v2-showcase-criteria{display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:600;color:#ffc19f}
-          .gc-v2-showcase-criteria i{width:3px;height:3px;border-radius:50%;background:#ffc19f;flex-shrink:0}
         }
         /* ── Mobile-landing 3-step animation (design handoff) ── */
         @keyframes gcStageCycle {
@@ -2042,10 +2042,14 @@ export default function Home() {
         .gc-v3-hero{position:relative;min-height:100dvh;display:grid;place-items:center;padding:100px 24px 70px;box-sizing:border-box;overflow:hidden;text-align:center}
         .gc-v3-hero-glow{position:absolute;width:min(70vw,720px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(239,115,95,.2),rgba(255,193,159,.05) 42%,transparent 70%);filter:blur(4px);animation:gcLoaderGlow 4s ease-in-out infinite}
         .gc-v3-hero-copy{position:relative;z-index:2}.gc-v3-hero h1{max-width:900px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(52px,7vw,100px);font-weight:650;line-height:.94;letter-spacing:-.06em}.gc-v3-hero h1 em{display:inline-block;margin-top:10px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
-        .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:28px}.gc-v3-scroll-cue{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:12px;color:#b8cac7;font-size:12px;font-weight:700;letter-spacing:.04em}.gc-v3-scroll-cue b,.gc-v3-next span{width:31px;height:31px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.22);border-radius:50%;color:#ffc19f;animation:gcbob 1.7s ease-in-out infinite}
+        .gc-v3-hero .gc-v2-benefits{justify-content:center;margin-top:28px}
+        .gc-v3-scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:11px}
+        .gc-v3-scroll-cue span{padding:8px 18px;border-radius:999px;background:rgba(239,115,95,.18);border:1px solid rgba(255,193,159,.4);color:#fff4e8;font-size:12.5px;font-weight:800;letter-spacing:.03em;white-space:nowrap}
+        .gc-v3-scroll-cue b,.gc-v3-next span{width:34px;height:34px;display:grid;place-items:center;border:1.5px solid rgba(255,193,159,.55);border-radius:50%;color:#ffc19f;font-size:15px;animation:gcScrollPulse 1.8s ease-in-out infinite}
+        @keyframes gcScrollPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,115,95,.45);transform:translateY(0)}45%{transform:translateY(7px)}55%{box-shadow:0 0 0 12px rgba(239,115,95,0)}}
         .gc-v3-phase{position:relative;min-height:118dvh;border-top:1px solid rgba(255,255,255,.06)}.gc-v3-phase:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(239,115,95,.45) 18%,rgba(239,115,95,.45) 82%,transparent)}
         .gc-v3-phase-inner{position:sticky;top:72px;min-height:calc(100dvh - 72px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
-        .gc-v3-copy{position:relative;z-index:3}.gc-v3-copy small{color:#ef735f;font-size:10px;font-weight:800;letter-spacing:.2em}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
+        .gc-v3-copy{position:relative;z-index:3;transition:transform .12s linear,opacity .12s linear}.gc-v3-copy small{color:#ef735f;font-size:10px;font-weight:800;letter-spacing:.2em}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
         .gc-v3-art{position:relative;z-index:3;min-height:410px;transition:transform .12s linear,opacity .12s linear;will-change:transform,opacity}.gc-v3-message-art{display:grid;place-items:center}.gc-v3-message-card{position:relative;width:min(470px,88%);min-height:210px;box-sizing:border-box;padding:34px;border:1px solid rgba(255,193,159,.35);border-radius:30px;background:linear-gradient(145deg,rgba(255,244,232,.98),rgba(239,225,213,.95));box-shadow:0 35px 80px rgba(3,18,27,.36);color:#203746;font-family:Georgia,serif;font-size:clamp(21px,2.3vw,31px);line-height:1.25}.gc-v3-message-card i{position:absolute;bottom:22px;width:7px;height:7px;border-radius:50%;background:#ef735f}.gc-v3-message-card i:nth-child(2){left:34px}.gc-v3-message-card i:nth-child(3){left:48px;opacity:.6}.gc-v3-message-card i:nth-child(4){left:62px;opacity:.3}
         .gc-v3-float-chip,.gc-v3-signal{position:absolute;padding:9px 13px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(21,43,56,.92);box-shadow:0 12px 28px rgba(0,0,0,.26);color:#ffd2bb;font-size:12px;font-weight:800}.gc-v3-chip-a{left:2%;top:16%;transform:rotate(-8deg)}.gc-v3-chip-b{right:0;top:27%;transform:rotate(7deg)}.gc-v3-chip-c{right:12%;bottom:10%;transform:rotate(-4deg)}
         .gc-v3-signal-art{display:grid;place-items:center}.gc-v3-ai-core{position:absolute;width:128px;height:128px;display:grid;place-items:center;border-radius:35px;background:linear-gradient(145deg,#ffc19f,#ef735f 58%,#c94f48);box-shadow:0 0 0 16px rgba(239,115,95,.08),0 30px 70px rgba(3,18,27,.4);transform:rotate(45deg)}.gc-v3-ai-core span{color:#17303e;font-size:42px;transform:rotate(-45deg)}.gc-v3-orbit{position:absolute;border:1px solid rgba(255,193,159,.28);border-radius:50%;animation:gcorbit 10s linear infinite}.gc-v3-orbit-one{width:300px;height:190px;transform:rotate(18deg)}.gc-v3-orbit-two{width:390px;height:270px;transform:rotate(-23deg);animation-direction:reverse;animation-duration:14s}.gc-v3-signal-a{left:8%;top:22%}.gc-v3-signal-b{right:4%;top:34%}.gc-v3-signal-c{left:19%;bottom:14%}
@@ -2225,12 +2229,28 @@ export default function Home() {
                       <h1>Raccontaci chi è.<br/><em>Gifty trova il regalo giusto.</em></h1>
                       <div className="gc-v2-benefits"><span>Gratis</span><i/> <span>Nessun account</span><i/> <span>2 minuti</span></div>
                     </div>
+
+                    <div className="gc-v3-marquee" aria-label="Esempi di regali trovati da Gifty">
+                      <div className="gc-v3-marquee-track">
+                        {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
+                          <div key={i} className="gc-v3-marquee-card" style={{ transform:`rotate(${i % 2 === 0 ? "-2.5deg" : "2.5deg"})`, backgroundImage:`url(${item.photo})` }}>
+                            <div className="gc-v3-marquee-fade" />
+                            <span className="gc-v3-marquee-cat">{item.category}</span>
+                            <div className="gc-v3-marquee-body">
+                              <strong>{item.title}</strong>
+                              <p>{item.description}</p>
+                              <div className="gc-v3-marquee-criteria"><span>{item.budget}</span><i/><span>{item.occasion}</span><i/><span>{item.interest}</span></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <div className="gc-v3-scroll-cue"><span>Scorri in basso per iniziare la ricerca</span><b>↓</b></div>
                   </section>
 
                   <section className="gc-v3-phase gc-v3-phase-one">
                     <div className="gc-v3-phase-inner">
-                      <div className="gc-v3-copy"><small>PASSAGGIO 01</small><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
+                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase1 * .7, transform:`translateY(${16 - landingPhase1 * 16}px)` }}><small>PASSAGGIO 01</small><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
                       <div className="gc-v3-art gc-v3-message-art" style={{ opacity:.35 + landingPhase1 * .65, transform:`translateY(${34 - landingPhase1 * 34}px) scale(${.9 + landingPhase1 * .1})` }}>
                         <div className="gc-v3-message-card"><span>“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”</span><i/><i/><i/></div>
                         <span className="gc-v3-float-chip gc-v3-chip-a">Trekking</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Pratico</span>
@@ -2240,7 +2260,7 @@ export default function Home() {
 
                   <section className="gc-v3-phase gc-v3-phase-two">
                     <div className="gc-v3-phase-inner gc-v3-reverse">
-                      <div className="gc-v3-copy"><small>PASSAGGIO 02</small><h2>Gifty collega gli indizi.</h2><p>L’AI distingue passioni, vincoli e dettagli utili. Poi cerca direzioni diverse, senza perdere il filo.</p></div>
+                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase2 * .7, transform:`translateY(${16 - landingPhase2 * 16}px)` }}><small>PASSAGGIO 02</small><h2>Gifty collega gli indizi.</h2><p>L’AI distingue passioni, vincoli e dettagli utili. Poi cerca direzioni diverse, senza perdere il filo.</p></div>
                       <div className="gc-v3-art gc-v3-signal-art" style={{ opacity:.3 + landingPhase2 * .7, transform:`rotate(${(1 - landingPhase2) * -8}deg) scale(${.84 + landingPhase2 * .16})` }}>
                         <div className="gc-v3-orbit gc-v3-orbit-one"/><div className="gc-v3-orbit gc-v3-orbit-two"/><div className="gc-v3-ai-core"><span>✦</span></div>
                         <span className="gc-v3-signal gc-v3-signal-a">passione</span><span className="gc-v3-signal gc-v3-signal-b">vincolo</span><span className="gc-v3-signal gc-v3-signal-c">stile</span>
@@ -2250,7 +2270,7 @@ export default function Home() {
 
                   <section className="gc-v3-phase gc-v3-phase-three">
                     <div className="gc-v3-phase-inner">
-                      <div className="gc-v3-copy"><small>PASSAGGIO 03</small><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
+                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase3 * .7, transform:`translateY(${16 - landingPhase3 * 16}px)` }}><small>PASSAGGIO 03</small><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
                       <div className="gc-v3-art gc-v3-result-art" style={{ opacity:.28 + landingPhase3 * .72, transform:`translateY(${40 - landingPhase3 * 40}px)` }}>
                         <article><span>01</span><div>Esperienza</div><strong>Workshop di cucina</strong></article><article><span>02</span><div>Prodotto</div><strong>Set da trekking</strong></article><article><span>03</span><div>Personale</div><strong>Kit su misura</strong></article>
                       </div>
