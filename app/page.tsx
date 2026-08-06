@@ -1358,19 +1358,35 @@ export default function Home() {
           33.4%, 100% { background:rgba(255,255,255,.25); box-shadow:none; transform:scale(1); }
         }
         @keyframes gcLineFill { 0%,33.3%{transform:scaleX(0)} 96%,100%{transform:scaleX(1)} }
-        @keyframes gcTypingDot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
-        @keyframes gcNodePulse { 0%,100%{opacity:.35;transform:scale(.8)} 50%{opacity:1;transform:scale(1.25)} }
-        @keyframes gcSignalTravel { 0%{stroke-dashoffset:40} 100%{stroke-dashoffset:0} }
-        @keyframes gcLidOpen { 0%,20%{transform:translateY(0) rotate(0)} 55%,100%{transform:translateY(-10px) rotate(-10deg)} }
-        @keyframes gcSmileDraw { 0%,15%{stroke-dashoffset:34} 65%,100%{stroke-dashoffset:0} }
-        @keyframes gcFloatSlow { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes gcTypingDot { 0%,60%,100%{transform:translateY(0);opacity:.45} 30%{transform:translateY(-3px);opacity:1} }
+        @keyframes gcFloatSlow { 0%,100%{transform:translateY(1px) rotate(-1deg)} 50%{transform:translateY(-4px) rotate(1deg)} }
+        @keyframes gcProfileIn { 0%,12%{opacity:0;transform:translateX(-10px) scale(.92)} 35%,100%{opacity:1;transform:none} }
+        @keyframes gcBubbleIn { 0%,25%{opacity:0;transform:translate(8px,5px) scale(.88)} 48%,100%{opacity:1;transform:none} }
+        @keyframes gcChipPop { 0%,35%{opacity:0;transform:scale(.4)} 55%{opacity:1;transform:scale(1.14)} 70%,100%{opacity:1;transform:scale(1)} }
+        @keyframes gcAura { 0%,100%{opacity:.35;transform:scale(.86)} 50%{opacity:.75;transform:scale(1.08)} }
+        @keyframes gcOrbitSlow { to{transform:rotate(360deg)} }
+        @keyframes gcCorePulse { 0%,100%{filter:drop-shadow(0 0 2px rgba(240,217,168,.25));transform:scale(.94)} 50%{filter:drop-shadow(0 0 9px rgba(240,217,168,.75));transform:scale(1.04)} }
+        @keyframes gcSparkTwinkle { 0%,100%{opacity:.25;transform:scale(.55) rotate(0)} 50%{opacity:1;transform:scale(1.18) rotate(90deg)} }
+        @keyframes gcSignalTravel { 0%{stroke-dashoffset:52;opacity:.3} 55%{opacity:1} 100%{stroke-dashoffset:0;opacity:.3} }
+        @keyframes gcLidOpen { 0%,18%{transform:translateY(0) rotate(0)} 52%,82%{transform:translateY(-9px) rotate(-7deg)} 100%{transform:translateY(0) rotate(0)} }
+        @keyframes gcGiftRise { 0%,18%{transform:translateY(7px) scale(.92)} 55%,82%{transform:translateY(0) scale(1.04)} 100%{transform:translateY(7px) scale(.92)} }
+        @keyframes gcConfetti { 0%,25%{opacity:0;transform:translateY(8px) scale(.3) rotate(0)} 55%{opacity:1;transform:translateY(-7px) scale(1) rotate(150deg)} 85%,100%{opacity:0;transform:translateY(-13px) scale(.7) rotate(260deg)} }
+        @keyframes gcHeartRise { 0%,28%{opacity:0;transform:translateY(7px) scale(.5)} 55%,78%{opacity:1;transform:translateY(-6px) scale(1)} 100%{opacity:0;transform:translateY(-12px) scale(.8)} }
         .gc-stage-scene { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:gcStageCycle 9s ease-in-out infinite; }
         .gc-stage-float { animation:gcFloatSlow 2.4s ease-in-out infinite; }
         .gc-stage-typing-dot { animation:gcTypingDot 1.2s ease-in-out infinite; }
-        .gc-stage-node { animation:gcNodePulse 1.6s ease-in-out infinite; }
+        .gc-stage-profile { transform-origin:center; animation:gcProfileIn 3s ease-out infinite; }
+        .gc-stage-bubble { transform-origin:center; animation:gcBubbleIn 3s ease-out infinite; }
+        .gc-stage-chip { transform-origin:center; animation:gcChipPop 3s ease-out infinite; }
+        .gc-stage-aura { transform-origin:center; animation:gcAura 1.8s ease-in-out infinite; }
+        .gc-stage-orbit { transform-origin:55px 38px; animation:gcOrbitSlow 5.5s linear infinite; }
+        .gc-stage-core { transform-origin:center; animation:gcCorePulse 1.7s ease-in-out infinite; }
+        .gc-stage-spark { transform-origin:center; animation:gcSparkTwinkle 1.4s ease-in-out infinite; }
         .gc-stage-signal { animation:gcSignalTravel 1.6s linear infinite; }
-        .gc-stage-lid { transform-origin:36px 26px; animation:gcLidOpen 2.4s ease-in-out infinite; }
-        .gc-stage-smile { animation:gcSmileDraw 2.4s ease-in-out infinite; }
+        .gc-stage-gift { transform-origin:center; animation:gcGiftRise 2.7s ease-in-out infinite; }
+        .gc-stage-lid { transform-origin:55px 31px; animation:gcLidOpen 2.7s ease-in-out infinite; }
+        .gc-stage-confetti { transform-origin:center; animation:gcConfetti 2.7s ease-out infinite; }
+        .gc-stage-heart { transform-origin:center; animation:gcHeartRise 2.7s ease-out infinite; }
         .gc-stage-dot { width:9px; height:9px; border-radius:50%; animation:gcDotActive 9s steps(1,end) infinite; }
         .gc-stage-line-fill { height:100%; width:100%; background:#e3c089; transform:scaleX(0); animation:gcLineFill 3s linear infinite; }
         .gc-fade  {animation:gcfade .4s ease both}
@@ -1379,6 +1395,7 @@ export default function Home() {
         .gc-p1    {animation:gcpulse 1.2s ease-in-out infinite}
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
+        @media (prefers-reduced-motion:reduce){.gc-stage-scene,.gc-stage-float,.gc-stage-typing-dot,.gc-stage-profile,.gc-stage-bubble,.gc-stage-chip,.gc-stage-aura,.gc-stage-orbit,.gc-stage-core,.gc-stage-spark,.gc-stage-signal,.gc-stage-gift,.gc-stage-lid,.gc-stage-confetti,.gc-stage-heart,.gc-stage-dot,.gc-stage-line-fill{animation:none!important}.gc-stage-scene{opacity:0!important}.gc-stage-scene:first-child{opacity:1!important}}
         input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;outline:none;cursor:pointer}
         input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#7c3f3f;border:3px solid #fff;box-shadow:0 2px 8px rgba(124,63,63,.4);cursor:pointer}
         textarea:focus,input:focus{outline:none;border-color:#7c3f3f!important}
@@ -1594,16 +1611,33 @@ export default function Home() {
                   — no JS timers/measurement needed. */}
               <div style={{ position:"relative", height:150, marginTop:14, marginBottom:20 }}>
                 <div className="gc-stage-scene" style={{ animationDelay:"0s" }}>
-                  <div className="gc-stage-float" style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
-                      <circle cx="24" cy="26" r="13" stroke="#f0d9a8" strokeWidth="2.2"/>
-                      <path d="M8 54c1-10 8-16 16-16s15 6 16 16" stroke="#f0d9a8" strokeWidth="2.2" strokeLinecap="round"/>
-                      <g>
-                        <rect x="40" y="6" width="28" height="20" rx="8" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
-                        <path d="M46 26l-3 6 7-6" fill="rgba(240,217,168,.16)" stroke="#e3c089" strokeWidth="1.6"/>
-                        <circle className="gc-stage-typing-dot" cx="48" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:"0s", transformOrigin:"48px 16px" }}/>
-                        <circle className="gc-stage-typing-dot" cx="54" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".15s", transformOrigin:"54px 16px" }}/>
-                        <circle className="gc-stage-typing-dot" cx="60" cy="16" r="2" fill="#f0d9a8" style={{ animationDelay:".3s", transformOrigin:"60px 16px" }}/>
+                  <div className="gc-stage-float" style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                      <defs>
+                        <linearGradient id="gcProfileCard" x1="18" y1="12" x2="70" y2="67"><stop stopColor="#fff4df"/><stop offset="1" stopColor="#e8c49b"/></linearGradient>
+                        <linearGradient id="gcAvatar" x1="24" y1="22" x2="48" y2="48"><stop stopColor="#d88d79"/><stop offset="1" stopColor="#a95f78"/></linearGradient>
+                        <filter id="gcSoftShadow"><feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#2c1420" floodOpacity=".28"/></filter>
+                      </defs>
+                      <ellipse className="gc-stage-aura" cx="54" cy="42" rx="45" ry="30" fill="rgba(232,196,155,.16)" style={{ transformOrigin:"54px 42px" }}/>
+                      <g className="gc-stage-profile" filter="url(#gcSoftShadow)" style={{ transformOrigin:"45px 41px" }}>
+                        <rect x="16" y="11" width="58" height="58" rx="14" fill="url(#gcProfileCard)"/>
+                        <circle cx="35" cy="33" r="11" fill="url(#gcAvatar)"/>
+                        <circle cx="35" cy="30" r="4" fill="#f8d7bd"/>
+                        <path d="M27 41c1-5 4-7 8-7s7 2 8 7" fill="#7c3f58"/>
+                        <rect x="49" y="25" width="17" height="3.5" rx="2" fill="#9b665c"/>
+                        <rect x="49" y="32" width="12" height="3" rx="1.5" fill="#c99c79"/>
+                        <rect x="25" y="52" width="18" height="7" rx="3.5" fill="#8fc6aa"/>
+                        <rect x="46" y="52" width="19" height="7" rx="3.5" fill="#b8a6d9"/>
+                      </g>
+                      <g className="gc-stage-bubble" filter="url(#gcSoftShadow)" style={{ transformOrigin:"84px 28px" }}>
+                        <rect x="70" y="14" width="34" height="27" rx="10" fill="#fff8ea" stroke="#e3c089" strokeWidth="1.2"/>
+                        <path d="M78 40l-3 7 9-7" fill="#fff8ea" stroke="#e3c089" strokeWidth="1.2" strokeLinejoin="round"/>
+                        <circle className="gc-stage-typing-dot" cx="79" cy="27" r="2" fill="#a95f78" style={{ animationDelay:"0s", transformOrigin:"79px 27px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="87" cy="27" r="2" fill="#d88976" style={{ animationDelay:".15s", transformOrigin:"87px 27px" }}/>
+                        <circle className="gc-stage-typing-dot" cx="95" cy="27" r="2" fill="#c9a26b" style={{ animationDelay:".3s", transformOrigin:"95px 27px" }}/>
+                      </g>
+                      <g className="gc-stage-chip" style={{ transformOrigin:"91px 57px", animationDelay:".18s" }}>
+                        <circle cx="91" cy="57" r="9" fill="#d88976"/><path d="M91 61s-5-3.1-5-6.1c0-2.8 3.6-3.5 5-1.2 1.4-2.3 5-1.6 5 1.2 0 3-5 6.1-5 6.1Z" fill="#fff4df"/>
                       </g>
                     </svg>
                   </div>
@@ -1611,27 +1645,59 @@ export default function Home() {
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"3s" }}>
-                  <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
-                      <circle className="gc-stage-node" cx="36" cy="32" r="7" fill="#f0d9a8"/>
-                      <circle className="gc-stage-node" cx="14" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".2s" }}/>
-                      <circle className="gc-stage-node" cx="58" cy="14" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".5s" }}/>
-                      <circle className="gc-stage-node" cx="10" cy="46" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:".8s" }}/>
-                      <circle className="gc-stage-node" cx="62" cy="48" r="4" fill="rgba(240,217,168,.7)" style={{ animationDelay:"1.1s" }}/>
-                      <path className="gc-stage-signal" d="M36 32L14 14M36 32L58 14M36 32L10 46M36 32L62 48" stroke="#e3c089" strokeWidth="1.4" strokeDasharray="4 3"/>
+                  <div style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                      <defs>
+                        <radialGradient id="gcAiAura"><stop stopColor="#f0d9a8" stopOpacity=".45"/><stop offset="1" stopColor="#f0d9a8" stopOpacity="0"/></radialGradient>
+                        <linearGradient id="gcAiCore" x1="38" y1="24" x2="72" y2="58"><stop stopColor="#f7dcaa"/><stop offset=".5" stopColor="#d88976"/><stop offset="1" stopColor="#a95f78"/></linearGradient>
+                        <filter id="gcAiShadow"><feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#21101c" floodOpacity=".38"/></filter>
+                      </defs>
+                      <circle className="gc-stage-aura" cx="55" cy="39" r="34" fill="url(#gcAiAura)" style={{ transformOrigin:"55px 39px" }}/>
+                      <path className="gc-stage-signal" d="M55 39C42 22 28 21 17 27M55 39C72 24 85 23 96 30M55 39C70 54 81 59 94 55M55 39C40 54 29 58 16 53" stroke="#e3c089" strokeWidth="1.3" strokeDasharray="5 4"/>
+                      <g className="gc-stage-orbit">
+                        <g transform="translate(12 20)"><circle cx="7" cy="7" r="7" fill="#8fc6aa"/><path d="M4 7h6M7 4v6" stroke="#fff8ea" strokeWidth="1.3" strokeLinecap="round"/></g>
+                        <g transform="translate(89 23)"><circle cx="7" cy="7" r="7" fill="#b8a6d9"/><path d="M4 9l3-5 3 5H4Z" fill="#fff8ea"/></g>
+                        <g transform="translate(87 48)"><circle cx="7" cy="7" r="7" fill="#d88976"/><path d="M4 5h6v5H4zM5 4h4v2" stroke="#fff8ea" strokeWidth="1.1"/></g>
+                        <g transform="translate(9 46)"><circle cx="7" cy="7" r="7" fill="#e4b96f"/><path d="M4 7.5c2-4 4-4 6 0-2 3-4 3-6 0Z" fill="#fff8ea"/></g>
+                      </g>
+                      <g className="gc-stage-core" filter="url(#gcAiShadow)" style={{ transformOrigin:"55px 39px" }}>
+                        <rect x="38" y="22" width="34" height="34" rx="12" fill="url(#gcAiCore)"/>
+                        <path d="M55 29l2.5 6.5L64 38l-6.5 2.5L55 47l-2.5-6.5L46 38l6.5-2.5L55 29Z" fill="#fff8ea"/>
+                        <circle cx="64" cy="30" r="2" fill="#fff8ea" fillOpacity=".75"/>
+                      </g>
+                      <path className="gc-stage-spark" d="M77 12v8M73 16h8" stroke="#f0d9a8" strokeWidth="1.8" strokeLinecap="round" style={{ transformOrigin:"77px 16px" }}/>
+                      <path className="gc-stage-spark" d="M31 11v6M28 14h6" stroke="#d88976" strokeWidth="1.6" strokeLinecap="round" style={{ transformOrigin:"31px 14px", animationDelay:".45s" }}/>
                     </svg>
                   </div>
                   <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:260, lineHeight:1.35 }}>{tr.stepCaption2}</div>
                 </div>
 
                 <div className="gc-stage-scene" style={{ opacity:0, animationDelay:"6s" }}>
-                  <div style={{ position:"relative", width:90, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg width="90" height="80" viewBox="0 0 72 64" fill="none">
-                      <rect x="21" y="26" width="30" height="26" rx="3" fill="rgba(240,217,168,.14)" stroke="#e3c089" strokeWidth="2"/>
-                      <path d="M21 34h30" stroke="#e3c089" strokeWidth="2"/>
-                      <path d="M36 26v26" stroke="#e3c089" strokeWidth="2"/>
-                      <path className="gc-stage-lid" d="M27 26c0-6 4-10 9-10s9 4 9 10" stroke="#e3c089" strokeWidth="2"/>
-                      <path className="gc-stage-smile" d="M27 44c3 4 15 4 18 0" stroke="#f0d9a8" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="34"/>
+                  <div style={{ position:"relative", width:110, height:80, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
+                      <defs>
+                        <linearGradient id="gcGiftBox" x1="31" y1="32" x2="78" y2="69"><stop stopColor="#f5d99e"/><stop offset="1" stopColor="#d7a65f"/></linearGradient>
+                        <linearGradient id="gcGiftRibbon" x1="48" y1="25" x2="64" y2="69"><stop stopColor="#c46f72"/><stop offset="1" stopColor="#8f4967"/></linearGradient>
+                        <filter id="gcGiftShadow"><feDropShadow dx="0" dy="5" stdDeviation="5" floodColor="#21101c" floodOpacity=".38"/></filter>
+                      </defs>
+                      <ellipse className="gc-stage-aura" cx="55" cy="51" rx="40" ry="23" fill="rgba(240,217,168,.18)" style={{ transformOrigin:"55px 51px" }}/>
+                      <g className="gc-stage-confetti" style={{ transformOrigin:"27px 27px" }}><rect x="24" y="22" width="5" height="3" rx="1" fill="#8fc6aa" transform="rotate(28 24 22)"/></g>
+                      <g className="gc-stage-confetti" style={{ transformOrigin:"82px 25px", animationDelay:".18s" }}><circle cx="82" cy="25" r="2.5" fill="#b8a6d9"/></g>
+                      <g className="gc-stage-confetti" style={{ transformOrigin:"91px 42px", animationDelay:".35s" }}><path d="M88 40l6 4" stroke="#d88976" strokeWidth="3" strokeLinecap="round"/></g>
+                      <g className="gc-stage-confetti" style={{ transformOrigin:"18px 44px", animationDelay:".5s" }}><path d="M15 47l6-6" stroke="#e4b96f" strokeWidth="3" strokeLinecap="round"/></g>
+                      <g className="gc-stage-heart" style={{ transformOrigin:"55px 24px" }}><path d="M55 29s-8-4.8-8-9.3c0-4.2 5.4-5.2 8-1.8 2.6-3.4 8-2.4 8 1.8 0 4.5-8 9.3-8 9.3Z" fill="#d88976"/></g>
+                      <g className="gc-stage-gift" filter="url(#gcGiftShadow)" style={{ transformOrigin:"55px 51px" }}>
+                        <rect x="31" y="34" width="48" height="34" rx="6" fill="url(#gcGiftBox)"/>
+                        <rect x="50" y="34" width="10" height="34" fill="url(#gcGiftRibbon)"/>
+                        <path d="M31 43h48" stroke="#fff0d0" strokeOpacity=".45" strokeWidth="1.5"/>
+                        <circle cx="43" cy="54" r="2" fill="#fff8ea" fillOpacity=".6"/><circle cx="69" cy="58" r="2.5" fill="#fff8ea" fillOpacity=".45"/>
+                      </g>
+                      <g className="gc-stage-lid" filter="url(#gcGiftShadow)">
+                        <rect x="27" y="29" width="56" height="12" rx="5" fill="#f3cf8d"/>
+                        <rect x="50" y="29" width="10" height="12" fill="#a95f78"/>
+                        <path d="M55 29c-8-1-13-4-13-8 0-3 4-4 7-2 3 2 5 6 6 10Zm0 0c8-1 13-4 13-8 0-3-4-4-7-2-3 2-5 6-6 10Z" fill="#c46f72" stroke="#f0b0a1" strokeWidth="1"/>
+                      </g>
+                      <path className="gc-stage-spark" d="M76 14v8M72 18h8" stroke="#f0d9a8" strokeWidth="1.8" strokeLinecap="round" style={{ transformOrigin:"76px 18px", animationDelay:".2s" }}/>
                     </svg>
                   </div>
                   <div style={{ fontSize:14.5, color:"#f0d9a8", fontWeight:700, textAlign:"center", maxWidth:250, lineHeight:1.35 }}>{tr.stepCaption3}</div>
