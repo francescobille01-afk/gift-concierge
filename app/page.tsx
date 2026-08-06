@@ -38,6 +38,19 @@ const N = {
 const DISPLAY = "'Outfit', sans-serif";
 const BODY    = "'Hanken Grotesk', sans-serif";
 
+/* ─── Desktop landing showcase — real photography, standing in for real
+   product/lifestyle shots until proper photography is sourced. Uses
+   Picsum's stable photo-CDN (seeded per card so the same real photo shows
+   every load), not icons or illustrations. ─── */
+const GIFT_SHOWCASE = [
+  { photo:"https://picsum.photos/seed/gifty-coffee/440/560", category:"Caffè", title:"Set da degustazione specialty", description:"Tre origini rare con moka in ceramica artigianale.", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
+  { photo:"https://picsum.photos/seed/gifty-hike/440/560", category:"Outdoor", title:"Zaino da trekking tecnico", description:"Impermeabile, leggero, pensato per uscite di un giorno.", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
+  { photo:"https://picsum.photos/seed/gifty-camera/440/560", category:"Foto", title:"Fotocamera istantanea vintage", description:"Per chi ama i ricordi stampati, non solo salvati.", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
+  { photo:"https://picsum.photos/seed/gifty-ceramics/440/560", category:"Casa", title:"Kit di ceramica per iniziare", description:"Tornio da tavolo e argilla per i primi vasi.", budget:"€50-80", occasion:"Compleanno", interest:"Ceramica" },
+  { photo:"https://picsum.photos/seed/gifty-headphones/440/560", category:"Tech", title:"Cuffie over-ear minimal", description:"Audio caldo, design pulito, batteria lunghissima.", budget:"€120-160", occasion:"Natale", interest:"Musica" },
+  { photo:"https://picsum.photos/seed/gifty-plant/440/560", category:"Casa", title:"Pianta rara in vaso di design", description:"Facile da curare, per chi ama vivere tra il verde.", budget:"€30-45", occasion:"Nuova casa", interest:"Giardinaggio" },
+];
+
 const AMAZON_TAG = "gifty0de-21";
 // Testing phase: we only have an amazon.it affiliate link, so force every
 // Amazon URL onto that domain regardless of which Amazon TLD it came from.
@@ -1887,6 +1900,8 @@ export default function Home() {
         .gc-v2-hero{align-self:center;padding-bottom:34px}.gc-v2-eyebrow{margin:0 0 17px;color:#a9bfbd;font-size:10px;font-weight:800;letter-spacing:.18em}.gc-v2-hero h1{max-width:560px;margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(43px,5vw,76px);font-weight:650;line-height:.98;letter-spacing:-.055em}.gc-v2-hero h1 em{display:inline-block;margin-top:8px;color:#ef735f;font-family:Georgia,serif;font-weight:400;letter-spacing:-.045em}
         .gc-v2-benefits{display:flex;align-items:center;gap:11px;margin-top:25px;color:#d7e1df;font-size:13px;font-weight:650}.gc-v2-benefits i{width:4px;height:4px;border-radius:50%;background:#ffc19f}.gc-v2-scroll-cue{display:flex;align-items:center;gap:9px;margin:28px 0 0;color:#91aaa9;font-size:11px}.gc-v2-scroll-cue b{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.18);border-radius:50%;color:#ffc19f}
         .gc-v2-story{position:relative;height:430px;align-self:center}.gc-v2-route{position:absolute;left:0;right:0;top:36px;width:100%;height:210px;overflow:visible}.gc-v2-route path:last-child{transition:stroke-dashoffset .12s linear;filter:drop-shadow(0 0 6px rgba(239,115,95,.45))}
+        .gc-v2-showcase{display:none}
+        @keyframes gcShowcaseScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
         .gc-v2-node{position:absolute;z-index:3;width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#294b59;border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 24px rgba(3,18,27,.28);opacity:.38;transform:scale(.86);transition:.42s cubic-bezier(.2,.8,.2,1)}.gc-v2-node[data-active=true]{opacity:1;transform:scale(1);background:linear-gradient(145deg,#ffc19f,#ef735f);color:#17303e;box-shadow:0 0 0 7px rgba(239,115,95,.12),0 12px 28px rgba(3,18,27,.34)}.gc-v2-node-1{left:4.5%;top:144px}.gc-v2-node-2{left:67%;top:98px}.gc-v2-node-3{right:2%;top:82px}
         .gc-v2-step{position:absolute;z-index:2;width:29%;padding:16px 17px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(15,39,51,.65);box-shadow:0 16px 38px rgba(4,20,29,.22);backdrop-filter:blur(9px);opacity:.18;transform:translateY(12px);transition:.52s cubic-bezier(.2,.8,.2,1)}.gc-v2-step[data-visible=true]{opacity:1;transform:none}.gc-v2-step small{color:#ef735f;font-size:9px;font-weight:800;letter-spacing:.18em}.gc-v2-step h2{margin:5px 0 5px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(18px,1.7vw,24px);font-weight:700;line-height:1.05;letter-spacing:-.03em}.gc-v2-step p{margin:0;color:#b9ccca;font-size:12px;line-height:1.35}.gc-v2-step-1{left:0;bottom:8px}.gc-v2-step-2{left:35.5%;bottom:8px}.gc-v2-step-3{right:0;bottom:8px}
         .gc-v2-example{margin-top:12px;padding:9px 10px;border-left:2px solid #ef735f;background:rgba(255,255,255,.05);color:#f1ddd1;font-size:10.5px;line-height:1.35}.gc-v2-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}.gc-v2-signals span{padding:5px 7px;border-radius:999px;background:rgba(255,193,159,.12);border:1px solid rgba(255,193,159,.2);color:#ffd3bb;font-size:9px;font-weight:700}.gc-v2-products{display:flex;gap:6px;margin-top:10px}.gc-v2-products span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#fff4e8;box-shadow:0 5px 14px rgba(0,0,0,.18);font-size:16px}
@@ -1897,7 +1912,20 @@ export default function Home() {
         .gc-main section[style*="max-width: 430px"]{border-radius:0}.gc-main section[style*="max-width: 430px"] textarea:focus,.gc-main section[style*="max-width: 430px"] input:focus{border-color:#ef735f!important}
         @media(max-width:900px){.gc-landing{min-height:calc(100dvh + 650px)!important}.gc-landing-v2{min-height:560px;padding:calc(13px + env(safe-area-inset-top)) 18px calc(132px + env(safe-area-inset-bottom))}.gc-v2-logo{width:39px;height:39px;border-radius:12px}.gc-v2-wordmark strong{font-size:25px}.gc-v2-wordmark small{font-size:7px}.gc-v2-pill{height:34px;padding:0 9px}.gc-v2-layout{height:calc(100% - 50px);display:flex;flex-direction:column;gap:0;align-items:stretch}.gc-v2-hero{text-align:center;padding:18px 0 0}.gc-v2-eyebrow{font-size:8px;margin-bottom:10px}.gc-v2-hero h1{font-size:clamp(34px,9.8vw,43px);line-height:.98}.gc-v2-hero h1 em{margin-top:5px}.gc-v2-benefits{justify-content:center;margin-top:14px;font-size:11px}.gc-v2-scroll-cue{justify-content:center;margin-top:12px;font-size:9.5px}.gc-v2-story{width:100%;height:245px;margin-top:4px}.gc-v2-route{top:-4px;height:132px}.gc-v2-node{width:38px;height:38px;border-radius:12px}.gc-v2-node-1{left:3%;top:74px}.gc-v2-node-2{left:65%;top:46px}.gc-v2-node-3{right:0;top:34px}.gc-v2-step{left:0!important;right:0!important;bottom:0!important;width:auto;min-height:102px;padding:13px 15px;opacity:0!important;transform:translateY(9px) scale(.98)!important;pointer-events:none}.gc-v2-step[data-current=true]{opacity:1!important;transform:none!important;pointer-events:auto}.gc-v2-step h2{font-size:20px}.gc-v2-step p{font-size:11px}.gc-v2-example{margin-top:8px}.gc-v2-signals{margin-top:8px}.gc-v2-products{margin-top:7px}.gc-v2-legal{bottom:104px;font-size:10.5px}.gc-v2-scroll-cue b{width:21px;height:21px}}
         @media(max-width:900px){.gc-v2-legal{bottom:142px}}
-        @media(min-width:901px){.gc-main.gc-main--flush{padding:0!important}.gc-landing{display:block!important;min-height:calc(100vh + 900px)!important}.gc-landing-v2{min-height:680px;padding-bottom:122px}.gc-landing-sheet{left:50%!important;right:auto!important;bottom:24px!important;width:min(720px,calc(100vw - 64px));transform:translateX(-50%);border-radius:24px!important}.gc-main section[style*="max-width: 430px"]{max-width:620px!important}}
+        @media(min-width:901px){.gc-main.gc-main--flush{padding:0!important}.gc-landing{display:block!important;min-height:calc(100vh + 900px)!important}.gc-landing-v2{min-height:680px;padding-bottom:122px}.gc-landing-sheet{left:50%!important;right:auto!important;bottom:24px!important;width:min(720px,calc(100vw - 64px));transform:translateX(-50%);border-radius:24px!important}.gc-main section[style*="max-width: 430px"]{max-width:620px!important}
+          .gc-v2-story{display:none}
+          .gc-v2-showcase{display:block;position:relative;height:430px;align-self:center;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+          .gc-v2-showcase-track{display:flex;gap:22px;align-items:center;height:100%;width:max-content;animation:gcShowcaseScroll 34s linear infinite}
+          .gc-v2-showcase:hover .gc-v2-showcase-track{animation-play-state:paused}
+          .gc-v2-showcase-card{position:relative;flex:0 0 auto;width:230px;height:320px;border-radius:20px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+          .gc-v2-showcase-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,43,56,0) 35%,rgba(21,43,56,.92) 100%)}
+          .gc-v2-showcase-cat{position:absolute;top:14px;left:14px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(3px);color:#fff4e8;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+          .gc-v2-showcase-body{position:absolute;left:14px;right:14px;bottom:14px;color:#fff4e8}
+          .gc-v2-showcase-body strong{display:block;font-size:15px;font-weight:650;letter-spacing:-.01em;margin-bottom:4px}
+          .gc-v2-showcase-body p{margin:0 0 8px;font-size:11.5px;line-height:1.35;color:#d7e1df}
+          .gc-v2-showcase-criteria{display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:600;color:#ffc19f}
+          .gc-v2-showcase-criteria i{width:3px;height:3px;border-radius:50%;background:#ffc19f;flex-shrink:0}
+        }
         /* ── Mobile-landing 3-step animation (design handoff) ── */
         @keyframes gcStageCycle {
           0%, 30% { opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
@@ -2170,6 +2198,22 @@ export default function Home() {
                     <h1>Raccontaci chi è.<br/><em>Gifty trova il regalo giusto.</em></h1>
                     <div className="gc-v2-benefits"><span>Gratis</span><i/> <span>Nessun account</span><i/> <span>2 minuti</span></div>
                     <p className="gc-v2-scroll-cue"><span>Scorri per vedere come funziona</span><b>↓</b></p>
+                  </section>
+
+                  <section className="gc-v2-showcase" aria-label="Esempi di regali trovati da Gifty">
+                    <div className="gc-v2-showcase-track">
+                      {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
+                        <div key={i} className="gc-v2-showcase-card" style={{ transform:`rotate(${i % 2 === 0 ? "-2.5deg" : "2.5deg"})`, backgroundImage:`url(${item.photo})` }}>
+                          <div className="gc-v2-showcase-fade" />
+                          <span className="gc-v2-showcase-cat">{item.category}</span>
+                          <div className="gc-v2-showcase-body">
+                            <strong>{item.title}</strong>
+                            <p>{item.description}</p>
+                            <div className="gc-v2-showcase-criteria"><span>{item.budget}</span><i/><span>{item.occasion}</span><i/><span>{item.interest}</span></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </section>
 
                   <section className="gc-v2-story" aria-label="Come funziona Gifty">
