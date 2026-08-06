@@ -2020,10 +2020,7 @@ export default function Home() {
               <div style={{ textAlign:"center", marginBottom:4 }}>
                 <div style={{ fontFamily:"var(--font-bricolage)", fontWeight:800, fontSize:48, color:"#f8eee0", letterSpacing:"-.02em", marginBottom:0, lineHeight:1 }}>Gifty</div>
                 <div style={{ fontFamily:"var(--font-bricolage)", fontSize:11, fontWeight:700, letterSpacing:".18em", textTransform:"uppercase" as const, color:"#f0d9a8", marginTop:6, marginBottom:10 }}>{tr.landingKicker}</div>
-                <div style={{ width:"min(330px,100%)", margin:"0 auto 10px", padding:"8px 12px 8px 9px", display:"flex", alignItems:"center", gap:9, textAlign:"left", border:"1px solid rgba(255,245,224,.24)", borderRadius:15, background:"linear-gradient(135deg,rgba(255,250,240,.14),rgba(255,255,255,.06))", boxShadow:"inset 0 1px 0 rgba(255,255,255,.14),0 7px 22px rgba(55,23,28,.12)", backdropFilter:"blur(8px)" }}>
-                  <span aria-hidden="true" style={{ width:28, height:28, flexShrink:0, display:"grid", placeItems:"center", borderRadius:10, color:"#5e2e2e", background:"linear-gradient(145deg,#f5dba8,#d9a863)", boxShadow:"0 4px 10px rgba(49,20,26,.2)" }}>
-                    <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="m10 2 1.8 5.1L17 9l-5.2 1.9L10 16l-1.8-5.1L3 9l5.2-1.9L10 2Z" fill="currentColor"/><circle cx="16.5" cy="3.5" r="1.5" fill="#fff7df"/></svg>
-                  </span>
+                <div style={{ width:"min(330px,100%)", margin:"0 auto 10px", padding:"10px 16px", textAlign:"center", border:"1px solid rgba(255,245,224,.24)", borderRadius:15, background:"linear-gradient(135deg,rgba(255,250,240,.14),rgba(255,255,255,.06))", boxShadow:"inset 0 1px 0 rgba(255,255,255,.14),0 7px 22px rgba(55,23,28,.12)", backdropFilter:"blur(8px)" }}>
                   <p style={{ fontWeight:500, color:"#fff1df", margin:0, fontSize:14, lineHeight:1.32, textShadow:"0 1px 8px rgba(45,20,22,.25)" }}>{tr.landingSub}</p>
                 </div>
               </div>
