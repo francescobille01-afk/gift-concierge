@@ -789,6 +789,12 @@ const EMPTY: Gathered = {
 /* ─── Helpers ────────────────────────────────────────────────── */
 function fmtAge(a: number) { return a <= 2 ? `${a} yr` : a >= 90 ? "90+" : `${a}`; }
 function fmtBudget(b: number, sym: string) { return b >= 500 ? `${sym}500+` : `${sym}${b}`; }
+function budgetToSliderStep(budget: number) {
+  return budget <= 100 ? Math.round(budget / 5) : 20 + Math.round((budget - 100) / 25);
+}
+function sliderStepToBudget(step: number) {
+  return step <= 20 ? step * 5 : 100 + (step - 20) * 25;
+}
 function parsePriceLow(r: string): number { const m = r.replace(/[, ]/g,"").match(/\d+/); return m ? parseInt(m[0]) : 9999; }
 // Pre-API: the model's price is an estimate, and the link goes to an Amazon
 // search page — so we never show it as an exact price. Widen it into an
@@ -1771,8 +1777,8 @@ export default function Home() {
                                 <label htmlFor="gc-landing-budget">{landingForm.budgetLabel}</label>
                                 <strong style={{ color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{fmtBudget(g.budget, sym)}</strong>
                               </div>
-                              <input id="gc-landing-budget" type="range" min={0} max={500} step={10} value={g.budget} onChange={e => setG(p => ({ ...p, budget:+e.target.value }))}
-                                style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${(g.budget/500)*100}%,#ddcbb6 ${(g.budget/500)*100}%)` }}/>
+                              <input id="gc-landing-budget" type="range" min={0} max={36} step={1} value={budgetToSliderStep(g.budget)} onChange={e => setG(p => ({ ...p, budget:sliderStepToBudget(+e.target.value) }))}
+                                style={{ width:"100%", background:`linear-gradient(90deg,${C.maroon} ${(budgetToSliderStep(g.budget)/36)*100}%,#ddcbb6 ${(budgetToSliderStep(g.budget)/36)*100}%)` }}/>
                             </div>
                           </div>
                         </div>
