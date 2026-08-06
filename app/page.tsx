@@ -91,12 +91,12 @@ const LANDING_FORM_COPY: Record<TKey, {
   sheetSub: string;
   cta: string;
 }> = {
-  en: { collapsedPrompt:"Start here", nameLabel:"Recipient's name", namePlaceholder:"e.g. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"e.g. Birthday", budgetLabel:"Maximum budget", sheetTitle:"Let's start with the essentials", sheetSub:"Three details, then you can tell Gifty everything you know.", cta:"Continue to clues" },
-  it: { collapsedPrompt:"Inizia da qui", nameLabel:"Nome del destinatario", namePlaceholder:"Es. Giulia", occasionLabel:"Occasione", occasionPlaceholder:"Es. Compleanno", budgetLabel:"Budget massimo", sheetTitle:"Partiamo dalle cose essenziali", sheetSub:"Tre informazioni, poi potrai raccontare a Gifty tutto quello che sai.", cta:"Continua agli indizi" },
-  fr: { collapsedPrompt:"Commencez ici", nameLabel:"Prénom du destinataire", namePlaceholder:"Ex. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"Ex. Anniversaire", budgetLabel:"Budget maximum", sheetTitle:"Commençons par l'essentiel", sheetSub:"Trois informations, puis racontez à Gifty tout ce que vous savez.", cta:"Continuer vers les indices" },
-  de: { collapsedPrompt:"Hier starten", nameLabel:"Name der Person", namePlaceholder:"z. B. Giulia", occasionLabel:"Anlass", occasionPlaceholder:"z. B. Geburtstag", budgetLabel:"Maximales Budget", sheetTitle:"Beginnen wir mit dem Wesentlichen", sheetSub:"Drei Angaben, danach kannst du Gifty alles erzählen, was du weißt.", cta:"Weiter zu den Hinweisen" },
-  es: { collapsedPrompt:"Empieza aquí", nameLabel:"Nombre del destinatario", namePlaceholder:"Ej. Giulia", occasionLabel:"Ocasión", occasionPlaceholder:"Ej. Cumpleaños", budgetLabel:"Presupuesto máximo", sheetTitle:"Empecemos por lo esencial", sheetSub:"Tres datos y después podrás contarle a Gifty todo lo que sabes.", cta:"Continuar a las pistas" },
-  pt: { collapsedPrompt:"Comece aqui", nameLabel:"Nome do destinatário", namePlaceholder:"Ex. Giulia", occasionLabel:"Ocasião", occasionPlaceholder:"Ex. Aniversário", budgetLabel:"Orçamento máximo", sheetTitle:"Vamos começar pelo essencial", sheetSub:"Três dados e depois pode contar à Gifty tudo o que sabe.", cta:"Continuar para as pistas" },
+  en: { collapsedPrompt:"Start here", nameLabel:"Recipient's name", namePlaceholder:"e.g. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"e.g. Birthday", budgetLabel:"Budget", sheetTitle:"Let's start with the essentials", sheetSub:"Three details, then you can tell Gifty everything you know.", cta:"Continue" },
+  it: { collapsedPrompt:"Inizia da qui", nameLabel:"Nome del destinatario", namePlaceholder:"Es. Giulia", occasionLabel:"Occasione", occasionPlaceholder:"Es. Compleanno", budgetLabel:"Budget", sheetTitle:"Partiamo dalle cose essenziali", sheetSub:"Tre informazioni, poi potrai raccontare a Gifty tutto quello che sai.", cta:"Continua" },
+  fr: { collapsedPrompt:"Commencez ici", nameLabel:"Prénom du destinataire", namePlaceholder:"Ex. Giulia", occasionLabel:"Occasion", occasionPlaceholder:"Ex. Anniversaire", budgetLabel:"Budget", sheetTitle:"Commençons par l'essentiel", sheetSub:"Trois informations, puis racontez à Gifty tout ce que vous savez.", cta:"Continuer" },
+  de: { collapsedPrompt:"Hier starten", nameLabel:"Name der Person", namePlaceholder:"z. B. Giulia", occasionLabel:"Anlass", occasionPlaceholder:"z. B. Geburtstag", budgetLabel:"Budget", sheetTitle:"Beginnen wir mit dem Wesentlichen", sheetSub:"Drei Angaben, danach kannst du Gifty alles erzählen, was du weißt.", cta:"Weiter" },
+  es: { collapsedPrompt:"Empieza aquí", nameLabel:"Nombre del destinatario", namePlaceholder:"Ej. Giulia", occasionLabel:"Ocasión", occasionPlaceholder:"Ej. Cumpleaños", budgetLabel:"Presupuesto", sheetTitle:"Empecemos por lo esencial", sheetSub:"Tres datos y después podrás contarle a Gifty todo lo que sabes.", cta:"Continuar" },
+  pt: { collapsedPrompt:"Comece aqui", nameLabel:"Nome do destinatário", namePlaceholder:"Ex. Giulia", occasionLabel:"Ocasião", occasionPlaceholder:"Ex. Aniversário", budgetLabel:"Orçamento", sheetTitle:"Vamos começar pelo essencial", sheetSub:"Três dados e depois pode contar à Gifty tudo o que sabe.", cta:"Continuar" },
 };
 
 interface InterestDeepDiveConfig {
@@ -1729,10 +1729,6 @@ export default function Home() {
                             placeholder={landingForm.nameLabel}
                             style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:16, fontFamily:BODY, color:C.ink, cursor:"text" }}
                           />
-                          <button type="button" onClick={() => setLandingSheetOpen(true)} aria-label={landingForm.nameLabel}
-                            style={{ width:44, height:44, borderRadius:"50%", border:"none", background:"linear-gradient(150deg,#8c4f4f,#7c3f3f)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, cursor:"pointer" }}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                          </button>
                         </div>
                       </>
                     ) : (
@@ -1749,7 +1745,9 @@ export default function Home() {
 
                         <div style={{ display:"grid", gap:8 }}>
                           <div className="gc-landing-sheet-field">
-                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5", fontSize:15 }}>♡</span>
+                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5" }}>
+                              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                            </span>
                             <div style={{ flex:1, minWidth:0 }}>
                               <label htmlFor="gc-landing-recipient">{landingForm.nameLabel}</label>
                               <input id="gc-landing-recipient" autoFocus type="text" autoComplete="off" value={g.recipientName} onChange={e => setG(p => ({ ...p, recipientName:e.target.value }))} placeholder={landingForm.namePlaceholder}/>
@@ -1757,7 +1755,9 @@ export default function Home() {
                           </div>
 
                           <div className="gc-landing-sheet-field">
-                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5", fontSize:14 }}>◇</span>
+                            <span aria-hidden="true" style={{ width:30, height:30, display:"grid", placeItems:"center", flexShrink:0, borderRadius:9, color:C.maroon, background:"#f2e5d5" }}>
+                              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="M12 7H8.7a2.2 2.2 0 1 1 2.2-2.2L12 7Zm0 0h3.3a2.2 2.2 0 1 0-2.2-2.2L12 7Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/></svg>
+                            </span>
                             <div style={{ flex:1, minWidth:0 }}>
                               <label htmlFor="gc-landing-occasion">{landingForm.occasionLabel}</label>
                               <input id="gc-landing-occasion" type="text" autoComplete="off" value={g.occasion ?? ""} onChange={e => setG(p => ({ ...p, occasion:e.target.value }))} placeholder={landingForm.occasionPlaceholder}/>
@@ -1780,7 +1780,7 @@ export default function Home() {
                         <div style={{ marginTop:"auto" }}>
                           <button type="button" onClick={submitLandingAnswer} disabled={!g.recipientName.trim() || !g.occasion?.trim()}
                             style={{ width:"100%", minHeight:47, border:"none", borderRadius:14, background: g.recipientName.trim() && g.occasion?.trim() ? "linear-gradient(150deg,#8c4f4f,#7c3f3f)" : "#ccb9a6", color:"#fff", font:`700 14px ${BODY}`, cursor: g.recipientName.trim() && g.occasion?.trim() ? "pointer" : "not-allowed", boxShadow: g.recipientName.trim() && g.occasion?.trim() ? "0 7px 18px rgba(124,63,63,.24)" : "none" }}>
-                            {landingForm.cta} →
+                            {landingForm.cta}
                           </button>
                         </div>
                       </div>
