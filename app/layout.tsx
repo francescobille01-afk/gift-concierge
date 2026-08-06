@@ -52,10 +52,12 @@ export default function RootLayout({
         {/* iubenda Privacy Controls & Cookie Solution — must load as early as
             possible (iubenda: "all'inizio dell'head"). beforeInteractive lets
             Next inject it into <head> before hydration. */}
-        <Script
-          src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"
-          strategy="beforeInteractive"
-        />
+        {process.env.NODE_ENV === "production" && (
+          <Script
+            src="https://embeds.iubenda.com/widgets/6cd8297e-3942-416c-86d8-4f532d36c95e.js"
+            strategy="beforeInteractive"
+          />
+        )}
         {children}
       </body>
     </html>

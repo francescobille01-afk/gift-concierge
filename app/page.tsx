@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import type { GiftSuggestion, ChatResponse, UserLocale, ChatMessage } from "@/lib/types";
+import type { GiftSuggestion, ChatResponse, UserLocale, ChatMessage, ProfileSignal, AdaptiveQuestionResult } from "@/lib/types";
 
 /* ─── Design tokens ─────────────────────────────────────────── */
 const C = {
@@ -792,6 +792,8 @@ function fmtBudget(b: number, sym: string) { return b >= 500 ? `${sym}500+` : `$
 function budgetToSliderStep(budget: number) {
   return budget <= 100 ? Math.round(budget / 5) : 20 + Math.round((budget - 100) / 25);
 }
+
+type Screen = "landing" | "intake" | "clues" | "signals" | "loading" | "results" | "refine";
 function sliderStepToBudget(step: number) {
   return step <= 20 ? step * 5 : 100 + (step - 20) * 25;
 }
@@ -998,7 +1000,8 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
 }
 
 export default function Home() {
-  const [screen,      setScreen]      = useState<"landing"|"intake"|"loading"|"results">("intake");
+  const [screen,      setScreen]      = useState<Screen>("intake");
+  const [mobileFlow,  setMobileFlow]  = useState(false);
   const [landingBarFocused, setLandingBarFocused] = useState(false);
   const [landingSheetOpen, setLandingSheetOpen] = useState(false);
   const [landingDisclaimerOpen, setLandingDisclaimerOpen] = useState(false);
@@ -1021,6 +1024,15 @@ export default function Home() {
   const [thumbs,      setThumbs]      = useState<Record<string, "up"|"down">>({});
   const [refining,    setRefining]    = useState(false);
   const [errorMsg,    setErrorMsg]    = useState<string | null>(null);
+  const [clueText,    setClueText]    = useState("");
+  const [signals,     setSignals]     = useState<ProfileSignal[]>([]);
+  const [signalsBusy, setSignalsBusy] = useState(false);
+  const [editingSignals, setEditingSignals] = useState(false);
+  const [resultIndex, setResultIndex] = useState(0);
+  const [favoriteGifts, setFavoriteGifts] = useState<GiftSuggestion[]>([]);
+  const [refineText, setRefineText] = useState("");
+  const [refineChoices, setRefineChoices] = useState<string[]>([]);
+  const [refinementRound, setRefinementRound] = useState(0);
   /* Contact form */
   const [cName,       setCName]       = useState("");
   const [cEmail,      setCEmail]      = useState("");
@@ -1047,6 +1059,7 @@ export default function Home() {
 
   /* ── iubenda: load once so Privacy/Cookie Policy links open as a popup ── */
   useEffect(() => {
+    if (window.location.hostname === "localhost") return;
     if (document.getElementById("iubenda-loader")) return;
     const s = document.createElement("script");
     s.id = "iubenda-loader";
@@ -1127,7 +1140,7 @@ export default function Home() {
   }
   function restart() {
     const next = typeof window !== "undefined" && window.innerWidth <= 900 ? "landing" : "intake";
-    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false);
+    setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1162,6 +1175,167 @@ export default function Home() {
       ].filter(Boolean).join(". "),
     };
     return { recipient, locale };
+  }
+
+  function buildMobileRecipientAndLocale() {
+    const { recipient, locale } = buildRecipientAndLocale();
+    return {
+      locale,
+      recipient: {
+        ...recipient,
+        age: "unknown",
+        relation: "",
+        gender: "",
+        interests: signals.map(signal => signal.key).filter(Boolean).join(", "),
+        budgetMin: 0,
+        budgetMax: g.budget >= 500 ? 2000 : g.budget,
+        notes: [
+          clueText.trim(),
+          signals.length ? `Segnali confermati: ${signals.map(signal => `${signal.key}: ${signal.value}`).join("; ")}` : "",
+        ].filter(Boolean).join(". "),
+      },
+    };
+  }
+
+  function fallbackSignalsFromText(text: string): ProfileSignal[] {
+    const chunks = text
+      .split(/[.!?;\n]+|,\s*/)
+      .flatMap(chunk => chunk.split(/\s+e\s+(?=[a-zà-ù])/i))
+      .map(chunk => chunk.trim())
+      .filter(chunk => chunk.length >= 4)
+      .slice(0, 6);
+    const labels: Array<[RegExp, string]> = [
+      [/ceramic|argilla|kintsugi/i, "Ceramica"],
+      [/trek|cammin|montagn|escursion/i, "Trekking"],
+      [/giappon|japan/i, "Giappone"],
+      [/fotograf|foto|camera/i, "Fotografia"],
+      [/cucin|chef|ricett/i, "Cucina"],
+      [/music|vinil|concert|chitarr/i, "Musica"],
+      [/legg|libr|roman/i, "Lettura"],
+      [/viagg|vacanz/i, "Viaggi"],
+      [/tropp|non |evita|odia|lament/i, "Vincolo importante"],
+    ];
+    const seen = new Set<string>();
+    return chunks.map((value, index) => {
+      const key = labels.find(([pattern]) => pattern.test(value))?.[1]
+        ?? value.split(/\s+/).slice(0, 3).join(" ").replace(/^./, char => char.toUpperCase())
+        ?? `Segnale ${index + 1}`;
+      return { key, value };
+    }).filter(signal => {
+      const id = signal.key.toLowerCase();
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }
+
+  function normalizeMobileGifts(items: GiftSuggestion[], round: number) {
+    const batch = Date.now().toString(36);
+    return items.slice(0, 3).map((gift, index) => ({ ...gift, id:`mobile-${round}-${batch}-${gift.id || index}` }));
+  }
+
+  async function organizeClues() {
+    if (clueText.trim().length < 8 || signalsBusy) return;
+    setSignalsBusy(true);
+    setErrorMsg(null);
+    const { recipient, locale } = buildRecipientAndLocale();
+    try {
+      const res = await fetch("/api/adaptive-question", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ recipient:{ ...recipient, notes:clueText.trim(), budgetMin:0, budgetMax:g.budget }, observation:clueText.trim(), locale }),
+      });
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data: AdaptiveQuestionResult = await res.json();
+      const extracted = (data.signals ?? []).filter(signal => signal.key?.trim() && signal.value?.trim()).slice(0, 6);
+      setSignals(extracted.length ? extracted : fallbackSignalsFromText(clueText));
+    } catch {
+      setSignals(fallbackSignalsFromText(clueText));
+    } finally {
+      setSignalsBusy(false);
+      setEditingSignals(false);
+      setScreen("signals");
+    }
+  }
+
+  async function generateMobileResults() {
+    if (signals.length === 0) return;
+    setScreen("loading");
+    setLoadingLine(0);
+    setErrorMsg(null);
+    const { recipient, locale } = buildMobileRecipientAndLocale();
+    const firstMessage = [
+      `Sto cercando un regalo per ${g.recipientName || "questa persona"}.`,
+      `Occasione: ${g.occasion || "non specificata"}. Budget massimo: ${sym}${g.budget}.`,
+      `Quello che ho osservato: ${clueText.trim()}.`,
+      `Segnali confermati: ${signals.map(signal => `${signal.key} — ${signal.value}`).join("; ")}.`,
+      "Proponi le idee più personali e acquistabili, usando tutti i segnali insieme quando sono compatibili e direzioni diverse quando raccontano lati distinti della persona.",
+    ].join("\n");
+    try {
+      const res = await fetch("/api/chat", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ recipient, messages:[{ role:"user", content:firstMessage }], reactions:{}, locale }),
+      });
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data: ChatResponse = await res.json();
+      const newGifts = normalizeMobileGifts(data.suggestions ?? [], 0);
+      if (!newGifts.length) throw new Error("No suggestions");
+      setGifts(newGifts);
+      setResultIndex(0);
+      setConvo([{ role:"user", content:firstMessage }, { role:"assistant", content:data.message ?? "" }]);
+      pushHistoryEntry(newGifts);
+      setScreen("results");
+    } catch {
+      setErrorMsg("Non sono riuscito a creare i risultati. Riprova tra poco.");
+      setScreen("signals");
+    }
+  }
+
+  function toggleFavorite(gift: GiftSuggestion) {
+    setFavoriteGifts(previous => previous.some(item => item.id === gift.id)
+      ? previous.filter(item => item.id !== gift.id)
+      : [...previous, gift]);
+  }
+
+  async function refineMobileResults() {
+    if ((!refineText.trim() && refineChoices.length === 0) || refining) return;
+    setRefining(true);
+    setErrorMsg(null);
+    const { recipient, locale } = buildMobileRecipientAndLocale();
+    const kept = favoriteGifts.map(gift => `"${gift.title}"`).join(", ") || "nessun preferito esplicito";
+    const shown = gifts.map(gift => `"${gift.title}"`).join(", ");
+    const refineMessage = [
+      `Preferiti da conservare come riferimento: ${kept}.`,
+      `Commento dell'utente: ${refineText.trim() || "nessun commento libero"}.`,
+      refineChoices.length ? `Direzione richiesta: ${refineChoices.join(", ")}.` : "",
+      `Idee già mostrate da non ripetere: ${shown}.`,
+      "Genera risultati completamente nuovi. Mantieni il pattern dei preferiti, applica il commento come nuova regola ed evita le idee già mostrate.",
+    ].filter(Boolean).join("\n");
+    try {
+      const reactions = Object.fromEntries(favoriteGifts.map(gift => [gift.id, "love_it"]));
+      const res = await fetch("/api/chat", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ recipient, messages:[...convo, { role:"user", content:refineMessage }], reactions, locale, currentSuggestions:gifts }),
+      });
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data: ChatResponse = await res.json();
+      const newGifts = normalizeMobileGifts(data.suggestions ?? [], refinementRound + 1);
+      if (!newGifts.length) throw new Error("No suggestions");
+      setGifts(newGifts);
+      setResultIndex(0);
+      setConvo(previous => [...previous, { role:"user", content:refineMessage }, { role:"assistant", content:data.message ?? "" }]);
+      setRefinementRound(round => round + 1);
+      setRefineText("");
+      setRefineChoices([]);
+      pushHistoryEntry(newGifts);
+      setScreen("results");
+    } catch {
+      setErrorMsg("Non sono riuscito a rifinire i risultati. I preferiti sono ancora salvati.");
+    } finally {
+      setRefining(false);
+    }
   }
 
   function pushHistoryEntry(newGifts: GiftSuggestion[]) {
@@ -1324,6 +1498,65 @@ export default function Home() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  function renderMobileFlowHeader(progress: number) {
+    return (
+      <div style={{ marginBottom:14 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, marginBottom:10 }}>
+          <button onClick={restart} style={{ display:"flex", alignItems:"center", gap:9, border:0, padding:0, background:"transparent", cursor:"pointer", textAlign:"left" }}>
+            <span style={{ width:34, height:34, borderRadius:10, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#e4bc78,#c79452)", boxShadow:"0 4px 12px rgba(91,45,39,.16)" }}><GiftSVG size={18} fill="#5e2e2e"/></span>
+            <span>
+              <strong style={{ display:"block", color:C.ink, fontFamily:DISPLAY, fontSize:17, lineHeight:1 }}>Gifty</strong>
+              <small style={{ color:C.muted4, fontSize:9.5 }}>{g.recipientName} · {g.occasion} · max {fmtBudget(g.budget, sym)}</small>
+            </span>
+          </button>
+          <div aria-label={`${favoriteGifts.length} preferiti`} style={{ minWidth:38, height:34, padding:"0 9px", borderRadius:999, border:"1px solid #dfc7ae", background:"#fffaf4", display:"flex", alignItems:"center", justifyContent:"center", gap:4, color:C.maroon, fontSize:12.5, fontWeight:700 }}>
+            <span aria-hidden="true">♡</span>{favoriteGifts.length || ""}
+          </div>
+        </div>
+        <div style={{ height:4, borderRadius:99, overflow:"hidden", background:"#ddcdb9" }}>
+          <div style={{ height:"100%", width:`${Math.max(8, Math.min(100, progress))}%`, borderRadius:99, background:"linear-gradient(90deg,#a95c5d,#7c3f3f)", transition:"width .35s ease" }}/>
+        </div>
+      </div>
+    );
+  }
+
+  function renderMobileResultCard(gift: GiftSuggestion) {
+    const imgQ = gift.imageSearchQuery ?? gift.title;
+    const image = gift.imageUrl || `/api/product-image?q=${encodeURIComponent(imgQ)}`;
+    const fallbackLink = `https://www.amazon.it/s?k=${encodeURIComponent(gift.title)}`;
+    const amazonLink = addAffiliateTag(gift.amazonLink || fallbackLink);
+    const loved = favoriteGifts.some(item => item.id === gift.id);
+    return (
+      <article style={{ border:"1px solid #dfc8af", borderRadius:18, background:"#fffaf4", padding:8, boxShadow:"0 12px 28px rgba(91,45,39,.09)" }}>
+        <div style={{ height:165, borderRadius:13, overflow:"hidden", position:"relative", background:"linear-gradient(145deg,#ead8c4,#d8b99b)" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt={gift.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+          <span style={{ position:"absolute", left:10, top:10, padding:"5px 8px", borderRadius:999, color:"#fff8ed", background:"rgba(73,36,39,.55)", backdropFilter:"blur(5px)", fontSize:9, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase" }}>{gift.category || "Scelta personale"}</span>
+        </div>
+        <div style={{ padding:"12px 3px 2px" }}>
+          <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:12 }}>
+            <div style={{ flex:1 }}>
+              <div style={{ color:"#a15b58", fontSize:9, fontWeight:800, letterSpacing:".1em", textTransform:"uppercase", marginBottom:6 }}>{refinementRound ? "Nuova scelta più centrata" : "Scelta ad alta affinità"}</div>
+              <h2 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:20, lineHeight:1.15, letterSpacing:"-.02em" }}>{gift.title}</h2>
+            </div>
+            <button type="button" onClick={() => toggleFavorite(gift)} aria-label={loved ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+              style={{ width:35, height:35, flexShrink:0, borderRadius:"50%", border:`1px solid ${loved ? "#9f5959" : "#dec7ae"}`, background:loved ? "#9f5959" : "#fffaf4", color:loved ? "#fff" : "#9f5959", display:"grid", placeItems:"center", cursor:"pointer", fontSize:18 }}>
+              {loved ? "♥" : "♡"}
+            </button>
+          </div>
+          <p style={{ margin:"0 0 7px", color:C.muted4, fontSize:11.5, lineHeight:1.4 }}>{gift.reason || gift.description}</p>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:10 }}>
+            <span style={{ fontSize:11, color:C.muted, lineHeight:1.25 }}>{gift.description}</span>
+            <strong style={{ whiteSpace:"nowrap", color:C.maroon, fontFamily:DISPLAY, fontSize:17 }}>{toPriceBand(gift.priceRange, sym)}</strong>
+          </div>
+          <a href={amazonLink} target="_blank" rel="noopener noreferrer" style={{ display:"block", width:"100%", padding:"11px 12px", borderRadius:11, boxSizing:"border-box", textAlign:"center", textDecoration:"none", color:"#fff", background:C.maroon, fontSize:12.5, fontWeight:700 }}>
+            Vedi dove acquistarlo
+          </a>
+        </div>
+      </article>
     );
   }
 
@@ -1536,7 +1769,7 @@ export default function Home() {
         <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : "gc-main"} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}>
 
           {/* Top nav */}
-          {screen !== "landing" && (
+          {screen !== "landing" && !mobileFlow && (
           <div className="gc-topnav" style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", gap:6, marginBottom:18 }}>
             {/* Mobile-only brand mark — .gc-brand (with the full logo) is hidden
                 below 900px, so without this the mobile header has no branding
@@ -1823,9 +2056,10 @@ export default function Home() {
             (() => {
               const submitLandingAnswer = () => {
                 if (!g.recipientName.trim() || !g.occasion?.trim()) return;
-                setSkipRelPicker(true);
                 setLandingSheetOpen(false);
-                setScreen("intake");
+                setLandingBarFocused(false);
+                setMobileFlow(true);
+                setScreen("clues");
               };
               return (
                 <>
@@ -1933,6 +2167,149 @@ export default function Home() {
           )}
 
           {/* ══ HOME / APP ══ */}
+              {/* MOBILE FLOW — clues → signals → results → refinement */}
+              {mobileFlow && screen === "clues" && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(18)}
+                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginTop:2, marginBottom:8 }}>Un solo messaggio</div>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
+                  <p style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
+                  <label htmlFor="gc-clue-text" style={{ color:C.label, fontSize:10.5, fontWeight:700, marginBottom:6 }}>Quello che sai</label>
+                  <textarea id="gc-clue-text" autoFocus value={clueText} onChange={event => setClueText(event.target.value)}
+                    placeholder={`${g.recipientName || "La persona"} parla spesso di…, ha iniziato a…, possiede già…, non sopporta…`}
+                    style={{ width:"100%", minHeight:170, resize:"none", boxSizing:"border-box", padding:"14px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:14, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
+                  <div style={{ display:"flex", gap:6, overflowX:"auto", padding:"9px 0 4px", scrollbarWidth:"none" }}>
+                    {["Parla spesso di…","Ha già…","Non sopporta…"].map(prompt => (
+                      <button key={prompt} type="button" onClick={() => setClueText(text => `${text}${text.trim() ? " " : ""}${prompt} `)}
+                        style={{ flexShrink:0, padding:"7px 10px", border:"1px solid #ddc8b1", borderRadius:999, background:"#fff8ef", color:C.muted4, fontSize:11, cursor:"pointer" }}>{prompt}</button>
+                    ))}
+                  </div>
+                  <div style={{ marginTop:"auto", paddingTop:12 }}>
+                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9.5, marginBottom:8 }}>Nessuna scheda separata per interesse.</div>
+                    <button type="button" onClick={organizeClues} disabled={clueText.trim().length < 8 || signalsBusy}
+                      style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:clueText.trim().length >= 8 ? C.maroon : "#ccb9a6", color:"#fff", fontSize:13.5, fontWeight:700, cursor:clueText.trim().length >= 8 ? "pointer" : "not-allowed", boxShadow:clueText.trim().length >= 8 ? "0 8px 20px rgba(124,63,63,.22)" : "none" }}>
+                      {signalsBusy ? "Analizzo le informazioni…" : "Analizza le informazioni"}
+                    </button>
+                  </div>
+                </section>
+              )}
+
+              {mobileFlow && screen === "signals" && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(42)}
+                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginTop:2, marginBottom:8 }}>Quello che ho capito</div>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:26, lineHeight:1.08, letterSpacing:"-.03em" }}>Segnali diversi, già organizzati.</h1>
+                  <p style={{ margin:"0 0 13px", color:C.muted4, fontSize:12, lineHeight:1.4 }}>Puoi correggerli prima che influenzino la ricerca.</p>
+                  {errorMsg && <div style={{ marginBottom:10, padding:"9px 11px", borderRadius:10, background:"#f8dfd9", color:"#8d413e", fontSize:11.5 }}>{errorMsg}</div>}
+                  <div style={{ display:"grid", gap:7 }}>
+                    {signals.map((signal, index) => {
+                      const isConstraint = /non |evita|odia|tropp|vincol|lament/i.test(`${signal.key} ${signal.value}`);
+                      return (
+                        <div key={`${signal.key}-${index}`} style={{ minHeight:52, padding:"8px 10px", display:"flex", alignItems:"center", gap:10, border:`1px solid ${isConstraint ? "#d5c69c" : "#dec7b0"}`, borderRadius:13, background:isConstraint ? "#f4f0dc" : "#fffaf4" }}>
+                          <span style={{ width:28, height:28, flexShrink:0, borderRadius:9, display:"grid", placeItems:"center", color:isConstraint ? "#8d7346" : "#9b5756", background:isConstraint ? "#ebe4c4" : "#f2e2d6", fontSize:14 }}>{isConstraint ? "⊘" : "✦"}</span>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            {editingSignals ? (
+                              <>
+                                <input value={signal.key} onChange={event => setSignals(previous => previous.map((item, itemIndex) => itemIndex === index ? { ...item, key:event.target.value } : item))}
+                                  style={{ width:"100%", border:0, borderBottom:"1px solid #dfc7ae", background:"transparent", color:C.ink, fontSize:12.5, fontWeight:700, fontFamily:BODY, padding:"0 0 2px" }}/>
+                                <input value={signal.value} onChange={event => setSignals(previous => previous.map((item, itemIndex) => itemIndex === index ? { ...item, value:event.target.value } : item))}
+                                  style={{ width:"100%", border:0, background:"transparent", color:C.muted4, fontSize:10.5, fontFamily:BODY, padding:"3px 0 0" }}/>
+                              </>
+                            ) : (
+                              <><strong style={{ display:"block", color:C.ink, fontSize:12.5 }}>{signal.key}</strong><small style={{ display:"block", color:C.muted4, fontSize:10, marginTop:1 }}>{signal.value}</small></>
+                            )}
+                          </div>
+                          {editingSignals ? (
+                            <button type="button" onClick={() => setSignals(previous => previous.filter((_, itemIndex) => itemIndex !== index))} aria-label="Rimuovi segnale" style={{ border:0, background:"transparent", color:"#a25e5a", fontSize:17, cursor:"pointer" }}>×</button>
+                          ) : (
+                            <span style={{ padding:"3px 6px", borderRadius:999, background:isConstraint ? "#eadfd1" : "#efe1d8", color:C.muted4, fontSize:8.5 }}>{isConstraint ? "decisivo" : index < 2 ? "forte" : "recente"}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <button type="button" onClick={() => setEditingSignals(editing => !editing)} style={{ alignSelf:"flex-end", marginTop:9, border:0, background:"transparent", color:C.maroon, fontSize:12, fontWeight:700, cursor:"pointer" }}>{editingSignals ? "Fine" : "Correggi"}</button>
+                  <div style={{ marginTop:"auto", paddingTop:12 }}>
+                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9.5, marginBottom:8 }}>L’AI può combinare i segnali oppure esplorare lati diversi di {g.recipientName}.</div>
+                    <button type="button" onClick={generateMobileResults} disabled={!signals.length}
+                      style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:signals.length ? C.maroon : "#ccb9a6", color:"#fff", fontSize:13.5, fontWeight:700, cursor:signals.length ? "pointer" : "not-allowed" }}>
+                      Vai ai risultati
+                    </button>
+                  </div>
+                </section>
+              )}
+
+              {mobileFlow && screen === "loading" && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(64)}
+                  <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", paddingBottom:30 }}>
+                    <div style={{ position:"relative", width:116, height:116, marginBottom:24 }}>
+                      <div className="gc-orbit" style={{ position:"absolute", inset:0 }}><span style={{ position:"absolute", top:1, left:"50%", width:13, height:13, marginLeft:-6, borderRadius:"50%", background:C.maroon }}/><span style={{ position:"absolute", bottom:4, left:12, width:9, height:9, borderRadius:"50%", background:C.gold }}/></div>
+                      <div className="gc-bob" style={{ position:"absolute", inset:28, borderRadius:22, display:"grid", placeItems:"center", background:"linear-gradient(145deg,#9a5555,#6d3434)", boxShadow:"0 12px 28px rgba(124,63,63,.28)" }}><GiftSVG size={27} fill="#f8ead7"/></div>
+                    </div>
+                    <h2 style={{ margin:"0 0 8px", color:C.ink, fontFamily:DISPLAY, fontSize:25 }}>Sto costruendo le scelte per {g.recipientName}.</h2>
+                    <p style={{ margin:0, color:C.muted4, fontSize:13 }}>{LOADING_LINES[loadingLine]}</p>
+                  </div>
+                </section>
+              )}
+
+              {mobileFlow && screen === "results" && gifts.length > 0 && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(refinementRound ? 100 : 82)}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:5 }}>
+                    <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase" }}>{refinementRound ? "Ricerca rifinita" : `Idea ${resultIndex + 1} di ${gifts.length}`}</div>
+                    <button type="button" onClick={() => setScreen("refine")} style={{ padding:"6px 9px", border:"1px solid #d7bca3", borderRadius:999, background:"#fffaf4", color:C.maroon, fontSize:10.5, cursor:"pointer" }}>☷ Rifinisci</button>
+                  </div>
+                  <h1 style={{ margin:"0 0 8px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.08, letterSpacing:"-.03em" }}>{refinementRound ? `Nuove scelte per ${g.recipientName}` : `Scelte per ${g.recipientName}`}</h1>
+                  {refinementRound > 0 && favoriteGifts.length > 0 && (
+                    <div style={{ marginBottom:8, padding:"8px 10px", display:"flex", alignItems:"center", gap:8, border:"1px solid #ddc7b0", borderRadius:12, background:"#fff8f0" }}>
+                      <span style={{ color:C.maroon }}>♥</span><div><small style={{ display:"block", color:"#a45e5b", fontSize:8, fontWeight:800, letterSpacing:".08em", textTransform:"uppercase" }}>Preferito conservato</small><strong style={{ color:C.ink, fontSize:10.5 }}>{favoriteGifts[0].title}</strong></div>
+                    </div>
+                  )}
+                  {renderMobileResultCard(gifts[resultIndex])}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, padding:"8px 0 6px" }}>
+                    <button type="button" onClick={() => setResultIndex(index => (index - 1 + gifts.length) % gifts.length)} aria-label="Idea precedente" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>‹</button>
+                    <div style={{ display:"flex", gap:5 }}>{gifts.map((gift, index) => <span key={gift.id} style={{ width:index === resultIndex ? 13 : 5, height:5, borderRadius:99, background:index === resultIndex ? "#a25b5b" : "#d5c2ae", transition:"all .2s" }}/>)}</div>
+                    <button type="button" onClick={() => setResultIndex(index => (index + 1) % gifts.length)} aria-label="Idea successiva" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>›</button>
+                  </div>
+                  <div style={{ marginTop:"auto", paddingTop:6 }}>
+                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9, marginBottom:7 }}>I preferiti diventano il riferimento del prossimo giro.</div>
+                    <button type="button" onClick={() => setScreen("refine")} style={{ width:"100%", minHeight:44, border:"1px solid #d3b597", borderRadius:12, background:"#fffaf4", color:C.maroon, fontSize:12.5, cursor:"pointer" }}>{refinementRound ? "Rifinisci ancora" : "Rifinisci questi risultati"}</button>
+                  </div>
+                </section>
+              )}
+
+              {mobileFlow && screen === "refine" && (
+                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                  {renderMobileFlowHeader(92)}
+                  <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginBottom:7 }}>Secondo giro</div>
+                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.06, letterSpacing:"-.03em" }}>Tengo ciò che funziona. Cambio il resto.</h1>
+                  <p style={{ margin:"0 0 11px", color:C.muted4, fontSize:11.5 }}>I preferiti restano fermi; il commento diventa una nuova regola.</p>
+                  <div style={{ minHeight:54, padding:"9px 11px", border:"1px solid #ddc7b0", borderRadius:13, background:"#fff9f2", marginBottom:10 }}>
+                    <small style={{ display:"block", color:"#a45e5b", fontSize:8, fontWeight:800, letterSpacing:".08em", textTransform:"uppercase", marginBottom:4 }}>{favoriteGifts.length ? "Da mantenere" : "Punto di partenza"}</small>
+                    <div style={{ display:"flex", alignItems:"center", gap:7, color:C.ink, fontSize:11.5 }}><span style={{ color:C.maroon }}>{favoriteGifts.length ? "♥" : "✦"}</span>{favoriteGifts[0]?.title || gifts[resultIndex]?.title}</div>
+                  </div>
+                  <label htmlFor="gc-refine-text" style={{ color:C.label, fontSize:10, fontWeight:700, marginBottom:6 }}>Cosa vuoi cambiare?</label>
+                  <textarea id="gc-refine-text" autoFocus value={refineText} onChange={event => setRefineText(event.target.value)} placeholder="Mi piace questa direzione, ma vorrei qualcosa di più…"
+                    style={{ width:"100%", minHeight:112, resize:"none", boxSizing:"border-box", padding:"12px", border:"1.5px solid #d39d55", borderRadius:14, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:13.5, lineHeight:1.42 }}/>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:8 }}>
+                    {["Più originale","Niente oggetti","Più economico","Più emozionante"].map(choice => {
+                      const active = refineChoices.includes(choice);
+                      return <button key={choice} type="button" onClick={() => setRefineChoices(previous => active ? previous.filter(item => item !== choice) : [...previous, choice])}
+                        style={{ padding:"7px 9px", border:`1px solid ${active ? "#9d5a58" : "#ddc7b0"}`, borderRadius:999, background:active ? "#9d5a58" : "#fff8ef", color:active ? "#fff" : C.muted4, fontSize:10.5, cursor:"pointer" }}>{choice}</button>;
+                    })}
+                  </div>
+                  {errorMsg && <div style={{ marginTop:9, color:"#963f3d", fontSize:11 }}>{errorMsg}</div>}
+                  <div style={{ marginTop:"auto", paddingTop:12 }}>
+                    <div style={{ textAlign:"center", color:C.muted2, fontSize:9, marginBottom:7 }}>Escludo le idee già viste e applico il nuovo commento.</div>
+                    <button type="button" onClick={refineMobileResults} disabled={refining || (!refineText.trim() && refineChoices.length === 0)}
+                      style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:(!refineText.trim() && !refineChoices.length) ? "#ccb9a6" : C.maroon, color:"#fff", fontSize:13, fontWeight:700, cursor:(!refineText.trim() && !refineChoices.length) ? "not-allowed" : "pointer" }}>
+                      {refining ? "Creo nuove scelte…" : "Crea nuovi risultati"}
+                    </button>
+                  </div>
+                </section>
+              )}
+
               {/* INTAKE */}
               {screen === "intake" && (
                 <div className="gc-intake-wrap" style={{ maxWidth:640, width:"100%", margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
@@ -2059,7 +2436,7 @@ export default function Home() {
               )}
 
               {/* LOADING */}
-              {screen === "loading" && (
+              {!mobileFlow && screen === "loading" && (
                 <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center" }}>
                   <div style={{ position:"relative", width:120, height:120, marginBottom:34 }}>
                     <div className="gc-orbit" style={{ position:"absolute", inset:0 }}>
@@ -2082,7 +2459,7 @@ export default function Home() {
               )}
 
               {/* RESULTS */}
-              {screen === "results" && (
+              {!mobileFlow && screen === "results" && (
                 <div className="gc-fade" style={{ maxWidth:980, width:"100%", margin:"0 auto" }}>
                   <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:20, flexWrap:"wrap", marginBottom:8 }}>
                     <div>
