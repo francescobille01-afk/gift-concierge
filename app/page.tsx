@@ -1606,7 +1606,7 @@ export default function Home() {
     const target = scroller?.querySelector<HTMLElement>(selector);
     if (!scroller || !target) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 78;
+    const top = scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     // Native smooth scrolling and mandatory scroll snapping can compete and
     // send a click back to the previous stop. Pause snapping during the short
@@ -2008,7 +2008,7 @@ export default function Home() {
         .gc-v2-brand{display:flex;align-items:center;gap:13px;padding:0;border:0;background:transparent;color:#fff4e8;text-align:left;cursor:pointer;transition:transform .2s ease,opacity .2s ease}
         .gc-v2-brand:hover{transform:translateY(-1px);opacity:.92}
         .gc-v2-logo{width:52px;height:52px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:16px;background:linear-gradient(145deg,#ffd0ad 0%,#ef735f 78%);box-shadow:0 11px 26px rgba(239,115,95,.3),inset 0 1px 0 rgba(255,255,255,.72);transform:rotate(-3deg)}
-        .gc-v2-wordmark{display:flex;flex-direction:column;gap:3px}.gc-v2-wordmark strong{display:block;font-family:var(--font-cormorant),Georgia,serif;font-size:38px;font-weight:700;font-style:italic;line-height:1;letter-spacing:-.04em;text-shadow:0 4px 18px rgba(0,0,0,.24)}.gc-v2-wordmark small{display:block;margin-left:2px;font-family:'Hanken Grotesk',sans-serif;font-size:8.5px;font-weight:850;line-height:1;letter-spacing:.19em;color:#ffc19f}
+        .gc-v2-wordmark{display:flex;flex-direction:column;gap:8px}.gc-v2-wordmark strong{display:block;font-family:var(--font-cormorant),Georgia,serif;font-size:38px;font-weight:700;font-style:italic;line-height:.86;letter-spacing:-.04em;text-shadow:0 4px 18px rgba(0,0,0,.24)}.gc-v2-wordmark small{display:block;margin-left:2px;font-family:'Hanken Grotesk',sans-serif;font-size:8.5px;font-weight:850;line-height:1.15;letter-spacing:.19em;color:#ffc19f}
         .gc-v2-actions{display:flex;align-items:center;gap:10px}.gc-v2-pill{height:46px;min-width:46px;padding:0 14px;border:1px solid rgba(255,244,232,.34);border-radius:999px;background:rgba(255,244,232,.08);box-shadow:0 10px 26px rgba(3,18,27,.22),inset 0 1px 0 rgba(255,255,255,.12);color:#fff4e8;font:800 12px 'Hanken Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;backdrop-filter:blur(12px);transition:transform .2s ease,border-color .2s ease,background .2s ease}.gc-v2-pill:hover{transform:translateY(-2px);border-color:rgba(255,193,159,.66);background:rgba(255,193,159,.14)}
         .gc-v2-favorites{width:46px;padding:0;color:#ffc19f}.gc-v2-favorites svg{width:21px;height:21px;filter:drop-shadow(0 3px 8px rgba(239,115,95,.24))}.gc-v2-favorites-count{font-size:10px;color:#fff4e8}
         .gc-v2-language{padding:0 13px 0 11px}.gc-v2-language svg{width:18px;height:18px;color:#ffc19f}.gc-v2-language strong{font-size:12px;letter-spacing:.06em}.gc-v2-language-chevron{width:10px!important;height:10px!important;color:#fff4e8!important;opacity:.62}
@@ -2156,7 +2156,7 @@ export default function Home() {
         @media(min-width:901px){.gc-landing{display:block!important}}
 
         /* Real scroll journey: every phase occupies physical page space. */
-        .gc-main.gc-main--flush{scroll-snap-type:y mandatory;scroll-padding-top:78px;scroll-behavior:smooth}
+        .gc-main.gc-main--flush{scroll-snap-type:y mandatory;scroll-padding-top:0;scroll-behavior:smooth}
         .gc-landing{min-height:0!important;background:#17303e!important}
         .gc-landing-v2{position:relative!important;top:auto!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:0!important;background:linear-gradient(180deg,#17303e 0%,#203746 48%,#294b59 100%)!important}
         .gc-landing-v2-header{position:sticky!important;top:0;z-index:80;isolation:isolate;box-sizing:border-box;max-width:none!important;height:82px;padding:15px clamp(18px,4vw,56px) 8px;background:transparent;backdrop-filter:none}
@@ -2203,7 +2203,7 @@ export default function Home() {
         @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px)}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{min-width:250px;margin-top:14px;padding:12px 20px 10px}.gc-v3-scroll-cue span{padding:0;font-size:14px}.gc-v3-scroll-cue b{width:12px;height:12px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
         @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:20px;width:min(270px,calc(100% - 44px));min-width:0}}
-        @media(max-width:900px){.gc-v2-wordmark{gap:2px}.gc-v2-wordmark strong{line-height:1}}
+        @media(max-width:900px){.gc-v2-wordmark{gap:7px}.gc-v2-wordmark strong{line-height:.86}.gc-v2-wordmark small{line-height:1.15}}
         @media(prefers-reduced-motion:reduce){.gc-main.gc-main--flush{scroll-behavior:auto}.gc-v3-hero-glow,.gc-v3-scroll-cue,.gc-v3-scroll-cue span,.gc-v3-scroll-cue b,.gc-v3-next-arrow,.gc-v3-orbit,.gc-v3-search-bar{animation:none!important}.gc-v3-transition,.gc-v3-phase-wash{display:none!important}.gc-v3-art{transition:none!important}.gc-v3-start-inner{opacity:1!important;transform:none!important}}
       `}</style>
 
