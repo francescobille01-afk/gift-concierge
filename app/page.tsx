@@ -1877,7 +1877,9 @@ export default function Home() {
                             <div style={{ marginTop:4, fontSize:12.5, lineHeight:1.35, color:C.muted4 }}>{landingForm.sheetSub}</div>
                           </div>
                           <button type="button" onClick={() => { setLandingSheetOpen(false); setLandingBarFocused(false); }} aria-label="Chiudi"
-                            style={{ width:30, height:30, flexShrink:0, border:`1px solid ${C.bord5}`, borderRadius:"50%", background:"rgba(255,255,255,.55)", color:C.maroon, fontSize:19, lineHeight:1, cursor:"pointer" }}>×</button>
+                            style={{ width:30, height:30, flexShrink:0, padding:0, border:`1px solid ${C.bord5}`, borderRadius:"50%", background:"rgba(255,255,255,.55)", color:C.maroon, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                          </button>
                         </div>
 
                         <div style={{ display:"grid", gap:8 }}>
