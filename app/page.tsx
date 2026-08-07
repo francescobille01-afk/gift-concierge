@@ -62,8 +62,31 @@ const RESULT_PREVIEW = [
 /* Phase 1's example message. Typed out one character at a time from JS —
    a CSS reveal can only wipe the finished text, which reads as a shutter
    opening rather than as somebody writing. */
-const PHASE_ONE_SENTENCE = "“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”";
-const PHASE_ONE_TYPE_MS = 26;
+const PHASE_ONE_SENTENCE = "“Mio fratello si è appena trasferito e ha un terrazzo tutto suo. Va in montagna ogni weekend e la domenica cucina per gli amici.”";
+const PHASE_ONE_TYPE_MS = 19;
+
+/* Phase 2's worked example: what the message in phase 1 gets classified
+   into, and what the analysis weighs those classes out to. */
+const ENGINE_TOKENS = [
+  { kind:"contesto",  label:"casa nuova" },
+  { kind:"spazio",    label:"terrazzo" },
+  { kind:"passione",  label:"montagna" },
+  { kind:"ritmo",     label:"ogni weekend" },
+  { kind:"abitudine", label:"cucina per altri" },
+];
+/* How long the spark takes to run a phase's thread — and therefore how long
+   you stay on a phase before it hands over to the next. Kept in sync with
+   the gcThreadDrop / gcSparkDrop durations in the stylesheet. */
+const PHASE_DWELL_MS = 5400;
+
+/* The five ideas that spill out of the parcel once it opens. */
+const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4], GIFT_SHOWCASE[2]];
+
+const ENGINE_RESULTS = [
+  { label:"Outdoor",   score:88 },
+  { label:"Terrazzo",  score:64 },
+  { label:"Cucina",    score:47 },
+];
 
 const AMAZON_TAG = "gifty0de-21";
 // Testing phase: we only have an amazon.it affiliate link, so force every
@@ -1133,6 +1156,7 @@ export default function Home() {
   const [skipRelPicker, setSkipRelPicker] = useState(false);
   const gcMainRef = useRef<HTMLElement>(null);
   const heroTrackRef = useRef<HTMLDivElement>(null);
+  const activePhaseRef = useRef(0);
   const [step,        setStep]        = useState(0);
   const [stepKey,     setStepKey]     = useState(0);
   const [g,           setG]           = useState<Gathered>(EMPTY);
@@ -1217,29 +1241,15 @@ export default function Home() {
       stops.forEach((element, index) => {
         if (element.getBoundingClientRect().top <= trigger) active = index;
       });
+      // Mirrored into a ref so the hero carousel's frame loop can check it
+      // without the effect having to re-register on every phase change.
+      activePhaseRef.current = active;
       setLandingActivePhase(active);
-    };
-
-    /* The thread down the middle of the journey. Each stop draws its own
-       segment, filled from how far that stop has travelled up the screen, so
-       the line grows downward as you scroll and the segments join into one
-       continuous run. Written straight to a CSS variable rather than React
-       state — this updates on every scroll event and re-rendering the page
-       for it would be wasteful. */
-    const drawThread = () => {
-      const scrollerRect = scroller.getBoundingClientRect();
-      const foot = scrollerRect.top + scroller.clientHeight;
-      stops.forEach(element => {
-        const rect = element.getBoundingClientRect();
-        const fill = (foot - rect.top) / Math.max(1, rect.height);
-        element.style.setProperty("--thread-fill", String(Math.min(1, Math.max(0, fill))));
-      });
     };
 
     const updateLandingProgress = () => {
       const distance = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
       setLandingProgress(Math.min(1, Math.max(0, scroller.scrollTop / distance)));
-      drawThread();
       // Measured straight off the scroll event, not deferred to the next
       // animation frame: the browser already throttles scroll to about one
       // event per frame, and anything frame-based stalls when the tab isn't
@@ -1311,8 +1321,13 @@ export default function Home() {
     const tick = (now: number) => {
       const dt = Math.min(64, now - last);
       last = now;
-      if (!reduced) offset += dt / (SECONDS_PER_CARD * 1000);
-      layout();
+      // Idle while the hero is off screen. Fourteen cards were being
+      // repositioned every frame for the whole journey, competing with the
+      // phase entrances for the same frames.
+      if (activePhaseRef.current === 0) {
+        if (!reduced) offset += dt / (SECONDS_PER_CARD * 1000);
+        layout();
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -1321,6 +1336,19 @@ export default function Home() {
     window.addEventListener("resize", onResize);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
   }, [screen]);
+
+  /* ── The thread reaching the bottom of a phase carries you to the next one.
+     The spark takes PHASE_DWELL_MS to run the length of the line, so the
+     hand-off happens exactly when it lands. Scrolling yourself at any point
+     re-targets the phase and restarts this, so it never fights you. ── */
+  useEffect(() => {
+    if (screen !== "landing") return;
+    if (landingActivePhase < 1 || landingActivePhase > 3) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const next = [".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"][landingActivePhase - 1];
+    const id = window.setTimeout(() => scrollLandingTo(next), PHASE_DWELL_MS);
+    return () => window.clearTimeout(id);
+  }, [screen, landingActivePhase]);
 
   /* ── Phase 1: type the example message out, character by character.
      Rewinds whenever you leave the phase so it replays on the way back. ── */
@@ -2277,7 +2305,18 @@ export default function Home() {
         @keyframes gcScrollPulse{0%,100%{transform:translateY(0)}45%{transform:translateY(6px)}}
         .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         /* The bead riding the leading end of the thread. */
-        .gc-v3-phase:after{content:"";position:absolute;z-index:3;left:50%;top:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--phase-color);box-shadow:0 0 14px var(--phase-color);opacity:calc(var(--thread-fill,0) * (1 - var(--thread-fill,0)) * 4);transform:translateY(calc(var(--thread-fill,0) * 100dvh))}
+        /* The thread only exists where the spark has been. It runs the length
+           of the active phase over PHASE_DWELL_MS and hands over when it lands;
+           a phase already passed keeps its line lit. */
+        .gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(color-mix(in srgb,var(--phase-color) 45%,transparent),var(--phase-color));box-shadow:0 0 26px color-mix(in srgb,var(--phase-color) 55%,transparent)}
+        .gc-v3-phase[data-done=true]:before{transform:scaleY(1)}
+        .gc-v3-phase[data-active=true]:before{animation:gcThreadDrop 5.4s linear both}
+        /* The spark riding its leading end. */
+        .gc-v3-phase:after{content:"";position:absolute;z-index:3;left:50%;top:0;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 24%,var(--phase-color) 62%,transparent 72%);box-shadow:0 0 22px var(--phase-color),0 0 46px color-mix(in srgb,var(--phase-color) 60%,transparent);opacity:0}
+        .gc-v3-phase[data-active=true]:after{animation:gcSparkDrop 5.4s linear both,gcSparkPulse .9s ease-in-out infinite}
+        @keyframes gcThreadDrop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+        @keyframes gcSparkDrop{0%{opacity:0;transform:translateY(0)}4%{opacity:1}94%{opacity:1}100%{opacity:0;transform:translateY(100dvh)}}
+        @keyframes gcSparkPulse{0%,100%{scale:1}50%{scale:1.35}}
         .gc-v3-phase-inner{position:relative;top:0;min-height:calc(100dvh - 78px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
@@ -2301,29 +2340,35 @@ export default function Home() {
         .gc-v3-rail-stop:hover{color:#fff4e8}.gc-v3-rail-stop:hover i{border-color:rgba(255,255,255,.55)}
         @keyframes gcRailPulse{0%,100%{transform:scale(1);opacity:.42}50%{transform:scale(1.22);opacity:0}}
 
-        /* ── Phase 2 art: the analysis, shown happening ──
-           A beam sweeps the sentence, the three words that matter light up,
-           drop into the core as signals, and the core turns them into
-           directions. Stages are chained CSS animations off data-active. */
-        .gc-v3-scan{width:min(540px,100%);display:flex;flex-direction:column;align-items:center;gap:0}
-        .gc-v3-scan-source{position:relative;width:100%;box-sizing:border-box;padding:20px 22px;overflow:hidden;border:1px solid rgba(126,214,203,.24);border-radius:20px;background:linear-gradient(150deg,rgba(18,50,62,.96),rgba(13,38,49,.92));box-shadow:0 18px 40px rgba(2,18,27,.34)}
-        .gc-v3-scan-source span{display:block;color:#a8c2c4;font-family:Georgia,serif;font-size:clamp(15px,1.5vw,19px);line-height:1.5}
-        .gc-v3-scan-source em{position:relative;font-style:normal;font-weight:700;color:#a8c2c4;border-radius:5px;padding:1px 4px;margin:0 -1px;transition:none}
-        .gc-v3-scan-beam{position:absolute;z-index:2;top:0;bottom:0;left:0;width:120px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(126,214,203,.22),rgba(126,214,203,.5),rgba(126,214,203,.22),transparent);opacity:0}
-        .gc-v3-scan-drops{position:relative;width:100%;height:54px}
-        .gc-v3-scan-drops i{position:absolute;top:0;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#7ed6cb;box-shadow:0 0 16px #7ed6cb;opacity:0}
-        .gc-v3-scan-drops i:nth-child(1){left:18%}.gc-v3-scan-drops i:nth-child(2){left:50%}.gc-v3-scan-drops i:nth-child(3){left:80%}
-        .gc-v3-scan-core{position:relative;width:104px;height:104px;flex:0 0 auto;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:32px;background:linear-gradient(148deg,#d9fff8,#7ed6cb 52%,#ef735f);box-shadow:0 22px 50px rgba(3,18,27,.42),0 0 44px rgba(126,214,203,.24)}
-        .gc-v3-scan-core b{color:#12303c;font-size:31px;line-height:1}
-        .gc-v3-scan-core small{position:absolute;bottom:13px;color:#12303c;font-size:7.5px;font-weight:950;letter-spacing:.16em}
-        .gc-v3-scan-ring{position:absolute;inset:-14px;border:1.5px solid rgba(126,214,203,.5);border-radius:38px;opacity:0}
-        .gc-v3-scan-ring-b{inset:-26px;border-radius:46px;border-style:dashed}
-        .gc-v3-scan-out{margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-        .gc-v3-scan-out span{padding:9px 14px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.13);color:#ffe2cd;font:750 12.5px 'Hanken Grotesk',sans-serif;opacity:0}
+        /* ── Phase 2: the analysis running ──
+           Details stream in already tagged, a wave of activation crosses the
+           grid, three weighted directions come out ranked. Transform and
+           opacity only, like the rest of the journey. */
+        .gc-v3-engine{width:min(540px,100%);display:flex;flex-direction:column;align-items:stretch;gap:14px}
+        .gc-v3-engine-feed{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+        .gc-v3-engine-feed span{display:inline-flex;align-items:center;gap:6px;padding:6px 11px 6px 7px;border:1px solid rgba(126,214,203,.26);border-radius:999px;background:rgba(126,214,203,.09);color:#dff3ef;font:700 12px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-engine-feed b{padding:3px 6px;border-radius:999px;background:rgba(126,214,203,.22);color:#7ed6cb;font-size:8.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+        .gc-v3-engine-core{position:relative;padding:16px 18px;border:1px solid rgba(126,214,203,.22);border-radius:18px;background:linear-gradient(150deg,rgba(17,48,60,.96),rgba(12,36,47,.92))}
+        .gc-v3-engine-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:5px}
+        .gc-v3-engine-grid i{aspect-ratio:1;border-radius:2px;background:rgba(126,214,203,.16);opacity:.35}
+        .gc-v3-engine-badge{position:absolute;right:14px;top:-9px;padding:3px 9px;border-radius:999px;background:#7ed6cb;color:#0d2731;font:900 8.5px 'Hanken Grotesk',sans-serif;letter-spacing:.16em}
+        .gc-v3-engine-out{display:flex;flex-direction:column;gap:9px}
+        .gc-v3-engine-out>div{display:grid;grid-template-columns:78px 1fr 30px;align-items:center;gap:10px;opacity:0}
+        .gc-v3-engine-out small{color:#cfe3e0;font:750 12px 'Hanken Grotesk',sans-serif}
+        .gc-v3-engine-out i{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+        .gc-v3-engine-out i>b{position:absolute;inset:0;border-radius:999px;background:linear-gradient(90deg,#7ed6cb,#ffc19f);transform-origin:0 50%;transform:scaleX(0)}
+        .gc-v3-engine-out em{color:#ffc19f;font:900 13px 'Hanken Grotesk',sans-serif;font-style:normal;text-align:right}
         @media(max-width:900px){
-          .gc-v3-scan-source{padding:16px 16px}.gc-v3-scan-drops{height:40px}
-          .gc-v3-scan-core{width:86px;height:86px;border-radius:26px}.gc-v3-scan-core b{font-size:26px}
-          .gc-v3-scan-out{margin-top:18px;gap:6px}.gc-v3-scan-out span{padding:8px 11px;font-size:11.5px}
+          .gc-v3-engine{gap:11px}
+          .gc-v3-engine-feed span{padding:5px 9px 5px 6px;font-size:11px;gap:5px}
+          .gc-v3-engine-feed b{font-size:7.5px;padding:3px 5px}
+          .gc-v3-engine-core{padding:13px 13px}
+          .gc-v3-engine-grid{gap:4px}
+          .gc-v3-engine-out>div{grid-template-columns:66px 1fr 26px;gap:8px}
+          .gc-v3-engine-out small{font-size:11px}
+          .gc-v3-engine-out em{font-size:12px}
+        }
+        @media(max-width:900px){
           .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
         }
         /* Phase 3 cards use the same anatomy as the hero carousel — real
@@ -2354,8 +2399,66 @@ export default function Home() {
         /* Hung off the parcel rather than off the section, so the thread lands
            exactly on the lid at every viewport height instead of stopping
            short of it. */
-        .gc-v3-parcel:before{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:1.5px;height:clamp(200px,40vh,380px);transform-origin:50% 0;transform:translateX(-50%) scaleY(var(--thread-fill,0));background:linear-gradient(#ffc36f,#ef735f);box-shadow:0 0 20px rgba(239,115,95,.45)}
-        .gc-v3-parcel:after{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#ef735f;box-shadow:0 0 14px #ef735f;opacity:calc(var(--thread-fill,0) * (1 - var(--thread-fill,0)) * 4);transform:translateY(calc((var(--thread-fill,0) - 1) * clamp(200px,40vh,380px)))}
+        /* ── What the parcel spills out ──
+           Each card starts inside the box, tiny, and is thrown out on its own
+           arc to a slot along the foot of the screen, landing with a bounce
+           and then breathing. Everything is transform and opacity. */
+        .gc-v3-pops{position:absolute;z-index:4;left:50%;bottom:clamp(46px,7vh,74px);width:0;height:0;pointer-events:none}
+        .gc-v3-pop{position:absolute;left:0;bottom:0;width:clamp(74px,8vw,104px);aspect-ratio:4/5;margin-left:calc(clamp(74px,8vw,104px) / -2);border:1px solid rgba(255,255,255,.16);border-radius:14px;overflow:hidden;background:#0f2733;box-shadow:0 18px 34px rgba(3,18,27,.5);opacity:0}
+        .gc-v3-pop>img{position:absolute;left:0;right:0;top:0;width:100%;height:68%;object-fit:cover;display:block}
+        .gc-v3-pop>b{position:absolute;left:0;right:0;bottom:0;height:32%;box-sizing:border-box;padding:0 6px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,.12);background:linear-gradient(155deg,#102b38,#0b202b);color:#fff4e8;font:750 8.5px/1.1 'Hanken Grotesk',sans-serif;text-align:center}
+        .gc-v3-pop[data-slot="0"]{--pop-x:-2.15;--pop-tilt:-9deg}
+        .gc-v3-pop[data-slot="1"]{--pop-x:-1.08;--pop-tilt:5deg}
+        .gc-v3-pop[data-slot="2"]{--pop-x:0;--pop-tilt:-3deg}
+        .gc-v3-pop[data-slot="3"]{--pop-x:1.08;--pop-tilt:7deg}
+        .gc-v3-pop[data-slot="4"]{--pop-x:2.15;--pop-tilt:-6deg}
+        .gc-v3-start[data-active=true] .gc-v3-pop{animation:gcPopOut .95s cubic-bezier(.22,.72,.3,1) both,gcPopBreathe 3.4s ease-in-out infinite}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.35s,2.3s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:1.5s,2.45s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="4"]{animation-delay:1.95s,2.9s}
+        @keyframes gcPopOut{
+          0%{opacity:0;transform:translate(0,calc(-1 * clamp(150px,22vh,240px))) scale(.06) rotate(0)}
+          14%{opacity:1}
+          52%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px) * 1.04),calc(-1 * clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
+          76%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),6px) scale(.97) rotate(var(--pop-tilt))}
+          89%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),-9px) scale(1.02) rotate(var(--pop-tilt))}
+          100%{opacity:1;transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),0) scale(1) rotate(var(--pop-tilt))}
+        }
+        @keyframes gcPopBreathe{
+          0%,100%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),0) rotate(var(--pop-tilt))}
+          50%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),-7px) rotate(calc(var(--pop-tilt) * .82))}
+        }
+        @media(max-width:900px){
+          .gc-v3-pops{bottom:clamp(40px,6vh,60px)}
+          .gc-v3-pop{width:60px;margin-left:-30px;border-radius:11px}
+          .gc-v3-pop>b{font-size:7px;padding:0 4px}
+          .gc-v3-pop[data-slot="0"]{--pop-x:-2.1}
+          .gc-v3-pop[data-slot="1"]{--pop-x:-1.05}
+          .gc-v3-pop[data-slot="3"]{--pop-x:1.05}
+          .gc-v3-pop[data-slot="4"]{--pop-x:2.1}
+          @keyframes gcPopOut{
+            0%{opacity:0;transform:translate(0,-160px) scale(.06)}
+            14%{opacity:1}
+            52%{transform:translate(calc(var(--pop-x) * 62px),-46px) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
+            76%{transform:translate(calc(var(--pop-x) * 60px),5px) scale(.97) rotate(var(--pop-tilt))}
+            89%{transform:translate(calc(var(--pop-x) * 60px),-7px) scale(1.02) rotate(var(--pop-tilt))}
+            100%{opacity:1;transform:translate(calc(var(--pop-x) * 60px),0) scale(1) rotate(var(--pop-tilt))}
+          }
+          @keyframes gcPopBreathe{
+            0%,100%{transform:translate(calc(var(--pop-x) * 60px),0) rotate(var(--pop-tilt))}
+            50%{transform:translate(calc(var(--pop-x) * 60px),-5px) rotate(calc(var(--pop-tilt) * .82))}
+          }
+        }
+        /* The last run of the thread, hung off the parcel so it meets the lid
+           at any viewport height. Brighter and thicker than the rest — this is
+           where it arrives. */
+        .gc-v3-parcel:before{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(#ffc36f,#ef735f);box-shadow:0 0 30px rgba(239,115,95,.7)}
+        .gc-v3-parcel:after{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle,#fff4e8 26%,#ffc36f 60%,transparent 72%);box-shadow:0 0 26px #ef735f,0 0 54px rgba(255,195,111,.7);opacity:0}
+        .gc-v3-start[data-active=true] .gc-v3-parcel:before{animation:gcThreadDrop 1.15s linear both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel:after{animation:gcParcelSpark 1.15s linear both}
+        @keyframes gcParcelSpark{0%{opacity:0;transform:translateY(calc(-1 * clamp(200px,40vh,380px))) scale(.6)}8%{opacity:1}88%{opacity:1;transform:translateY(-14px) scale(1.25)}100%{opacity:0;transform:translateY(0) scale(.4)}}
         .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,180,.55),rgba(239,115,95,.16) 42%,transparent 66%);opacity:0}
         .gc-v3-parcel-box{position:absolute;left:50%;bottom:0;width:68px;height:60px;margin-left:-34px;border-radius:14px;background:linear-gradient(150deg,#ffc19f,#ef735f 72%);box-shadow:0 16px 34px rgba(4,20,29,.34),inset 0 1px 0 rgba(255,255,255,.5);transform-origin:50% 100%}
         .gc-v3-parcel-box>b{position:absolute;left:50%;top:0;bottom:0;width:8px;margin-left:-4px;background:rgba(23,48,62,.32)}
@@ -2435,30 +2538,28 @@ export default function Home() {
         /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
            that matter light up in turn, drop into the core as signals, the core
            absorbs each one, then the directions rise out of it. */
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-beam{animation:gcScanSweep 1.25s .18s cubic-bezier(.4,0,.5,1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em{animation:gcWordHit .45s cubic-bezier(.16,.8,.2,1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(1){animation-delay:.48s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(2){animation-delay:.7s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(3){animation-delay:.92s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i{animation:gcSignalDrop .58s cubic-bezier(.5,0,.75,.4) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(1){animation-delay:.78s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(2){animation-delay:1s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(3){animation-delay:1.22s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-core{animation:gcCoreIgnite .55s 0s cubic-bezier(.16,.86,.22,1.14) both,gcCoreAbsorb .42s 1.2s ease-out 3}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring{animation:gcCoreRing 1.6s 1.2s ease-out infinite}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring-b{animation-delay:1.6s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span{animation:gcDirectionRise .5s cubic-bezier(.14,.86,.22,1.14) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(1){animation-delay:1.5s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(2){animation-delay:1.64s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(3){animation-delay:1.78s}
-        @keyframes gcScanSweep{0%{opacity:0;transform:translateX(-130px)}12%{opacity:1}88%{opacity:1}100%{opacity:0;transform:translateX(560px)}}
-        @keyframes gcWordHit{0%{color:#a8c2c4;background:transparent}45%{color:#0d2731;background:#7ed6cb}100%{color:#7ed6cb;background:rgba(126,214,203,.16)}}
-        @keyframes gcSignalDrop{0%{opacity:0;transform:translateY(-6px) scale(.4)}25%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(54px) scale(.3)}}
-        @keyframes gcCoreIgnite{0%{opacity:0;transform:scale(.4) rotate(-30deg)}100%{opacity:1;transform:none}}
-        @keyframes gcCoreAbsorb{0%,100%{transform:scale(1)}40%{transform:scale(1.08)}}
-        @keyframes gcCoreRing{0%{opacity:.7;transform:scale(.86)}100%{opacity:0;transform:scale(1.5)}}
-        @keyframes gcDirectionRise{0%{opacity:0;transform:translateY(20px) scale(.8)}70%{opacity:1;transform:translateY(-3px) scale(1.04)}100%{opacity:1;transform:none}}
+        /* Phase 2 sequence: tokens stream in (0-0.7s) → activation crosses the
+           grid diagonally (0.7-1.4s) → the ranked bars fill (1.4s+). */
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span{animation:gcTokenIn .42s cubic-bezier(.16,.86,.22,1.12) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(1){animation-delay:.04s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(2){animation-delay:.16s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(3){animation-delay:.28s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(4){animation-delay:.4s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(5){animation-delay:.52s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-core{animation:gcCardLand .5s .3s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-grid i{animation:gcCellFire 1.15s cubic-bezier(.3,.7,.4,1) infinite;animation-delay:calc(.62s + var(--cell,0) * .055s)}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div{animation:gcRankIn .44s cubic-bezier(.16,.86,.22,1.1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(1){animation-delay:1.32s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(2){animation-delay:1.46s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(3){animation-delay:1.6s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out i>b{animation:gcBarFill .72s cubic-bezier(.2,.8,.28,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(1) i>b{animation-delay:1.44s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(2) i>b{animation-delay:1.58s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(3) i>b{animation-delay:1.72s}
+        @keyframes gcTokenIn{0%{opacity:0;transform:translateX(-26px) scale(.86)}70%{opacity:1;transform:translateX(3px) scale(1.03)}100%{opacity:1;transform:none}}
+        @keyframes gcCellFire{0%,72%,100%{opacity:.3;transform:scale(1)}18%{opacity:1;transform:scale(1.32)}44%{opacity:.55;transform:scale(1.06)}}
+        @keyframes gcRankIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
+        @keyframes gcBarFill{0%{transform:scaleX(0)}100%{transform:scaleX(var(--bar,1))}}
         /* Phase 3 — dealing a hand. The three cards arrive as one stack from
            below, then fan out centre, left, right, one after another. */
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}
@@ -2683,7 +2784,7 @@ export default function Home() {
                     <button type="button" className="gc-v3-scroll-cue" onClick={() => scrollLandingTo(".gc-v3-phase-one")}><span>Scorri in basso per continuare</span><b aria-hidden="true"/></button>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-one" data-active={landingActivePhase === 1}>
+                  <section className="gc-v3-phase gc-v3-phase-one" data-active={landingActivePhase === 1} data-done={landingActivePhase > 1}>
                     
                     <div className="gc-v3-phase-inner">
                       <div className="gc-v3-copy"><StepRail active={1} onGo={scrollLandingTo} /><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
@@ -2692,43 +2793,59 @@ export default function Home() {
                           <span className="gc-v3-typed-copy">{PHASE_ONE_SENTENCE.slice(0, typedCount)}<i className="gc-v3-caret" aria-hidden="true"/></span>
                           <i/><i/><i/>
                         </div>
-                        <span className="gc-v3-float-chip gc-v3-chip-a">Trekking</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Pratico</span>
+                        <span className="gc-v3-float-chip gc-v3-chip-a">Montagna</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Casa nuova</span>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-two" data-active={landingActivePhase === 2}>
+                  <section className="gc-v3-phase gc-v3-phase-two" data-active={landingActivePhase === 2} data-done={landingActivePhase > 2}>
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
-                      <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Riconosce le parole che contano, le trasforma in indizi e da lì costruisce le direzioni da esplorare.</p></div>
+                      <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Classifica le informazioni e le utilizza per costruire una rigorosa analisi.</p></div>
                       {/* The analysis shown as it happens: a beam sweeps the
                           sentence, the three words that matter light up and
                           fall into the core as signals, the core turns them
                           into directions. Each stage is a CSS animation keyed
                           off data-active, so it replays on every arrival. */}
-                      <div className="gc-v3-art gc-v3-scan">
-                        <div className="gc-v3-scan-source">
-                          <i className="gc-v3-scan-beam" aria-hidden="true"/>
-                          <span>“Fa <em>trekking</em> ogni <em>domenica</em>, cucina spesso e <em>odia gli oggetti inutili</em>.”</span>
+                      {/* The analysis as a machine you can watch run: the
+                          details stream in as tagged tokens, a wave of
+                          activation crosses the grid, and three weighted
+                          directions come out ranked. */}
+                      <div className="gc-v3-art gc-v3-engine">
+                        <div className="gc-v3-engine-feed" aria-hidden="true">
+                          {ENGINE_TOKENS.map(token => (
+                            <span key={token.label} data-kind={token.kind}><b>{token.kind}</b>{token.label}</span>
+                          ))}
                         </div>
-                        <div className="gc-v3-scan-drops" aria-hidden="true"><i/><i/><i/></div>
-                        <div className="gc-v3-scan-core">
-                          <i className="gc-v3-scan-ring"/><i className="gc-v3-scan-ring gc-v3-scan-ring-b"/>
-                          <b>✦</b><small>ANALISI</small>
+                        <div className="gc-v3-engine-core" aria-hidden="true">
+                          <div className="gc-v3-engine-grid">
+                            {Array.from({ length: 36 }, (_, cell) => (
+                              /* Column + row, so the activation crosses the grid
+                                 as a diagonal wave rather than row by row. */
+                              <i key={cell} style={{ ["--cell" as string]: (cell % 12) + Math.floor(cell / 12) }} />
+                            ))}
+                          </div>
+                          <span className="gc-v3-engine-badge">GIFTY AI</span>
                         </div>
-                        <div className="gc-v3-scan-out">
-                          <span>Attrezzatura outdoor</span><span>Esperienze in cucina</span><span>Solo cose che userà</span>
+                        <div className="gc-v3-engine-out" aria-hidden="true">
+                          {ENGINE_RESULTS.map(result => (
+                            <div key={result.label} style={{ ["--bar" as string]: result.score / 100 }}>
+                              <small>{result.label}</small>
+                              <i><b/></i>
+                              <em>{result.score}</em>
+                            </div>
+                          ))}
                         </div>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-three" data-active={landingActivePhase === 3}>
+                  <section className="gc-v3-phase gc-v3-phase-three" data-active={landingActivePhase === 3} data-done={landingActivePhase > 3}>
                     
                     <div className="gc-v3-phase-inner">
-                      <div className="gc-v3-copy"><StepRail active={3} onGo={scrollLandingTo} /><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
+                      <div className="gc-v3-copy"><StepRail active={3} onGo={scrollLandingTo} /><h2>Scegli il regalo giusto.</h2><p>Ricevi proposte acquistabili direttamente su Amazon. Salva, scarta o rifinisci ogni singola idea.</p></div>
                       {/* Real gift cards, same anatomy as the hero carousel —
                           the results you get should look like the results we
                           promised on the way in. */}
@@ -2767,6 +2884,16 @@ export default function Home() {
                       <button type="button" className="gc-v3-search-bar" onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}>
                         <span aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></span><strong>{g.recipientName || landingForm.nameLabel}</strong><b>›</b>
                       </button>
+                    </div>
+                    {/* What comes out of the box: real ideas, one after the
+                        other, landing along the foot of the screen. */}
+                    <div className="gc-v3-pops" aria-hidden="true">
+                      {PARCEL_POPS.map((item, i) => (
+                        <span key={item.title} className="gc-v3-pop" data-slot={i}>
+                          <img src={item.photo} alt="" decoding="async" style={{ objectPosition:item.position }} />
+                          <b>{item.title}</b>
+                        </span>
+                      ))}
                     </div>
                     <div className="gc-v3-legal">
                       <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer">Privacy Policy</a><span>·</span><button onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}>Preferenze cookie</button>
