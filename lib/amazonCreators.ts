@@ -85,25 +85,81 @@ async function getAccessToken(): Promise<string> {
   return cachedToken.value;
 }
 
-async function callApi(operation: string, body: Record<string, unknown>): Promise<any> {
-  const token = await getAccessToken();
-  const res = await fetch(`${API_HOST}/catalog/v1/${operation}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "x-marketplace": MARKETPLACE,
-    },
-    body: JSON.stringify({ marketplace: MARKETPLACE, partnerTag: PARTNER_TAG, ...body }),
-  });
+/* Amazon caps requests per second and answers 429 when you go over. Retrying
+   is on us — the official SDK doesn't do it either; the docs say rate limiting
+   and retries are the caller's responsibility. Without this, one throttled
+   call means a gift card with no photo and no price. */
+const MAX_ATTEMPTS = 3;
+const BASE_BACKOFF_MS = 450;
 
-  if (!res.ok) {
+function shouldRetry(status: number): boolean {
+  // 429 = throttled, 5xx = their side. Any other 4xx is our bug; retrying
+  // it just wastes the quota that made us throttle in the first place.
+  return status === 429 || status >= 500;
+}
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function callApi(operation: string, body: Record<string, unknown>): Promise<any> {
+  let lastError = "";
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const token = await getAccessToken();
+    const res = await fetch(`${API_HOST}/catalog/v1/${operation}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "x-marketplace": MARKETPLACE,
+      },
+      body: JSON.stringify({ marketplace: MARKETPLACE, partnerTag: PARTNER_TAG, ...body }),
+    });
+
+    if (res.ok) return res.json();
+
     const text = await res.text();
-    // A stale token is the one failure worth retrying blind.
-    if (res.status === 401) cachedToken = null;
-    throw new Error(`Amazon ${operation} failed (${res.status}): ${text.slice(0, 300)}`);
+    lastError = `${res.status}: ${text.slice(0, 300)}`;
+
+    // An expired token looks like a hard failure but isn't — drop it and the
+    // next attempt fetches a fresh one.
+    if (res.status === 401) {
+      cachedToken = null;
+      if (attempt < MAX_ATTEMPTS) continue;
+    }
+
+    if (!shouldRetry(res.status) || attempt === MAX_ATTEMPTS) break;
+
+    // Honour Retry-After when they send one, otherwise back off exponentially
+    // with jitter so simultaneous callers don't all return at the same instant.
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const backoff = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : BASE_BACKOFF_MS * 2 ** (attempt - 1) + Math.random() * 200;
+    await wait(backoff);
   }
-  return res.json();
+
+  throw new Error(`Amazon ${operation} failed after ${MAX_ATTEMPTS} attempts (${lastError})`);
+}
+
+/* Resolving a set of gifts means several lookups at once, which is exactly how
+   you hit the per-second cap. Run them a couple at a time instead: slower by a
+   fraction of a second, and it mostly avoids the throttling rather than
+   recovering from it. */
+export async function mapLimited<T, R>(
+  items: T[],
+  limit: number,
+  task: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await task(items[index]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
 }
 
 const RESOURCES = [
