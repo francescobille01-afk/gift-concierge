@@ -51,6 +51,14 @@ const GIFT_SHOWCASE = [
   { photo:"https://images.unsplash.com/photo-1743110727935-0dc8abf01509?auto=format&fit=crop&w=760&h=950&q=80", position:"center 38%", category:"Cucina", title:"Coltello da chef forgiato", recipient:"Per Elena", budget:"€80-120", occasion:"Nuova casa", interest:"Cucina" },
 ];
 
+/* Phase 3 shows real gift cards, not placeholders — the same three the
+   example recipient in phase 1 would actually get. */
+const RESULT_PREVIEW = [
+  GIFT_SHOWCASE[1], // zaino da trekking  → "fa trekking ogni domenica"
+  GIFT_SHOWCASE[6], // coltello da chef   → "cucina spesso"
+  GIFT_SHOWCASE[4], // monstera            → "odia gli oggetti inutili"
+];
+
 const AMAZON_TAG = "gifty0de-21";
 // Testing phase: we only have an amazon.it affiliate link, so force every
 // Amazon URL onto that domain regardless of which Amazon TLD it came from.
@@ -1074,21 +1082,51 @@ function InterestDeepDiveStep({ g, setG, tr }: { g: Gathered; setG: React.Dispat
   );
 }
 
-function PhaseTransition({ phase, number }:{ phase:number; number:string }) {
-  const burst = Math.sin(phase * Math.PI);
-  const spread = 42 + phase * 210;
+/* The scene entrance behind each phase. Driven purely by the parent's
+   data-active attribute (CSS animations) — it used to ALSO carry inline
+   styles tied to scroll position, so the entrance played once as you
+   scrolled in, then restarted from zero when the scroll settled. That
+   double-drive is what read as a false start. */
+function PhaseTransition({ number }:{ number:string }) {
   return (
     <>
-      <div className="gc-v3-phase-wash" aria-hidden="true" style={{ opacity:.08 + burst * .72, transform:`scale(${.68 + phase * .72}) rotate(${phase * 24}deg)` }}/>
-      <div className="gc-v3-transition" aria-hidden="true" style={{ opacity:burst * .92, transform:`translate(-50%,-50%) scale(${.48 + phase * .8}) rotate(${(phase - .5) * 14}deg)` }}>
-        <span className="gc-v3-transition-ring" style={{ transform:`rotate(${phase * 150}deg) scale(${.72 + phase * .46})` }}/>
-        <b className="gc-v3-transition-number" style={{ transform:`translateY(${(1 - phase) * 34}px) scale(${1.22 - phase * .28})` }}>{number}</b>
-        <i className="gc-v3-transition-spark" style={{ transform:`translate(${spread}px,${-spread * .62}px) rotate(${phase * 220}deg)` }}/>
-        <i className="gc-v3-transition-spark" style={{ transform:`translate(${-spread * .82}px,${-spread * .38}px) rotate(${-phase * 170}deg)` }}/>
-        <i className="gc-v3-transition-spark" style={{ transform:`translate(${spread * .7}px,${spread * .72}px) rotate(${phase * 120}deg)` }}/>
-        <i className="gc-v3-transition-spark" style={{ transform:`translate(${-spread}px,${spread * .54}px) rotate(${-phase * 260}deg)` }}/>
+      <div className="gc-v3-phase-wash" aria-hidden="true"/>
+      <div className="gc-v3-transition" aria-hidden="true">
+        <span className="gc-v3-transition-ring"/>
+        <b className="gc-v3-transition-number">{number}</b>
+        <i className="gc-v3-transition-spark"/><i className="gc-v3-transition-spark"/>
+        <i className="gc-v3-transition-spark"/><i className="gc-v3-transition-spark"/>
       </div>
     </>
+  );
+}
+
+/* Replaces the "PASSAGGIO 01" label: three numbered stops on a rail, the
+   current one filled, the others clickable to jump straight there. Shows
+   at a glance that the journey is three steps and where you are in it. */
+const PHASE_STOPS = [
+  { n:1, selector:".gc-v3-phase-one",   label:"Racconta" },
+  { n:2, selector:".gc-v3-phase-two",   label:"Analisi" },
+  { n:3, selector:".gc-v3-phase-three", label:"Risultati" },
+];
+
+function StepRail({ active, onGo }:{ active:number; onGo:(selector:string)=>void }) {
+  return (
+    <div className="gc-v3-rail" role="group" aria-label={`Passaggio ${active} di 3`}>
+      {PHASE_STOPS.map(stop => (
+        <button
+          key={stop.n}
+          type="button"
+          className="gc-v3-rail-stop"
+          data-state={stop.n === active ? "current" : stop.n < active ? "done" : "next"}
+          aria-current={stop.n === active ? "step" : undefined}
+          onClick={() => onGo(stop.selector)}
+        >
+          <i>{stop.n === active ? <b/> : null}</i>
+          <span>{stop.label}</span>
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -1161,11 +1199,10 @@ export default function Home() {
   const selectedFavoriteGroup = selectedFavorite ? favoriteSearches.find(search => search.id === selectedFavorite.groupId) : undefined;
   const selectedFavoriteGift = selectedFavoriteGroup?.gifts.find(gift => gift.id === selectedFavorite?.giftId);
   const landingStep = landingProgress < .25 ? 0 : landingProgress < .50 ? 1 : 2;
-  const scrollPhase = (start: number, end: number) => Math.min(1, Math.max(0, (landingProgress - start) / (end - start)));
-  const landingPhase1 = scrollPhase(.02, .22);
-  const landingPhase2 = scrollPhase(.25, .47);
-  const landingPhase3 = scrollPhase(.50, .72);
-  const landingStartPhase = scrollPhase(.75, .97);
+  // The per-phase scroll fractions that used to drive the reveal inline are
+  // gone: each phase now animates once, on arrival, from its data-active
+  // attribute. Driving the same elements from both scroll position and a
+  // CSS animation is what made every entrance look like a false start.
 
   useEffect(() => setHasMounted(true), []);
 
@@ -1985,7 +2022,12 @@ export default function Home() {
   /* ─────────────────────────────── RENDER ─────────────────────── */
   return (
     <>
-      <style suppressHydrationWarning>{`
+      {/* Written with dangerouslySetInnerHTML, not as a text child: React
+          HTML-escapes text children during server rendering, which turned
+          every child combinator in here into ".foo&gt;bar" and silently
+          killed those rules (the close button of the legal popup, the photo
+          clipping on the hero cards, the search-bar icon, and ~12 more). */}
+      <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
         @keyframes gcfade  { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none} }
         @keyframes gcorbit { to{transform:rotate(360deg)} }
@@ -2029,7 +2071,10 @@ export default function Home() {
         .gc-v2-brand{display:flex;align-items:center;gap:13px;padding:0;border:0;background:transparent;color:#fff4e8;text-align:left;cursor:pointer;transition:transform .2s ease,opacity .2s ease}
         .gc-v2-brand:hover{transform:translateY(-1px);opacity:.92}
         .gc-v2-logo{width:52px;height:52px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:16px;background:linear-gradient(145deg,#ffd0ad 0%,#ef735f 78%);box-shadow:0 11px 26px rgba(239,115,95,.3),inset 0 1px 0 rgba(255,255,255,.72);transform:rotate(-3deg)}
-        .gc-v2-wordmark{display:flex;flex-direction:column;gap:8px}.gc-v2-wordmark strong{display:block;font-family:var(--font-cormorant),Georgia,serif;font-size:38px;font-weight:700;font-style:italic;line-height:.86;letter-spacing:-.04em;text-shadow:0 4px 18px rgba(0,0,0,.24)}.gc-v2-wordmark small{display:block;margin-left:2px;font-family:'Hanken Grotesk',sans-serif;font-size:8.5px;font-weight:850;line-height:1.15;letter-spacing:.19em;color:#ffc19f}
+        /* One font for the whole wordmark. It was set in an italic serif,
+           where the lowercase "Gifty" and the capital "AI" read as two
+           different typefaces even though they weren't. */
+        .gc-v2-wordmark{display:flex;flex-direction:column;gap:8px}.gc-v2-wordmark strong{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:33px;font-weight:800;font-style:normal;line-height:.9;letter-spacing:-.045em;text-shadow:0 4px 18px rgba(0,0,0,.24)}.gc-v2-wordmark small{display:block;margin-left:2px;font-family:'Hanken Grotesk',sans-serif;font-size:8.5px;font-weight:850;line-height:1.15;letter-spacing:.19em;color:#ffc19f}
         .gc-v2-actions{display:flex;align-items:center;gap:10px}.gc-v2-pill{height:46px;min-width:46px;padding:0 14px;border:1px solid rgba(255,244,232,.34);border-radius:999px;background:rgba(255,244,232,.08);box-shadow:0 10px 26px rgba(3,18,27,.22),inset 0 1px 0 rgba(255,255,255,.12);color:#fff4e8;font:800 12px 'Hanken Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;backdrop-filter:blur(12px);transition:transform .2s ease,border-color .2s ease,background .2s ease}.gc-v2-pill:hover{transform:translateY(-2px);border-color:rgba(255,193,159,.66);background:rgba(255,193,159,.14)}
         .gc-v2-favorites{width:46px;padding:0;color:#ffc19f}.gc-v2-favorites svg{width:21px;height:21px;filter:drop-shadow(0 3px 8px rgba(239,115,95,.24))}.gc-v2-favorites-count{font-size:10px;color:#fff4e8}
         .gc-v2-language{padding:0 13px 0 11px}.gc-v2-language svg{width:18px;height:18px;color:#ffc19f}.gc-v2-language strong{font-size:12px;letter-spacing:.06em}.gc-v2-language-chevron{width:10px!important;height:10px!important;color:#fff4e8!important;opacity:.62}
@@ -2044,25 +2089,25 @@ export default function Home() {
            edge on purpose — the lane is 100vw regardless of page padding. */
         .gc-v3-marquee{position:relative;width:100vw;max-width:100vw;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;perspective:1250px;perspective-origin:50% 50%;overflow-x:clip;-webkit-mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent);mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent)}
         .gc-v3-marquee-track{position:relative;width:0;height:0;transform-style:preserve-3d}
-        .gc-v3-marquee-card{--gc-card-panel:146px;position:absolute;top:0;left:0;height:min(52vh,540px);aspect-ratio:4/5;margin-top:calc(min(52vh,540px) / -2);margin-left:calc(min(52vh,540px) * 0.4 * -1);border:1px solid rgba(255,255,255,.13);border-radius:26px;overflow:hidden;background:#102733;box-shadow:0 28px 64px rgba(0,0,0,.48);will-change:transform,opacity;backface-visibility:hidden}
+        .gc-v3-marquee-card{--gc-card-panel:170px;position:absolute;top:0;left:0;height:min(58vh,600px);aspect-ratio:4/5;margin-top:calc(min(58vh,600px) / -2);margin-left:calc(min(58vh,600px) * 0.4 * -1);border:1px solid rgba(255,255,255,.13);border-radius:26px;overflow:hidden;background:#102733;box-shadow:0 28px 64px rgba(0,0,0,.48);will-change:transform,opacity;backface-visibility:hidden}
         .gc-v3-marquee-card>img{position:absolute;left:0;right:0;top:0;width:100%;height:calc(100% - var(--gc-card-panel));object-fit:cover;display:block}
         .gc-v3-marquee-fade{position:absolute;left:0;right:0;top:0;height:calc(100% - var(--gc-card-panel));background:linear-gradient(180deg,rgba(21,43,56,.02) 58%,rgba(10,31,41,.25) 100%);pointer-events:none}
         .gc-v3-marquee-cat{position:absolute;top:16px;left:16px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);color:#fff4e8;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
         .gc-v3-marquee-body{position:absolute;left:0;right:0;bottom:0;height:var(--gc-card-panel);box-sizing:border-box;padding:15px 15px 12px;display:flex;flex-direction:column;align-items:center;border-top:1px solid rgba(255,255,255,.14);background:linear-gradient(155deg,#102b38,#0b202b);box-shadow:0 -12px 28px rgba(4,19,27,.12),inset 0 1px 0 rgba(255,255,255,.05);color:#fff4e8;text-align:center}
-        .gc-v3-marquee-body strong{min-height:42px;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,1.45vw,20px);font-weight:750;line-height:1.08;letter-spacing:-.02em;text-shadow:0 2px 10px rgba(0,0,0,.35)}
-        .gc-v3-marquee-body p{margin:2px 0 10px;font-family:var(--font-cormorant),Georgia,serif;font-size:15px;font-weight:650;font-style:italic;line-height:1;color:#ffc19f}
-        .gc-v3-marquee-criteria{width:100%;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;font-weight:750;color:#ffd4b8;flex-wrap:wrap}
-        .gc-v3-marquee-criteria span{padding:4px 7px;border:1px solid rgba(255,193,159,.24);border-radius:999px;background:rgba(255,193,159,.12);line-height:1}
+        .gc-v3-marquee-body strong{min-height:44px;display:flex;align-items:center;justify-content:center;font-size:clamp(17px,1.55vw,21px);font-weight:750;line-height:1.1;letter-spacing:-.02em;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+        .gc-v3-marquee-body p{margin:3px 0 11px;font-size:14.5px;font-weight:750;line-height:1;letter-spacing:.01em;color:#ffc19f}
+        .gc-v3-marquee-criteria{width:100%;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:750;color:#ffe2cd;flex-wrap:wrap}
+        .gc-v3-marquee-criteria span{padding:6px 10px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(255,193,159,.17);line-height:1}
         .gc-v3-marquee-criteria i{display:none}
         @media(max-width:640px){
-          .gc-v3-marquee-card{--gc-card-panel:138px;height:min(44vh,410px);margin-top:calc(min(44vh,410px) / -2);margin-left:calc(min(44vh,410px) * 0.4 * -1);border-radius:22px}
-          .gc-v3-marquee-body{padding:13px 11px 10px}.gc-v3-marquee-body strong{min-height:38px;font-size:15.5px}.gc-v3-marquee-body p{font-size:14px;margin-bottom:8px}.gc-v3-marquee-criteria{gap:4px;font-size:9px}.gc-v3-marquee-criteria span{padding:4px 6px}
+          .gc-v3-marquee-card{--gc-card-panel:158px;height:min(52vh,480px);margin-top:calc(min(52vh,480px) / -2);margin-left:calc(min(52vh,480px) * 0.4 * -1);border-radius:22px}
+          .gc-v3-marquee-body{padding:14px 10px 11px}.gc-v3-marquee-body strong{min-height:40px;font-size:16.5px}.gc-v3-marquee-body p{font-size:14px;margin-bottom:9px}.gc-v3-marquee-criteria{gap:5px;font-size:11.5px}.gc-v3-marquee-criteria span{padding:5px 8px}
           .gc-v3-marquee{perspective:900px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
         }
         .gc-v2-node{position:absolute;z-index:3;width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#294b59;border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 24px rgba(3,18,27,.28);opacity:.38;transform:scale(.86);transition:.42s cubic-bezier(.2,.8,.2,1)}.gc-v2-node[data-active=true]{opacity:1;transform:scale(1);background:linear-gradient(145deg,#ffc19f,#ef735f);color:#17303e;box-shadow:0 0 0 7px rgba(239,115,95,.12),0 12px 28px rgba(3,18,27,.34)}.gc-v2-node-1{left:4.5%;top:144px}.gc-v2-node-2{left:67%;top:98px}.gc-v2-node-3{right:2%;top:82px}
         .gc-v2-step{position:absolute;z-index:2;width:29%;padding:16px 17px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(15,39,51,.65);box-shadow:0 16px 38px rgba(4,20,29,.22);backdrop-filter:blur(9px);opacity:.18;transform:translateY(12px);transition:.52s cubic-bezier(.2,.8,.2,1)}.gc-v2-step[data-visible=true]{opacity:1;transform:none}.gc-v2-step small{color:#ef735f;font-size:9px;font-weight:800;letter-spacing:.18em}.gc-v2-step h2{margin:5px 0 5px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(18px,1.7vw,24px);font-weight:700;line-height:1.05;letter-spacing:-.03em}.gc-v2-step p{margin:0;color:#b9ccca;font-size:12px;line-height:1.35}.gc-v2-step-1{left:0;bottom:8px}.gc-v2-step-2{left:35.5%;bottom:8px}.gc-v2-step-3{right:0;bottom:8px}
         .gc-v2-example{margin-top:12px;padding:9px 10px;border-left:2px solid #ef735f;background:rgba(255,255,255,.05);color:#f1ddd1;font-size:10.5px;line-height:1.35}.gc-v2-signals{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}.gc-v2-signals span{padding:5px 7px;border-radius:999px;background:rgba(255,193,159,.12);border:1px solid rgba(255,193,159,.2);color:#ffd3bb;font-size:9px;font-weight:700}.gc-v2-products{display:flex;gap:6px;margin-top:10px}.gc-v2-products span{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#fff4e8;box-shadow:0 5px 14px rgba(0,0,0,.18);font-size:16px}
-        .gc-v2-legal{position:absolute;z-index:6;left:50%;bottom:145px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;white-space:nowrap;color:#9db3b1;font-size:11px}.gc-v2-legal a,.gc-v2-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}.gc-v2-info{width:23px;height:23px;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(9,29,40,.32);color:#ffc19f;font-weight:800;cursor:pointer}.gc-v2-disclaimer{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:270px;white-space:normal;padding:14px;border-radius:14px;background:#fff8ef;color:#203746;box-shadow:0 18px 40px rgba(0,0,0,.3);font-size:11px;line-height:1.45}.gc-v2-disclaimer>button{position:absolute;right:7px;top:6px;border:0;background:none;color:#203746;font-size:18px;cursor:pointer}.gc-v2-disclaimer span{display:block;padding-right:12px}.gc-v2-disclaimer span+span{margin-top:7px}
+        .gc-v2-legal{position:absolute;z-index:6;left:50%;bottom:145px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;white-space:nowrap;color:#9db3b1;font-size:11px}.gc-v2-legal a,.gc-v2-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}.gc-v2-info{width:23px;height:23px;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(9,29,40,.32);color:#ffc19f;font-weight:800;cursor:pointer}.gc-v2-disclaimer{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:270px;white-space:normal;padding:12px 13px;border-radius:14px;background:#fff8ef;color:#203746;box-shadow:0 18px 40px rgba(0,0,0,.3);font-size:11px;line-height:1.45;text-align:left}.gc-v2-disclaimer>button{position:absolute;z-index:2;right:6px;top:5px;width:22px;height:22px;display:grid;place-items:center;padding:0;line-height:1;border:0;border-radius:50%;background:none;color:#5d7480;font-size:16px;font-weight:600;cursor:pointer}.gc-v2-disclaimer>button:hover{background:rgba(32,55,70,.08);color:#203746}.gc-v2-disclaimer span{display:block}.gc-v2-disclaimer span:first-of-type{padding-right:22px}.gc-v2-disclaimer span+span{margin-top:7px}
         .gc-landing-sheet{background:#edf0ea!important}.gc-landing-sheet-field{border-color:#b8cbc7;background:#fffaf4}.gc-landing-sheet-field:focus-within{border-color:#ef735f;box-shadow:0 0 0 3px rgba(239,115,95,.14)}.gc-landing-sheet-field label{color:#203746}.gc-landing-sheet-handle{background:#9eb4b0}
         .gc-landing-sheet .gc-start-bar{border-color:#ef735f!important;box-shadow:0 0 0 5px rgba(239,115,95,.17),0 12px 28px rgba(15,39,51,.25)!important}.gc-landing-sheet .gc-start-bar>span{background:linear-gradient(145deg,#294b59,#203746)!important}.gc-landing-sheet button:not(.gc-landing-sheet-handle){border-color:#b8cbc7!important}.gc-landing-sheet input[type=range]::-webkit-slider-thumb{background:#ef735f}
         .gc-flow-header strong{color:#fff4e8!important}.gc-flow-header small{color:#c3d2cf!important}.gc-flow-header>div:first-child>div button,.gc-flow-header>div:first-child>button+div button{border-color:rgba(255,244,232,.22)!important;background:rgba(9,29,40,.28)!important;color:#fff4e8!important}.gc-flow-header>div:last-child{background:rgba(255,255,255,.14)!important}.gc-flow-header>div:last-child>div{background:linear-gradient(90deg,#ffc19f,#ef735f)!important}
@@ -2211,13 +2256,69 @@ export default function Home() {
         .gc-v3-transition-number{position:absolute;inset:0;display:grid;place-items:center;color:color-mix(in srgb,var(--phase-color) 36%,transparent);font:900 clamp(150px,27vw,360px)/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.1em;text-shadow:0 0 60px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         .gc-v3-transition-spark{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:2px;background:var(--phase-color);box-shadow:0 0 18px var(--phase-color);will-change:transform}.gc-v3-transition-spark:nth-child(3){width:6px;height:18px}.gc-v3-transition-spark:nth-child(4){width:14px;height:5px}.gc-v3-transition-spark:nth-child(5){width:7px;height:7px;border-radius:50%}.gc-v3-transition-spark:nth-child(6){width:5px;height:22px}
         .gc-v3-phase-inner{position:relative;top:0;min-height:calc(100dvh - 78px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
+        /* Mirrored phases put the art in column 1, so mirror the track sizes
+           too — otherwise the artwork lands in the narrow column meant for
+           the copy and gets squeezed to ~2/3 of the space it has elsewhere. */
+        .gc-v3-phase-inner.gc-v3-reverse{grid-template-columns:minmax(440px,1.22fr) minmax(280px,.78fr)}
         .gc-v3-copy{position:relative;z-index:5;transition:transform .12s linear,opacity .12s linear}.gc-v3-copy small{display:inline-flex;align-items:center;gap:8px;color:var(--phase-color);font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-copy small:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--phase-color);box-shadow:0 0 0 5px color-mix(in srgb,var(--phase-color) 13%,transparent),0 0 18px var(--phase-color)}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
         .gc-v3-art{position:relative;z-index:3;min-height:410px;transition:transform .12s linear,opacity .12s linear;will-change:transform,opacity}.gc-v3-message-art{display:grid;place-items:center}.gc-v3-message-card{position:relative;width:min(470px,88%);min-height:210px;box-sizing:border-box;padding:34px;border:1px solid rgba(255,193,159,.35);border-radius:30px;background:linear-gradient(145deg,rgba(255,244,232,.98),rgba(239,225,213,.95));box-shadow:0 35px 80px rgba(3,18,27,.36);color:#203746;font-family:Georgia,serif;font-size:clamp(21px,2.3vw,31px);line-height:1.25}.gc-v3-message-card i{position:absolute;bottom:22px;width:7px;height:7px;border-radius:50%;background:#ef735f}.gc-v3-message-card i:nth-child(2){left:34px}.gc-v3-message-card i:nth-child(3){left:48px;opacity:.6}.gc-v3-message-card i:nth-child(4){left:62px;opacity:.3}
         .gc-v3-typed-copy{display:block}.gc-v3-phase-one[data-active=true] .gc-v3-typed-copy{animation:gcTypedReveal .7s .5s cubic-bezier(.2,.72,.2,1) both}.gc-v3-phase-one[data-active=true] .gc-v3-message-card:after{content:"";position:absolute;top:30px;bottom:52px;left:30px;width:3px;border-radius:4px;background:#ef735f;box-shadow:0 0 14px rgba(239,115,95,.8);animation:gcWritingCursor .72s .48s steps(7,end) both}
         .gc-v3-float-chip,.gc-v3-signal{position:absolute;padding:9px 13px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(21,43,56,.92);box-shadow:0 12px 28px rgba(0,0,0,.26);color:#ffd2bb;font-size:12px;font-weight:800}.gc-v3-chip-a{left:2%;top:16%;transform:rotate(-8deg)}.gc-v3-chip-b{right:0;top:27%;transform:rotate(7deg)}.gc-v3-chip-c{right:12%;bottom:10%;transform:rotate(-4deg)}
-        .gc-v3-signal-art{display:grid;place-items:center}.gc-v3-ai-core{position:absolute;width:128px;height:128px;display:grid;place-items:center;border-radius:35px;background:linear-gradient(145deg,#ffc19f,#ef735f 58%,#c94f48);box-shadow:0 0 0 16px rgba(239,115,95,.08),0 30px 70px rgba(3,18,27,.4);transform:rotate(45deg)}.gc-v3-ai-core span{color:#17303e;font-size:42px;transform:rotate(-45deg)}.gc-v3-orbit{position:absolute;border:1px solid rgba(255,193,159,.28);border-radius:50%;animation:gcorbit 10s linear infinite}.gc-v3-orbit-one{width:300px;height:190px;transform:rotate(18deg)}.gc-v3-orbit-two{width:390px;height:270px;transform:rotate(-23deg);animation-direction:reverse;animation-duration:14s}.gc-v3-signal-a{left:8%;top:22%}.gc-v3-signal-b{right:4%;top:34%}.gc-v3-signal-c{left:19%;bottom:14%}
-        .gc-v3-signal-map{position:relative;width:min(540px,96%);height:350px;filter:drop-shadow(0 28px 50px rgba(3,18,27,.3))}.gc-v3-signal-map svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.gc-v3-signal-map path{stroke:#7ed6cb;stroke-width:1.7;stroke-linecap:round;stroke-dasharray:4 8;filter:drop-shadow(0 0 7px rgba(126,214,203,.65))}.gc-v3-insight{position:absolute;min-width:126px;padding:13px 15px;border:1px solid rgba(126,214,203,.3);border-radius:17px;background:linear-gradient(145deg,rgba(20,53,65,.96),rgba(29,75,83,.88));box-shadow:0 16px 34px rgba(2,18,27,.3),inset 0 1px rgba(255,255,255,.09);color:#effbf7}.gc-v3-insight small{display:block;margin-bottom:4px;color:#7ed6cb;font-size:8px;font-weight:900;letter-spacing:.16em}.gc-v3-insight strong{font:750 13px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-insight-a{left:0;top:32px}.gc-v3-insight-b{right:0;top:30px}.gc-v3-insight-c{left:8px;bottom:28px}.gc-v3-insight-d{right:5px;bottom:28px}.gc-v3-synthesis{position:absolute;left:50%;top:50%;width:122px;height:122px;transform:translate(-50%,-50%) rotate(45deg);display:grid;place-items:center;border:1px solid rgba(255,255,255,.5);border-radius:35px;background:linear-gradient(145deg,#d9fff8,#7ed6cb 48%,#ef735f);box-shadow:0 0 0 13px rgba(126,214,203,.08),0 30px 64px rgba(3,18,27,.42),0 0 48px rgba(126,214,203,.22)}.gc-v3-synthesis span{color:#17303e;font-size:33px;transform:rotate(-45deg) translateY(-7px)}.gc-v3-synthesis small{position:absolute;left:50%;top:63%;width:110px;transform:translate(-50%,-50%) rotate(-45deg);color:#17303e;font-size:7px;font-weight:950;letter-spacing:.11em;text-align:center}.gc-v3-map-spark{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff4e8;box-shadow:0 0 16px #7ed6cb}.gc-v3-map-spark-a{left:35%;top:25%}.gc-v3-map-spark-b{right:31%;top:41%}.gc-v3-map-spark-c{left:38%;bottom:21%}
-        .gc-v3-result-art{display:flex;align-items:center;justify-content:center;perspective:1200px}.gc-v3-result-art article{position:absolute;width:220px;height:300px;overflow:hidden;box-sizing:border-box;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.35);border-radius:24px;background:linear-gradient(160deg,#f8eadc 0 46%,#df7c68 46% 70%,#203746 70%);box-shadow:0 30px 60px rgba(3,18,27,.35);color:#fff4e8}.gc-v3-result-art article:after{content:"";position:absolute;inset:-70% -40%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.58) 49%,transparent 57%);transform:translateX(-80%) rotate(12deg)}.gc-v3-phase-three[data-active=true] .gc-v3-result-art article:after{animation:gcCardShine .65s .78s ease-out both}.gc-v3-result-art article:nth-child(1){transform:translateX(-145px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){z-index:2;transform:translateY(-20px)}.gc-v3-result-art article:nth-child(3){transform:translateX(145px) rotate(12deg)}.gc-v3-result-art article span{position:absolute;z-index:3;top:16px;right:17px;color:#203746;font-size:11px;font-weight:900}.gc-v3-card-glyph{position:absolute;left:50%;top:24%;width:72px;height:72px;transform:translateX(-50%) rotate(45deg);border:1px solid rgba(32,55,70,.18);border-radius:22px;background:rgba(255,255,255,.3);box-shadow:inset 0 0 28px rgba(239,115,95,.14)}.gc-v3-card-glyph b{position:absolute;left:50%;top:50%;width:35px;height:8px;border-radius:999px;background:#203746;transform:translate(-50%,-50%) rotate(-45deg)}.gc-v3-card-glyph b+b{width:8px;height:35px}.gc-v3-result-art article:nth-child(2) .gc-v3-card-glyph b{background:#31586a}.gc-v3-result-art article:nth-child(3) .gc-v3-card-glyph b{background:#b64f48}.gc-v3-result-art article div{position:relative;z-index:2;color:#ffc19f;font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.gc-v3-result-art article strong{position:relative;z-index:2;margin-top:5px;font:700 19px/1.1 'Bricolage Grotesque',sans-serif}
+        /* ── Step rail (replaces the "PASSAGGIO 0N" caption) ── */
+        .gc-v3-rail{display:flex;align-items:stretch;gap:0;margin-bottom:20px}
+        .gc-v3-rail-stop{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:0 18px 0 0;border:0;background:none;color:#7d979c;font:800 11.5px 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;transition:color .3s ease}
+        .gc-v3-rail-stop:not(:last-child):after{content:"";position:absolute;right:7px;top:50%;width:6px;height:1px;background:rgba(255,255,255,.2)}
+        .gc-v3-rail-stop i{position:relative;width:26px;height:26px;flex:0 0 auto;display:grid;place-items:center;border:1.5px solid rgba(255,255,255,.24);border-radius:50%;background:rgba(255,255,255,.04);transition:border-color .3s ease,background .3s ease,transform .3s ease}
+        .gc-v3-rail-stop i:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;transition:opacity .3s ease}
+        .gc-v3-rail-stop b{position:absolute;inset:-6px;border:1.5px solid var(--phase-color);border-radius:50%;opacity:.42;animation:gcRailPulse 2.1s ease-in-out infinite}
+        .gc-v3-rail-stop[data-state=done]{color:#a9c3c0}.gc-v3-rail-stop[data-state=done] i{border-color:rgba(255,255,255,.4)}.gc-v3-rail-stop[data-state=done] i:before{opacity:.85}
+        .gc-v3-rail-stop[data-state=current]{color:var(--phase-color)}
+        .gc-v3-rail-stop[data-state=current] i{border-color:var(--phase-color);background:color-mix(in srgb,var(--phase-color) 20%,transparent);transform:scale(1.12);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 40%,transparent)}
+        .gc-v3-rail-stop[data-state=current] i:before{opacity:1}
+        .gc-v3-rail-stop:hover{color:#fff4e8}.gc-v3-rail-stop:hover i{border-color:rgba(255,255,255,.55)}
+        @keyframes gcRailPulse{0%,100%{transform:scale(1);opacity:.42}50%{transform:scale(1.22);opacity:0}}
+
+        /* ── Phase 2 art: the analysis, shown happening ──
+           A beam sweeps the sentence, the three words that matter light up,
+           drop into the core as signals, and the core turns them into
+           directions. Stages are chained CSS animations off data-active. */
+        .gc-v3-scan{width:min(540px,100%);display:flex;flex-direction:column;align-items:center;gap:0}
+        .gc-v3-scan-source{position:relative;width:100%;box-sizing:border-box;padding:20px 22px;overflow:hidden;border:1px solid rgba(126,214,203,.24);border-radius:20px;background:linear-gradient(150deg,rgba(18,50,62,.96),rgba(13,38,49,.92));box-shadow:0 18px 40px rgba(2,18,27,.34)}
+        .gc-v3-scan-source span{display:block;color:#a8c2c4;font-family:Georgia,serif;font-size:clamp(15px,1.5vw,19px);line-height:1.5}
+        .gc-v3-scan-source em{position:relative;font-style:normal;font-weight:700;color:#a8c2c4;border-radius:5px;padding:1px 4px;margin:0 -1px;transition:none}
+        .gc-v3-scan-beam{position:absolute;z-index:2;top:0;bottom:0;left:0;width:120px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(126,214,203,.22),rgba(126,214,203,.5),rgba(126,214,203,.22),transparent);opacity:0}
+        .gc-v3-scan-drops{position:relative;width:100%;height:54px}
+        .gc-v3-scan-drops i{position:absolute;top:0;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#7ed6cb;box-shadow:0 0 16px #7ed6cb;opacity:0}
+        .gc-v3-scan-drops i:nth-child(1){left:18%}.gc-v3-scan-drops i:nth-child(2){left:50%}.gc-v3-scan-drops i:nth-child(3){left:80%}
+        .gc-v3-scan-core{position:relative;width:104px;height:104px;flex:0 0 auto;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:32px;background:linear-gradient(148deg,#d9fff8,#7ed6cb 52%,#ef735f);box-shadow:0 22px 50px rgba(3,18,27,.42),0 0 44px rgba(126,214,203,.24)}
+        .gc-v3-scan-core b{color:#12303c;font-size:31px;line-height:1}
+        .gc-v3-scan-core small{position:absolute;bottom:13px;color:#12303c;font-size:7.5px;font-weight:950;letter-spacing:.16em}
+        .gc-v3-scan-ring{position:absolute;inset:-14px;border:1.5px solid rgba(126,214,203,.5);border-radius:38px;opacity:0}
+        .gc-v3-scan-ring-b{inset:-26px;border-radius:46px;border-style:dashed}
+        .gc-v3-scan-out{margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+        .gc-v3-scan-out span{padding:9px 14px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.13);color:#ffe2cd;font:750 12.5px 'Hanken Grotesk',sans-serif;opacity:0}
+        @media(max-width:900px){
+          .gc-v3-scan-source{padding:16px 16px}.gc-v3-scan-drops{height:40px}
+          .gc-v3-scan-core{width:86px;height:86px;border-radius:26px}.gc-v3-scan-core b{font-size:26px}
+          .gc-v3-scan-out{margin-top:18px;gap:6px}.gc-v3-scan-out span{padding:8px 11px;font-size:11.5px}
+          .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
+        }
+        /* Phase 3 cards use the same anatomy as the hero carousel — real
+           photo on top, dark info panel underneath — so the results we
+           promise look like the results the carousel showed. */
+        .gc-v3-result-art{display:flex;align-items:center;justify-content:center;perspective:1200px}
+        .gc-v3-result-art article{--gc-result-panel:76px;position:absolute;width:212px;height:288px;overflow:hidden;box-sizing:border-box;border:1px solid rgba(255,255,255,.16);border-radius:24px;background:#0f2733;box-shadow:0 30px 60px rgba(3,18,27,.45)}
+        .gc-v3-result-art article>img{position:absolute;left:0;right:0;top:0;width:100%;height:calc(100% - var(--gc-result-panel));object-fit:cover;display:block}
+        .gc-v3-result-art article:after{content:"";position:absolute;inset:-70% -40%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.5) 49%,transparent 57%);transform:translateX(-80%) rotate(12deg)}
+        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:after{animation:gcCardShine .65s .95s ease-out both}
+        .gc-v3-result-art article:nth-child(1){transform:translateX(-145px) rotate(-12deg)}
+        .gc-v3-result-art article:nth-child(2){z-index:2;transform:translateY(-20px)}
+        .gc-v3-result-art article:nth-child(3){transform:translateX(145px) rotate(12deg)}
+        .gc-v3-result-art article>span{position:absolute;z-index:3;top:12px;right:12px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:rgba(10,28,37,.66);backdrop-filter:blur(4px);color:#fff4e8;font-size:11px;font-weight:900}
+        .gc-v3-result-body{position:absolute;z-index:2;left:0;right:0;bottom:0;height:var(--gc-result-panel);box-sizing:border-box;padding:10px 11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-top:1px solid rgba(255,255,255,.13);background:linear-gradient(155deg,#102b38,#0b202b);text-align:center}
+        .gc-v3-result-body strong{color:#fff4e8;font:750 14px/1.12 'Hanken Grotesk',sans-serif;letter-spacing:-.01em}
+        .gc-v3-result-criteria{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+        .gc-v3-result-criteria span{padding:4px 8px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.15);color:#ffe2cd;font:750 10.5px 'Hanken Grotesk',sans-serif;line-height:1}
         .gc-v3-next{position:absolute;left:50%;bottom:26px;z-index:8;min-width:285px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
         .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:100px 24px 90px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start:before,.gc-v3-start:after{content:"";position:absolute;left:50%;top:-22%;width:2px;height:72%;transform-origin:50% 0;background:linear-gradient(rgba(255,193,159,0),rgba(255,193,159,.72),rgba(239,115,95,0));filter:drop-shadow(0 0 12px rgba(239,115,95,.8));pointer-events:none}.gc-v3-start:before{transform:rotate(24deg)}.gc-v3-start:after{transform:rotate(-24deg)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-mark{width:68px;height:68px;margin:0 auto 22px;display:grid;place-items:center;border-radius:21px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 18px 40px rgba(4,20,29,.3),0 0 0 12px rgba(239,115,95,.08)}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
         @keyframes gcJourneyShimmer{to{background-position:-220% 0}}
@@ -2237,7 +2338,32 @@ export default function Home() {
         .gc-v3-phase[data-active=true] .gc-v3-next{animation:gcCtaArrival .68s .72s cubic-bezier(.18,.86,.26,1) both}
         .gc-v3-phase-one[data-active=true] .gc-v3-message-card{animation:gcMessageMaterialize .95s .34s cubic-bezier(.12,.84,.18,1) both}
         .gc-v3-phase-one[data-active=true] .gc-v3-float-chip{animation:gcChipScatter .62s cubic-bezier(.12,.88,.24,1.22) both}.gc-v3-phase-one[data-active=true] .gc-v3-chip-a{animation-delay:.62s}.gc-v3-phase-one[data-active=true] .gc-v3-chip-b{animation-delay:.72s}.gc-v3-phase-one[data-active=true] .gc-v3-chip-c{animation-delay:.82s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-insight{animation:gcInsightArrive .5s cubic-bezier(.14,.86,.22,1.15) both}.gc-v3-phase-two[data-active=true] .gc-v3-insight-a{animation-delay:.3s}.gc-v3-phase-two[data-active=true] .gc-v3-insight-b{animation-delay:.38s}.gc-v3-phase-two[data-active=true] .gc-v3-insight-c{animation-delay:.46s}.gc-v3-phase-two[data-active=true] .gc-v3-insight-d{animation-delay:.54s}.gc-v3-phase-two[data-active=true] .gc-v3-signal-map path{animation:gcPathConnect .58s .58s ease-out both}.gc-v3-phase-two[data-active=true] .gc-v3-synthesis{animation:gcSynthesisBuild .66s .72s cubic-bezier(.12,.86,.2,1.18) both}.gc-v3-phase-two[data-active=true] .gc-v3-map-spark{animation:gcMapSpark 1.2s .72s ease-in-out infinite}
+        /* Phase 2 choreography: beam sweeps (0.35s) → words light up in turn
+           (0.7s/0.9s/1.1s) → signals drop into the core (1.0s–1.5s) → core
+           pulses (1.5s) → directions appear (1.9s+). */
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-beam{animation:gcScanSweep 1.5s .35s cubic-bezier(.4,0,.5,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em{animation:gcWordHit .5s cubic-bezier(.16,.8,.2,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(1){animation-delay:.7s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(2){animation-delay:.95s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(3){animation-delay:1.2s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i{animation:gcSignalDrop .62s cubic-bezier(.5,0,.75,.4) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(1){animation-delay:1.02s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(2){animation-delay:1.27s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(3){animation-delay:1.52s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-core{animation:gcCoreIgnite .8s .25s cubic-bezier(.14,.86,.2,1.2) both,gcCoreAbsorb .45s 1.5s ease-out 3}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring{animation:gcCoreRing 1.6s 1.5s ease-out infinite}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring-b{animation-delay:1.9s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span{animation:gcDirectionRise .55s cubic-bezier(.14,.86,.22,1.14) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(1){animation-delay:1.95s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(2){animation-delay:2.1s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(3){animation-delay:2.25s}
+        @keyframes gcScanSweep{0%{opacity:0;transform:translateX(-130px)}12%{opacity:1}88%{opacity:1}100%{opacity:0;transform:translateX(560px)}}
+        @keyframes gcWordHit{0%{color:#a8c2c4;background:transparent;box-shadow:none}45%{color:#0d2731;background:#7ed6cb;box-shadow:0 0 22px rgba(126,214,203,.8)}100%{color:#7ed6cb;background:rgba(126,214,203,.16);box-shadow:0 0 0 1px rgba(126,214,203,.4)}}
+        @keyframes gcSignalDrop{0%{opacity:0;transform:translateY(-6px) scale(.4)}25%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(54px) scale(.3)}}
+        @keyframes gcCoreIgnite{0%{opacity:0;transform:scale(.2) rotate(-40deg);filter:blur(16px)}62%{opacity:1;transform:scale(1.1) rotate(6deg);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
+        @keyframes gcCoreAbsorb{0%{transform:scale(1)}40%{transform:scale(1.09);box-shadow:0 22px 50px rgba(3,18,27,.42),0 0 74px rgba(126,214,203,.6)}100%{transform:scale(1)}}
+        @keyframes gcCoreRing{0%{opacity:.7;transform:scale(.86)}100%{opacity:0;transform:scale(1.5)}}
+        @keyframes gcDirectionRise{0%{opacity:0;transform:translateY(20px) scale(.8)}70%{opacity:1;transform:translateY(-3px) scale(1.04)}100%{opacity:1;transform:none}}
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}.gc-v3-phase-three .gc-v3-result-art article:nth-child(2){--result-x:0px;--result-r:0deg}.gc-v3-phase-three .gc-v3-result-art article:nth-child(3){--result-x:145px;--result-r:12deg}
         .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(1){animation:gcCardArcLeft .78s .25s cubic-bezier(.12,.84,.2,1.12) both}.gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(2){animation:gcCardDepth .82s .38s cubic-bezier(.1,.86,.18,1.15) both}.gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(3){animation:gcCardArcRight .78s .51s cubic-bezier(.12,.84,.2,1.12) both}
         .gc-v3-start[data-active=true]:before{animation:gcBeamLeft 1.35s cubic-bezier(.15,.8,.2,1) both}.gc-v3-start[data-active=true]:after{animation:gcBeamRight 1.35s cubic-bezier(.15,.8,.2,1) both}.gc-v3-start[data-active=true] .gc-v3-start-inner{animation:gcStartReveal 1.1s .2s cubic-bezier(.14,.86,.2,1) both}.gc-v3-start[data-active=true] .gc-v3-start-mark{animation:gcGiftLanding .88s .34s cubic-bezier(.12,.86,.2,1.18) both}.gc-v3-start[data-active=true] .gc-v3-search-bar{animation:gcSearchReveal .82s .62s cubic-bezier(.14,.88,.24,1.12) both,gcSearchArrival 2.8s 1.5s ease-in-out infinite}
@@ -2250,7 +2376,6 @@ export default function Home() {
         @keyframes gcNumberDive{0%{opacity:0;transform:translateY(95px) scale(2.5);filter:blur(24px)}34%{opacity:.62;filter:blur(0)}100%{opacity:0;transform:translateY(-18px) scale(.58);filter:blur(8px)}}
         @keyframes gcSparkFlight{0%{opacity:0;transform:translate(0,0) scale(.1) rotate(0)}22%{opacity:1}100%{opacity:0;transform:translate(var(--spark-x),var(--spark-y)) scale(1.5) rotate(var(--spark-r))}}
         @keyframes gcCopyArrival{0%{opacity:0;transform:translateY(72px) scale(.86);filter:blur(22px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-        @keyframes gcArtArrival{0%{opacity:0;transform:translateY(100px) scale(.58) rotate(7deg);filter:blur(25px)}58%{opacity:1;transform:translateY(-9px) scale(1.025) rotate(-1deg);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0);filter:blur(0)}}
         @keyframes gcPhaseOneStage{0%{opacity:0;transform:translateX(100px) scale(1.28);filter:blur(20px)}58%{opacity:1;transform:translateX(-8px) scale(.98);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
         @keyframes gcPhaseTwoStage{0%{opacity:0;transform:perspective(1000px) rotateY(-42deg) scale(.72);filter:blur(20px)}62%{opacity:1;transform:perspective(1000px) rotateY(3deg) scale(1.02);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
         @keyframes gcPhaseThreeStage{0%{opacity:0;transform:perspective(1000px) translateZ(-650px) scale(.5);filter:blur(28px)}100%{opacity:1;transform:none;filter:blur(0)}}
@@ -2259,13 +2384,6 @@ export default function Home() {
         @keyframes gcTypedReveal{0%{opacity:.15;clip-path:inset(0 100% 0 0);filter:blur(5px)}100%{opacity:1;clip-path:inset(0 0 0 0);filter:blur(0)}}
         @keyframes gcWritingCursor{0%{opacity:0;left:30px}10%{opacity:1}88%{opacity:1;left:86%}100%{opacity:0;left:88%}}
         @keyframes gcChipScatter{0%{opacity:0;transform:translate(0,28px) scale(.25) rotate(-28deg);filter:blur(9px)}70%{opacity:1;transform:translate(0,-4px) scale(1.08) rotate(3deg);filter:blur(0)}100%{opacity:1;filter:blur(0)}}
-        @keyframes gcAiImpact{0%{opacity:0;transform:rotate(225deg) scale(.12);filter:blur(22px);box-shadow:0 0 0 0 transparent}58%{opacity:1;transform:rotate(38deg) scale(1.16);filter:blur(0);box-shadow:0 0 0 32px rgba(126,214,203,.08),0 0 90px rgba(126,214,203,.58)}100%{opacity:1;transform:rotate(45deg) scale(1);filter:blur(0)}}
-        @keyframes gcSignalPop{0%{opacity:0;transform:translateY(30px) scale(.2);filter:blur(8px)}72%{opacity:1;transform:translateY(-5px) scale(1.12);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-        @keyframes gcInsightArrive{0%{opacity:0;transform:translateY(28px) scale(.5);filter:blur(12px)}70%{opacity:1;transform:translateY(-4px) scale(1.05);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
-        @keyframes gcPathConnect{0%{opacity:0;stroke-dashoffset:120}20%{opacity:1}100%{opacity:1;stroke-dashoffset:0}}
-        @keyframes gcSynthesisBuild{0%{opacity:0;transform:translate(-50%,-50%) rotate(-135deg) scale(.08);filter:blur(18px)}68%{opacity:1;transform:translate(-50%,-50%) rotate(51deg) scale(1.13);filter:blur(0)}100%{opacity:1;transform:translate(-50%,-50%) rotate(45deg) scale(1);filter:blur(0)}}
-        @keyframes gcMapSpark{0%,100%{opacity:.15;transform:scale(.45)}50%{opacity:1;transform:scale(1.6)}}
-        @keyframes gcResultFan{0%{opacity:0;transform:translateX(0) translateY(105px) scale(.18) rotate(0);filter:blur(18px)}62%{opacity:1;transform:translateX(calc(var(--result-x) * 1.06)) translateY(-8px) scale(1.05) rotate(calc(var(--result-r) * 1.08));filter:blur(0)}100%{opacity:1;transform:translateX(var(--result-x)) translateY(0) scale(1) rotate(var(--result-r));filter:blur(0)}}
         @keyframes gcCardArcLeft{0%{opacity:0;transform:translateX(-520px) translateY(170px) rotateY(74deg) rotateZ(-48deg) scale(.18);filter:blur(22px)}72%{opacity:1;transform:translateX(calc(var(--result-x) * 1.08)) translateY(-9px) rotateY(-5deg) rotateZ(-15deg) scale(1.04);filter:blur(0)}100%{opacity:1;transform:translateX(var(--result-x)) rotate(var(--result-r));filter:blur(0)}}
         @keyframes gcCardDepth{0%{opacity:0;transform:translateY(110px) translateZ(-900px) rotateX(72deg) scale(.08);filter:blur(30px)}68%{opacity:1;transform:translateY(-30px) translateZ(35px) rotateX(-5deg) scale(1.08);filter:blur(0)}100%{opacity:1;transform:translateY(-20px) translateZ(0) rotateX(0) scale(1);filter:blur(0)}}
         @keyframes gcCardArcRight{0%{opacity:0;transform:translateX(520px) translateY(-170px) rotateY(-74deg) rotateZ(48deg) scale(.18);filter:blur(22px)}72%{opacity:1;transform:translateX(calc(var(--result-x) * 1.08)) translateY(8px) rotateY(5deg) rotateZ(15deg) scale(1.04);filter:blur(0)}100%{opacity:1;transform:translateX(var(--result-x)) rotate(var(--result-r));filter:blur(0)}}
@@ -2274,16 +2392,14 @@ export default function Home() {
         @keyframes gcStartReveal{0%{opacity:0;transform:translateY(105px) scale(.72);filter:blur(26px)}58%{opacity:1;transform:translateY(-8px) scale(1.025);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
         @keyframes gcGiftLanding{0%{opacity:0;transform:translateY(-110px) rotate(-28deg) scale(.25);filter:blur(14px)}62%{opacity:1;transform:translateY(8px) rotate(5deg) scale(1.12);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
         @keyframes gcSearchReveal{0%{opacity:0;transform:translateY(48px) scaleX(.55);filter:blur(12px)}68%{opacity:1;transform:translateY(-3px) scaleX(1.025);filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
-        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:10px;width:100%;justify-content:center;font-size:10.5px}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{width:145px;height:220px;padding:12px;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-art article strong{font-size:14px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:10px;width:100%;justify-content:center;font-size:10.5px}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
         @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px)}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{min-width:250px;margin-top:14px;padding:12px 20px 10px}.gc-v3-scroll-cue span{padding:0;font-size:14px}.gc-v3-scroll-cue b{width:12px;height:12px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
         @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:20px;width:min(270px,calc(100% - 44px));min-width:0}}
-        @media(max-width:900px){.gc-v3-start{padding-bottom:82px}.gc-v3-legal{bottom:calc(14px + env(safe-area-inset-bottom));gap:7px;font-size:12px}}
-        @media(max-width:900px){.gc-v3-signal-map{width:100%;height:252px}.gc-v3-signal-map svg{inset:0 2%;width:96%}.gc-v3-insight{min-width:88px;padding:9px 10px;border-radius:13px}.gc-v3-insight small{font-size:6px}.gc-v3-insight strong{font-size:10px}.gc-v3-insight-a{top:12px}.gc-v3-insight-b{top:10px}.gc-v3-insight-c{left:0;bottom:10px}.gc-v3-insight-d{right:0;bottom:10px}.gc-v3-synthesis{width:82px;height:82px;border-radius:24px}.gc-v3-synthesis span{font-size:25px}.gc-v3-synthesis small{top:67%;font-size:5.5px}.gc-v3-card-glyph{width:48px;height:48px;border-radius:15px}.gc-v3-card-glyph b{width:24px;height:6px}.gc-v3-card-glyph b+b{width:6px;height:24px}.gc-v3-phase-one[data-active=true] .gc-v3-message-card:after{top:24px;bottom:45px;left:22px}}
-        @media(max-width:900px){.gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-87px}.gc-v3-phase-three .gc-v3-result-art article:nth-child(2){--result-x:0px}.gc-v3-phase-three .gc-v3-result-art article:nth-child(3){--result-x:87px}.gc-v3-transition{width:min(118vw,560px)}.gc-v3-transition-spark:nth-of-type(1){--spark-x:150px;--spark-y:-120px}.gc-v3-transition-spark:nth-of-type(2){--spark-x:-145px;--spark-y:-95px}.gc-v3-transition-spark:nth-of-type(3){--spark-x:135px;--spark-y:145px}.gc-v3-transition-spark:nth-of-type(4){--spark-x:-155px;--spark-y:125px}}
+        @media(max-width:900px){.gc-v3-start{padding-bottom:82px}.gc-v3-legal{bottom:calc(14px + env(safe-area-inset-bottom));gap:7px;font-size:12px}}        @media(max-width:900px){.gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-87px}.gc-v3-phase-three .gc-v3-result-art article:nth-child(2){--result-x:0px}.gc-v3-phase-three .gc-v3-result-art article:nth-child(3){--result-x:87px}.gc-v3-transition{width:min(118vw,560px)}.gc-v3-transition-spark:nth-of-type(1){--spark-x:150px;--spark-y:-120px}.gc-v3-transition-spark:nth-of-type(2){--spark-x:-145px;--spark-y:-95px}.gc-v3-transition-spark:nth-of-type(3){--spark-x:135px;--spark-y:145px}.gc-v3-transition-spark:nth-of-type(4){--spark-x:-155px;--spark-y:125px}}
         @media(max-width:900px){.gc-v2-wordmark{gap:7px}.gc-v2-wordmark strong{line-height:.86}.gc-v2-wordmark small{line-height:1.15}}
         @media(prefers-reduced-motion:reduce){.gc-main.gc-main--flush{scroll-behavior:auto}.gc-v3-hero-glow,.gc-v3-scroll-cue,.gc-v3-scroll-cue span,.gc-v3-scroll-cue b,.gc-v3-next-arrow,.gc-v3-orbit,.gc-v3-search-bar{animation:none!important}.gc-v3-transition,.gc-v3-phase-wash{display:none!important}.gc-v3-art{transition:none!important}.gc-v3-start-inner{opacity:1!important;transform:none!important}.gc-v3-phase[data-active=true],.gc-v3-phase[data-active=true] *,.gc-v3-phase[data-active=true]:before,.gc-v3-phase[data-active=true]:after,.gc-v3-start[data-active=true],.gc-v3-start[data-active=true] *,.gc-v3-start[data-active=true]:before,.gc-v3-start[data-active=true]:after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important}}
-      `}</style>
+      ` }} />
 
       <div className="gc-shell" style={{ display:"flex", height:"100vh", overflow:"hidden", background:mobileFlow ? "linear-gradient(155deg,#edf1ec 0%,#f6e9dd 55%,#f3e2d5 100%)" : C.bg, color:C.ink, fontFamily:BODY }}>
 
@@ -2479,55 +2595,78 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-                    <button type="button" className="gc-v3-scroll-cue" onClick={() => scrollLandingTo(".gc-v3-phase-one")}><span>Scorri verso il basso per continuare</span><b aria-hidden="true"/></button>
+                    <button type="button" className="gc-v3-scroll-cue" onClick={() => scrollLandingTo(".gc-v3-phase-one")}><span>Scorri in basso per continuare</span><b aria-hidden="true"/></button>
                   </section>
 
                   <section className="gc-v3-phase gc-v3-phase-one" data-active={landingActivePhase === 1}>
-                    <PhaseTransition phase={landingPhase1} number="01" />
+                    <PhaseTransition number="01" />
                     <div className="gc-v3-phase-inner">
-                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase1 * .7, transform:`translateY(${16 - landingPhase1 * 16}px)` }}><small>PASSAGGIO 01</small><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
-                      <div className="gc-v3-art gc-v3-message-art" style={{ opacity:.35 + landingPhase1 * .65, transform:`translateY(${34 - landingPhase1 * 34}px) scale(${.9 + landingPhase1 * .1})` }}>
+                      <div className="gc-v3-copy"><StepRail active={1} onGo={scrollLandingTo} /><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
+                      <div className="gc-v3-art gc-v3-message-art">
                         <div className="gc-v3-message-card"><span className="gc-v3-typed-copy">“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”</span><i/><i/><i/></div>
                         <span className="gc-v3-float-chip gc-v3-chip-a">Trekking</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Pratico</span>
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri per continuare 1/3</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
                   <section className="gc-v3-phase gc-v3-phase-two" data-active={landingActivePhase === 2}>
-                    <PhaseTransition phase={landingPhase2} number="02" />
+                    <PhaseTransition number="02" />
                     <div className="gc-v3-phase-inner gc-v3-reverse">
-                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase2 * .7, transform:`translateY(${16 - landingPhase2 * 16}px)` }}><small>PASSAGGIO 02</small><h2>Gifty collega gli indizi.</h2><p>L’AI distingue passioni, vincoli e dettagli utili. Poi cerca direzioni diverse, senza perdere il filo.</p></div>
-                      <div className="gc-v3-art gc-v3-signal-art" style={{ opacity:.3 + landingPhase2 * .7, transform:`rotate(${(1 - landingPhase2) * -8}deg) scale(${.84 + landingPhase2 * .16})` }}>
-                        <div className="gc-v3-signal-map">
-                          <svg viewBox="0 0 520 340" fill="none" aria-hidden="true"><path d="M104 78C174 75 184 151 248 166"/><path d="M416 76C348 80 340 151 274 166"/><path d="M112 273C178 270 190 206 249 186"/><path d="M408 270C344 269 329 208 274 186"/></svg>
-                          <div className="gc-v3-insight gc-v3-insight-a"><small>PASSIONE</small><strong>Trekking</strong></div>
-                          <div className="gc-v3-insight gc-v3-insight-b"><small>ABITUDINE</small><strong>Ogni domenica</strong></div>
-                          <div className="gc-v3-insight gc-v3-insight-c"><small>DESIDERIO</small><strong>Qualcosa di utile</strong></div>
-                          <div className="gc-v3-insight gc-v3-insight-d"><small>VINCOLO</small><strong>Niente ingombro</strong></div>
-                          <div className="gc-v3-synthesis"><span>✦</span><small>IDEA SU MISURA</small></div>
-                          <i className="gc-v3-map-spark gc-v3-map-spark-a"/><i className="gc-v3-map-spark gc-v3-map-spark-b"/><i className="gc-v3-map-spark gc-v3-map-spark-c"/>
+                      <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Riconosce le parole che contano, le trasforma in indizi e da lì costruisce le direzioni da esplorare.</p></div>
+                      {/* The analysis shown as it happens: a beam sweeps the
+                          sentence, the three words that matter light up and
+                          fall into the core as signals, the core turns them
+                          into directions. Each stage is a CSS animation keyed
+                          off data-active, so it replays on every arrival. */}
+                      <div className="gc-v3-art gc-v3-scan">
+                        <div className="gc-v3-scan-source">
+                          <i className="gc-v3-scan-beam" aria-hidden="true"/>
+                          <span>“Fa <em>trekking</em> ogni <em>domenica</em>, cucina spesso e <em>odia gli oggetti inutili</em>.”</span>
+                        </div>
+                        <div className="gc-v3-scan-drops" aria-hidden="true"><i/><i/><i/></div>
+                        <div className="gc-v3-scan-core">
+                          <i className="gc-v3-scan-ring"/><i className="gc-v3-scan-ring gc-v3-scan-ring-b"/>
+                          <b>✦</b><small>ANALISI</small>
+                        </div>
+                        <div className="gc-v3-scan-out">
+                          <span>Attrezzatura outdoor</span><span>Esperienze in cucina</span><span>Solo cose che userà</span>
                         </div>
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri per continuare 2/3</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
                   <section className="gc-v3-phase gc-v3-phase-three" data-active={landingActivePhase === 3}>
-                    <PhaseTransition phase={landingPhase3} number="03" />
+                    <PhaseTransition number="03" />
                     <div className="gc-v3-phase-inner">
-                      <div className="gc-v3-copy" style={{ opacity:.3 + landingPhase3 * .7, transform:`translateY(${16 - landingPhase3 * 16}px)` }}><small>PASSAGGIO 03</small><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
-                      <div className="gc-v3-art gc-v3-result-art" style={{ opacity:.28 + landingPhase3 * .72, transform:`translateY(${40 - landingPhase3 * 40}px)` }}>
-                        <article><span>01</span><i className="gc-v3-card-glyph"><b/><b/></i><div>Cucina</div><strong>Macchina per la pasta</strong></article><article><span>02</span><i className="gc-v3-card-glyph"><b/><b/></i><div>Sport</div><strong>Zaino da trekking</strong></article><article><span>03</span><i className="gc-v3-card-glyph"><b/><b/></i><div>Personale</div><strong>Kit su misura</strong></article>
+                      <div className="gc-v3-copy"><StepRail active={3} onGo={scrollLandingTo} /><h2>Scegli il regalo giusto.</h2><p>Ricevi da 4 a 6 proposte acquistabili. Salva, scarta o rifinisci ogni singola idea.</p></div>
+                      {/* Real gift cards, same anatomy as the hero carousel —
+                          the results you get should look like the results we
+                          promised on the way in. */}
+                      <div className="gc-v3-art gc-v3-result-art">
+                        {RESULT_PREVIEW.map((item, i) => (
+                          <article key={item.title}>
+                            {/* Not lazy: these three enter from scale(.08),
+                                so a lazy loader can decide they're too small
+                                to be "in view" and never fetch them. */}
+                            <img src={item.photo} alt="" decoding="async" style={{ objectPosition:item.position }} />
+                            <span>{String(i + 1).padStart(2, "0")}</span>
+                            <div className="gc-v3-result-body">
+                              <strong>{item.title}</strong>
+                              <div className="gc-v3-result-criteria"><span>{item.budget}</span><span>{item.interest}</span></div>
+                            </div>
+                          </article>
+                        ))}
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-start")}><strong>Scorri per continuare 3/3</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-start")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
                   <section className="gc-v3-start" data-active={landingActivePhase === 4}>
-                    <div className="gc-v3-start-inner" style={{ opacity:.28 + landingStartPhase * .72, transform:`translateY(${42 - landingStartPhase * 42}px) scale(${.9 + landingStartPhase * .1})` }}>
+                    <div className="gc-v3-start-inner">
                       <span className="gc-v3-start-mark"><GiftSVG size={30} fill={N.navy3}/></span><p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
-                      <span className="gc-v3-start-sub">Partiamo dal nome. Occasione e budget compariranno subito dopo.</span>
+                      <span className="gc-v3-start-sub">Partiamo da Nome, Occasione e Budget.</span>
                       <button type="button" className="gc-v3-search-bar" onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}>
                         <span aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></span><strong>{g.recipientName || landingForm.nameLabel}</strong><b>›</b>
                       </button>
