@@ -1177,7 +1177,6 @@ export default function Home() {
   const speechRecognitionRef = useRef<SpeechRecognitionController | null>(null);
   const speechBaseTextRef = useRef("");
   const langMenuRef = useRef<HTMLDivElement>(null);
-  const landingSceneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const lang = LANGS[langIdx];
   const tr   = TR[lang.t as TKey] ?? TR.en;
@@ -1202,32 +1201,37 @@ export default function Home() {
     if (screen !== "landing") return;
     const scroller = gcMainRef.current;
     if (!scroller) return;
+    const stops = [".gc-v3-hero", ".gc-v3-phase-one", ".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"]
+      .map(selector => scroller.querySelector<HTMLElement>(selector))
+      .filter((element): element is HTMLElement => Boolean(element));
+
+    /* A phase becomes the active one as soon as its top edge rises past 60%
+       of the viewport — roughly 40% into the movement, while it is still
+       coming in. This used to wait for scrolling to stop and then a further
+       110ms; because a snap scroll keeps firing scroll events for its whole
+       400-800ms, the phase had been sitting still on screen for about a
+       second before its entrance began. */
+    const pickActivePhase = () => {
+      const trigger = scroller.getBoundingClientRect().top + scroller.clientHeight * 0.82;
+      let active = 0;
+      stops.forEach((element, index) => {
+        if (element.getBoundingClientRect().top <= trigger) active = index;
+      });
+      setLandingActivePhase(active);
+    };
+
     const updateLandingProgress = () => {
       const distance = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
       setLandingProgress(Math.min(1, Math.max(0, scroller.scrollTop / distance)));
-      if (landingSceneTimerRef.current) clearTimeout(landingSceneTimerRef.current);
-      if (scroller.scrollTop < 4) {
-        setLandingActivePhase(0);
-        return;
-      }
-      landingSceneTimerRef.current = setTimeout(() => {
-        const stops = [".gc-v3-hero", ".gc-v3-phase-one", ".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"]
-          .map(selector => scroller.querySelector<HTMLElement>(selector))
-          .filter((element): element is HTMLElement => Boolean(element));
-        const scrollerTop = scroller.getBoundingClientRect().top;
-        const closest = stops.reduce((best, element, index) => {
-          const distanceFromStop = Math.abs(element.getBoundingClientRect().top - scrollerTop);
-          return distanceFromStop < best.distance ? { index, distance:distanceFromStop } : best;
-        }, { index:0, distance:Number.POSITIVE_INFINITY });
-        setLandingActivePhase(closest.index);
-      }, 110);
+      // Measured straight off the scroll event, not deferred to the next
+      // animation frame: the browser already throttles scroll to about one
+      // event per frame, and anything frame-based stalls when the tab isn't
+      // compositing — which would leave the phases stuck un-animated.
+      pickActivePhase();
     };
     updateLandingProgress();
     scroller.addEventListener("scroll", updateLandingProgress, { passive:true });
-    return () => {
-      scroller.removeEventListener("scroll", updateLandingProgress);
-      if (landingSceneTimerRef.current) clearTimeout(landingSceneTimerRef.current);
-    };
+    return () => scroller.removeEventListener("scroll", updateLandingProgress);
   }, [screen]);
 
   /* ── Hero carousel: a real 3D coverflow, same construction as the
@@ -2328,19 +2332,19 @@ export default function Home() {
            of them full-bleed) plus box-shadow and border-width, which force a
            full re-raster every frame — that is what made the phases stutter
            while the scroll-snap was still moving. */
-        .gc-v3-phase[data-active=true] .gc-v3-copy{animation:gcCopyArrival .6s .08s cubic-bezier(.16,.84,.24,1) both}
+        .gc-v3-phase[data-active=true] .gc-v3-copy{animation:gcCopyArrival .5s 0s cubic-bezier(.16,.84,.24,1) both}
         .gc-v3-phase[data-active=true] .gc-v3-rail-stop{animation:gcRailIn .42s cubic-bezier(.16,.86,.24,1.08) both}
-        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(1){animation-delay:.16s}
-        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(2){animation-delay:.24s}
-        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(3){animation-delay:.32s}
-        .gc-v3-phase[data-active=true] .gc-v3-next{animation:gcCtaArrival .5s .95s cubic-bezier(.18,.86,.26,1) both}
+        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(1){animation-delay:.06s}
+        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(2){animation-delay:.12s}
+        .gc-v3-phase[data-active=true] .gc-v3-rail-stop:nth-child(3){animation-delay:.18s}
+        .gc-v3-phase[data-active=true] .gc-v3-next{animation:gcCtaArrival .45s .5s cubic-bezier(.18,.86,.26,1) both}
         @keyframes gcCopyArrival{0%{opacity:0;transform:translateY(34px)}100%{opacity:1;transform:none}}
         @keyframes gcRailIn{0%{opacity:0;transform:translateY(12px) scale(.8)}100%{opacity:1;transform:none}}
         @keyframes gcCtaArrival{0%{opacity:0;transform:translateX(-50%) translateY(24px)}100%{opacity:1;transform:translateX(-50%)}}
         /* Phase 1 — someone writing. The card lands, the sentence types itself
            out under a caret, then the three words Gifty picked up lift off the
            text one at a time. */
-        .gc-v3-phase-one[data-active=true] .gc-v3-message-card{animation:gcCardLand .55s .1s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-one[data-active=true] .gc-v3-message-card{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
         /* The caret is a real inline element sitting after the last typed
            character, so it walks along the text and wraps with it. */
         .gc-v3-caret{display:inline-block;width:3px;height:.95em;margin-left:3px;vertical-align:-.09em;border-radius:2px;background:#ef735f;animation:gcCaretBlink 1s steps(1,end) infinite}
@@ -2359,23 +2363,23 @@ export default function Home() {
         /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
            that matter light up in turn, drop into the core as signals, the core
            absorbs each one, then the directions rise out of it. */
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source{animation:gcCardLand .5s .08s cubic-bezier(.16,.86,.22,1.04) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-beam{animation:gcScanSweep 1.4s .4s cubic-bezier(.4,0,.5,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-beam{animation:gcScanSweep 1.25s .18s cubic-bezier(.4,0,.5,1) both}
         .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em{animation:gcWordHit .45s cubic-bezier(.16,.8,.2,1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(1){animation-delay:.75s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(2){animation-delay:1s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(3){animation-delay:1.25s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(1){animation-delay:.48s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(2){animation-delay:.7s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-source em:nth-of-type(3){animation-delay:.92s}
         .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i{animation:gcSignalDrop .58s cubic-bezier(.5,0,.75,.4) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(1){animation-delay:1.05s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(2){animation-delay:1.3s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(3){animation-delay:1.55s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-core{animation:gcCoreIgnite .6s .2s cubic-bezier(.16,.86,.22,1.14) both,gcCoreAbsorb .42s 1.5s ease-out 3}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring{animation:gcCoreRing 1.6s 1.5s ease-out infinite}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring-b{animation-delay:1.9s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(1){animation-delay:.78s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(2){animation-delay:1s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-drops i:nth-child(3){animation-delay:1.22s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-core{animation:gcCoreIgnite .55s 0s cubic-bezier(.16,.86,.22,1.14) both,gcCoreAbsorb .42s 1.2s ease-out 3}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring{animation:gcCoreRing 1.6s 1.2s ease-out infinite}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-ring-b{animation-delay:1.6s}
         .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span{animation:gcDirectionRise .5s cubic-bezier(.14,.86,.22,1.14) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(1){animation-delay:2s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(2){animation-delay:2.14s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(3){animation-delay:2.28s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(1){animation-delay:1.5s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(2){animation-delay:1.64s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scan-out span:nth-child(3){animation-delay:1.78s}
         @keyframes gcScanSweep{0%{opacity:0;transform:translateX(-130px)}12%{opacity:1}88%{opacity:1}100%{opacity:0;transform:translateX(560px)}}
         @keyframes gcWordHit{0%{color:#a8c2c4;background:transparent}45%{color:#0d2731;background:#7ed6cb}100%{color:#7ed6cb;background:rgba(126,214,203,.16)}}
         @keyframes gcSignalDrop{0%{opacity:0;transform:translateY(-6px) scale(.4)}25%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(54px) scale(.3)}}
@@ -2389,9 +2393,9 @@ export default function Home() {
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(2){--result-x:0px;--result-r:0deg}
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(3){--result-x:145px;--result-r:12deg}
         .gc-v3-phase-three[data-active=true] .gc-v3-result-art article{animation:gcDeal .62s cubic-bezier(.16,.86,.22,1.06) both}
-        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(2){animation-delay:.18s}
-        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(1){animation-delay:.34s}
-        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(3){animation-delay:.5s}
+        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(2){animation-delay:.04s}
+        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(1){animation-delay:.18s}
+        .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(3){animation-delay:.32s}
         @keyframes gcDeal{0%{opacity:0;transform:translate(0,120px) rotate(0deg) scale(.88)}60%{opacity:1;transform:translate(calc(var(--result-x) * 1.07),-6px) rotate(calc(var(--result-r) * 1.12)) scale(1.02)}100%{opacity:1;transform:translateX(var(--result-x)) rotate(var(--result-r))}}
         @media(max-width:900px){
           .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-87px}
