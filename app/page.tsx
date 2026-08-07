@@ -1220,9 +1220,26 @@ export default function Home() {
       setLandingActivePhase(active);
     };
 
+    /* The thread down the middle of the journey. Each stop draws its own
+       segment, filled from how far that stop has travelled up the screen, so
+       the line grows downward as you scroll and the segments join into one
+       continuous run. Written straight to a CSS variable rather than React
+       state — this updates on every scroll event and re-rendering the page
+       for it would be wasteful. */
+    const drawThread = () => {
+      const scrollerRect = scroller.getBoundingClientRect();
+      const foot = scrollerRect.top + scroller.clientHeight;
+      stops.forEach(element => {
+        const rect = element.getBoundingClientRect();
+        const fill = (foot - rect.top) / Math.max(1, rect.height);
+        element.style.setProperty("--thread-fill", String(Math.min(1, Math.max(0, fill))));
+      });
+    };
+
     const updateLandingProgress = () => {
       const distance = Math.max(1, scroller.scrollHeight - scroller.clientHeight);
       setLandingProgress(Math.min(1, Math.max(0, scroller.scrollTop / distance)));
+      drawThread();
       // Measured straight off the scroll event, not deferred to the next
       // animation frame: the browser already throttles scroll to about one
       // event per frame, and anything frame-based stalls when the tab isn't
@@ -2258,7 +2275,9 @@ export default function Home() {
         .gc-v3-next-arrow{animation:gcScrollPulse 1.8s ease-in-out infinite}
         @keyframes gcScrollBob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
         @keyframes gcScrollPulse{0%,100%{transform:translateY(0)}45%{transform:translateY(6px)}}
-        .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(transparent,color-mix(in srgb,var(--phase-color) 58%,transparent) 18%,color-mix(in srgb,var(--phase-color) 58%,transparent) 82%,transparent);box-shadow:0 0 22px color-mix(in srgb,var(--phase-color) 28%,transparent)}
+        .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
+        /* The bead riding the leading end of the thread. */
+        .gc-v3-phase:after{content:"";position:absolute;z-index:3;left:50%;top:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--phase-color);box-shadow:0 0 14px var(--phase-color);opacity:calc(var(--thread-fill,0) * (1 - var(--thread-fill,0)) * 4);transform:translateY(calc(var(--thread-fill,0) * 100dvh))}
         .gc-v3-phase-inner{position:relative;top:0;min-height:calc(100dvh - 78px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
@@ -2324,7 +2343,60 @@ export default function Home() {
         .gc-v3-result-criteria{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
         .gc-v3-result-criteria span{padding:4px 8px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.15);color:#ffe2cd;font:750 10.5px 'Hanken Grotesk',sans-serif;line-height:1}
         .gc-v3-next{position:absolute;left:50%;bottom:26px;z-index:8;min-width:285px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
-        .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:100px 24px 90px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start:before,.gc-v3-start:after{content:"";position:absolute;left:50%;top:-22%;width:2px;height:72%;transform-origin:50% 0;background:linear-gradient(rgba(255,193,159,0),rgba(255,193,159,.72),rgba(239,115,95,0));filter:drop-shadow(0 0 12px rgba(239,115,95,.8));pointer-events:none}.gc-v3-start:before{transform:rotate(24deg)}.gc-v3-start:after{transform:rotate(-24deg)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-mark{width:68px;height:68px;margin:0 auto 22px;display:grid;place-items:center;border-radius:21px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 18px 40px rgba(4,20,29,.3),0 0 0 12px rgba(239,115,95,.08)}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
+        /* ── The thread's last run, and the parcel it arrives at ──
+           The two diagonal beams that used to split apart here are gone: the
+           line comes straight down out of phase 3, reaches the parcel, and
+           the parcel opens. Same rule as everywhere else on this page — the
+           descent is scroll-driven, the opening is opacity and transform. */
+        .gc-v3-start{--phase-color:#ffc19f}
+        .gc-v3-start:before,.gc-v3-start:after{content:none}
+        .gc-v3-parcel{position:relative;z-index:3;display:block;width:96px;height:86px;margin:0 auto 26px}
+        /* Hung off the parcel rather than off the section, so the thread lands
+           exactly on the lid at every viewport height instead of stopping
+           short of it. */
+        .gc-v3-parcel:before{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:1.5px;height:clamp(200px,40vh,380px);transform-origin:50% 0;transform:translateX(-50%) scaleY(var(--thread-fill,0));background:linear-gradient(#ffc36f,#ef735f);box-shadow:0 0 20px rgba(239,115,95,.45)}
+        .gc-v3-parcel:after{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#ef735f;box-shadow:0 0 14px #ef735f;opacity:calc(var(--thread-fill,0) * (1 - var(--thread-fill,0)) * 4);transform:translateY(calc((var(--thread-fill,0) - 1) * clamp(200px,40vh,380px)))}
+        .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,180,.55),rgba(239,115,95,.16) 42%,transparent 66%);opacity:0}
+        .gc-v3-parcel-box{position:absolute;left:50%;bottom:0;width:68px;height:60px;margin-left:-34px;border-radius:14px;background:linear-gradient(150deg,#ffc19f,#ef735f 72%);box-shadow:0 16px 34px rgba(4,20,29,.34),inset 0 1px 0 rgba(255,255,255,.5);transform-origin:50% 100%}
+        .gc-v3-parcel-box>b{position:absolute;left:50%;top:0;bottom:0;width:8px;margin-left:-4px;background:rgba(23,48,62,.32)}
+        .gc-v3-parcel-box>em{position:absolute;left:0;right:0;top:14px;display:grid;place-items:center;opacity:0}
+        .gc-v3-parcel-lid{position:absolute;left:50%;top:14px;width:82px;height:20px;margin-left:-41px;border-radius:8px;background:linear-gradient(150deg,#ffd9bd,#ffc19f 78%);box-shadow:0 8px 18px rgba(4,20,29,.3),inset 0 1px 0 rgba(255,255,255,.6);transform-origin:50% 100%}
+        .gc-v3-parcel-lid>b{position:absolute;left:50%;bottom:100%;width:8px;height:11px;margin-left:-4px;border-radius:3px 3px 0 0;background:#ffd9bd}
+        .gc-v3-parcel-bit{position:absolute;left:50%;top:34%;width:7px;height:7px;margin:-3px 0 0 -3px;border-radius:2px;background:#ffc36f;opacity:0}
+        .gc-v3-parcel-bit:nth-of-type(4){--bit-x:-96px;--bit-y:-74px;--bit-r:-210deg;background:#ef735f}
+        .gc-v3-parcel-bit:nth-of-type(5){--bit-x:88px;--bit-y:-86px;--bit-r:240deg}
+        .gc-v3-parcel-bit:nth-of-type(6){--bit-x:-124px;--bit-y:-18px;--bit-r:160deg;width:5px;height:14px}
+        .gc-v3-parcel-bit:nth-of-type(7){--bit-x:118px;--bit-y:-26px;--bit-r:-190deg;width:14px;height:5px;background:#ef735f}
+        .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-58px;--bit-y:-104px;--bit-r:120deg;border-radius:50%}
+        .gc-v3-parcel-bit:nth-of-type(9){--bit-x:52px;--bit-y:-110px;--bit-r:-140deg;border-radius:50%;background:#fff4e8}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1s .12s cubic-bezier(.16,.82,.2,1.06) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .7s .12s cubic-bezier(.18,.86,.24,1.14) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .5s .5s cubic-bezier(.16,.86,.22,1.16) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .8s .26s cubic-bezier(.2,.8,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit{animation:gcBitFly .95s .26s cubic-bezier(.12,.72,.2,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(5){animation-delay:.3s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(6){animation-delay:.34s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(7){animation-delay:.29s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(8){animation-delay:.36s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(9){animation-delay:.32s}
+        @keyframes gcLidOff{0%{opacity:1;transform:translateY(0) rotate(0)}18%{transform:translateY(2px) rotate(0)}55%{opacity:1;transform:translateY(-58px) rotate(-15deg)}100%{opacity:0;transform:translateY(-96px) rotate(-26deg)}}
+        @keyframes gcBoxSpring{0%{transform:scale(1,1)}22%{transform:scale(1.1,.86)}52%{transform:scale(.95,1.08)}100%{transform:scale(1,1)}}
+        @keyframes gcParcelContents{0%{opacity:0;transform:translateY(16px) scale(.5)}70%{opacity:1;transform:translateY(-3px) scale(1.08)}100%{opacity:1;transform:none}}
+        @keyframes gcParcelBurst{0%{opacity:0;transform:scale(.24)}30%{opacity:.95}100%{opacity:0;transform:scale(1.5)}}
+        @keyframes gcBitFly{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}18%{opacity:1}100%{opacity:0;transform:translate(var(--bit-x),var(--bit-y)) scale(1.05) rotate(var(--bit-r))}}
+        @media(max-width:900px){
+          .gc-v3-parcel{width:84px;height:76px;margin-bottom:20px}
+          .gc-v3-parcel-box{width:60px;height:52px;margin-left:-30px;border-radius:12px}
+          .gc-v3-parcel-lid{width:72px;height:17px;margin-left:-36px;top:12px}
+          .gc-v3-parcel-burst{width:170px;height:170px;margin:-85px 0 0 -85px}
+          .gc-v3-parcel-bit:nth-of-type(4){--bit-x:-70px;--bit-y:-58px}
+          .gc-v3-parcel-bit:nth-of-type(5){--bit-x:64px;--bit-y:-66px}
+          .gc-v3-parcel-bit:nth-of-type(6){--bit-x:-88px;--bit-y:-14px}
+          .gc-v3-parcel-bit:nth-of-type(7){--bit-x:84px;--bit-y:-20px}
+          .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-42px;--bit-y:-76px}
+          .gc-v3-parcel-bit:nth-of-type(9){--bit-x:38px;--bit-y:-80px}
+        }
+        .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:100px 24px 90px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
         @keyframes gcSearchArrival{0%,100%{transform:scale(1)}50%{transform:scale(1.014)}}
         /* ── Phase choreographies ──
            Every keyframe below animates only opacity and transform. The set
@@ -2402,10 +2474,8 @@ export default function Home() {
           .gc-v3-phase-three .gc-v3-result-art article:nth-child(3){--result-x:87px}
           .gc-v3-phase-one[data-active=true] .gc-v3-message-card:after{top:25px;left:25px}
         }
-        .gc-v3-start[data-active=true]:before{animation:gcBeamLeft 1.1s cubic-bezier(.15,.8,.2,1) both}
-        @keyframes gcBeamLeft{0%{opacity:0;transform:rotate(62deg) scaleY(.1)}45%{opacity:1}100%{opacity:.55;transform:rotate(24deg) scaleY(1)}}@keyframes gcBeamRight{0%{opacity:0;transform:rotate(-62deg) scaleY(.1)}45%{opacity:1}100%{opacity:.55;transform:rotate(-24deg) scaleY(1)}}
+        
         @keyframes gcStartReveal{0%{opacity:0;transform:translateY(60px) scale(.86)}100%{opacity:1;transform:none}}
-        @keyframes gcGiftLanding{0%{opacity:0;transform:translateY(-70px) rotate(-24deg) scale(.4)}62%{opacity:1;transform:translateY(6px) rotate(5deg) scale(1.1)}100%{opacity:1;transform:none}}
         @keyframes gcSearchReveal{0%{opacity:0;transform:translateY(32px) scaleX(.7)}68%{opacity:1;transform:translateY(-3px) scaleX(1.02)}100%{opacity:1;transform:none}}
         @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
         @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px)}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:13.5px}.gc-v3-scroll-cue b{width:10px;height:10px}}
@@ -2683,7 +2753,16 @@ export default function Home() {
 
                   <section className="gc-v3-start" data-active={landingActivePhase === 4}>
                     <div className="gc-v3-start-inner">
-                      <span className="gc-v3-start-mark"><GiftSVG size={30} fill={N.navy3}/></span><p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
+                      {/* The thread arrives here and the parcel it has been
+                          leading to opens: lid off, box springs, contents up. */}
+                      <span className="gc-v3-parcel" aria-hidden="true">
+                        <i className="gc-v3-parcel-burst"/>
+                        <i className="gc-v3-parcel-lid"><b/></i>
+                        <i className="gc-v3-parcel-box"><b/><em><GiftSVG size={26} fill={N.navy3}/></em></i>
+                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
+                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
+                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
+                      </span><p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
                       <span className="gc-v3-start-sub">Partiamo da Nome, Occasione e Budget.</span>
                       <button type="button" className="gc-v3-search-bar" onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}>
                         <span aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></span><strong>{g.recipientName || landingForm.nameLabel}</strong><b>›</b>
