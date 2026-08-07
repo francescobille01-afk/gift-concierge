@@ -42,13 +42,13 @@ const BODY    = "'Hanken Grotesk', sans-serif";
    picked per card so the shot actually matches the gift described. Portrait
    4:5 crops, served pre-sized so the cards stay sharp at hero scale. ─── */
 const GIFT_SHOWCASE = [
-  { photo:"https://plus.unsplash.com/premium_photo-1664970900335-a7c99062bc51?auto=format&fit=crop&w=760&h=950&q=80", position:"center 34%", category:"Caffè", title:"Set da degustazione specialty", recipient:"Per Giulia", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
-  { photo:"https://images.unsplash.com/photo-1622260614153-03223fb72052?auto=format&fit=crop&w=760&h=950&q=80", position:"center 38%", category:"Outdoor", title:"Zaino da trekking tecnico", recipient:"Per Luca", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
-  { photo:"https://images.unsplash.com/photo-1701115109838-c4a72a2b0de4?auto=format&fit=crop&w=760&h=950&q=80", position:"center 32%", category:"Foto", title:"Fotocamera istantanea", recipient:"Per Marta", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
-  { photo:"https://images.unsplash.com/photo-1764557159396-419b85356035?auto=format&fit=crop&w=760&h=950&q=80", position:"center 32%", category:"Tech", title:"Cuffie over-ear minimal", recipient:"Per Andrea", budget:"€120-160", occasion:"Natale", interest:"Musica" },
-  { photo:"https://images.unsplash.com/photo-1762755647813-017e128a4ba0?auto=format&fit=crop&w=760&h=950&q=80", position:"center 30%", category:"Casa", title:"Monstera in vaso di terracotta", recipient:"Per Sofia", budget:"€30-45", occasion:"Nuova casa", interest:"Piante" },
-  { photo:"https://images.unsplash.com/photo-1601148071764-8c3f50e9ab20?auto=format&fit=crop&w=760&h=950&q=80", position:"center 36%", category:"Musica", title:"Giradischi da salotto", recipient:"Per Marco", budget:"€150-220", occasion:"Anniversario", interest:"Vinili" },
-  { photo:"https://images.unsplash.com/photo-1743110727935-0dc8abf01509?auto=format&fit=crop&w=760&h=950&q=80", position:"center 38%", category:"Cucina", title:"Coltello da chef forgiato", recipient:"Per Elena", budget:"€80-120", occasion:"Nuova casa", interest:"Cucina" },
+  { photo:"https://plus.unsplash.com/premium_photo-1664970900335-a7c99062bc51?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Caffè", title:"Set da degustazione specialty", recipient:"Per Giulia", budget:"€40-60", occasion:"Compleanno", interest:"Caffè" },
+  { photo:"https://images.unsplash.com/photo-1622260614153-03223fb72052?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Outdoor", title:"Zaino da trekking tecnico", recipient:"Per Luca", budget:"€90-130", occasion:"Laurea", interest:"Trekking" },
+  { photo:"https://images.unsplash.com/photo-1701115109838-c4a72a2b0de4?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Foto", title:"Fotocamera istantanea", recipient:"Per Marta", budget:"€70-100", occasion:"Anniversario", interest:"Fotografia" },
+  { photo:"https://images.unsplash.com/photo-1764557159396-419b85356035?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Tech", title:"Cuffie over-ear minimal", recipient:"Per Andrea", budget:"€120-160", occasion:"Natale", interest:"Musica" },
+  { photo:"https://images.unsplash.com/photo-1762755647813-017e128a4ba0?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Casa", title:"Monstera in vaso di terracotta", recipient:"Per Sofia", budget:"€30-45", occasion:"Nuova casa", interest:"Piante" },
+  { photo:"https://images.unsplash.com/photo-1601148071764-8c3f50e9ab20?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Musica", title:"Giradischi da salotto", recipient:"Per Marco", budget:"€150-220", occasion:"Anniversario", interest:"Vinili" },
+  { photo:"https://images.unsplash.com/photo-1743110727935-0dc8abf01509?auto=format&fit=crop&crop=entropy&w=760&h=680&q=80",  category:"Cucina", title:"Coltello da chef forgiato", recipient:"Per Elena", budget:"€80-120", occasion:"Nuova casa", interest:"Cucina" },
 ];
 
 /* Phase 3 shows real gift cards, not placeholders — the same three the
@@ -74,9 +74,10 @@ const ENGINE_TOKENS = [
   { kind:"ritmo",     label:"ogni weekend" },
   { kind:"abitudine", label:"cucina per altri" },
 ];
-/* How long you stay on a phase before it hands over to the next. Long
-   enough to read the copy after its entrance has finished playing. */
-const PHASE_DWELL_MS = 5400;
+/* How long you stay on a phase before it hands over to the next, and how
+   long the opening screen holds before it carries you into step 1. */
+const PHASE_DWELL_MS = 4600;
+const HERO_DWELL_MS = 5000;
 
 /* The five ideas that spill out of the parcel once it opens. */
 const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4]];
@@ -1343,16 +1344,15 @@ export default function Home() {
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
   }, [screen]);
 
-  /* ── The thread reaching the bottom of a phase carries you to the next one.
-     The spark takes PHASE_DWELL_MS to run the length of the line, so the
-     hand-off happens exactly when it lands. Scrolling yourself at any point
-     re-targets the phase and restarts this, so it never fights you. ── */
+  /* ── Each stop hands over to the next on its own: the opening screen after
+     HERO_DWELL_MS, every phase after PHASE_DWELL_MS. Scrolling yourself
+     re-targets the phase and restarts the timer, so it never fights you. ── */
   useEffect(() => {
     if (screen !== "landing") return;
-    if (landingActivePhase < 1 || landingActivePhase > 3) return;
+    if (landingActivePhase > 3) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const next = [".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"][landingActivePhase - 1];
-    const id = window.setTimeout(() => scrollLandingTo(next), PHASE_DWELL_MS);
+    const next = [".gc-v3-phase-one", ".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"][landingActivePhase];
+    const id = window.setTimeout(() => scrollLandingTo(next), landingActivePhase === 0 ? HERO_DWELL_MS : PHASE_DWELL_MS);
     return () => window.clearTimeout(id);
   }, [screen, landingActivePhase]);
 
@@ -2192,19 +2192,19 @@ export default function Home() {
            edge on purpose — the lane is 100vw regardless of page padding. */
         .gc-v3-marquee{position:relative;width:100vw;max-width:100vw;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;perspective:1250px;perspective-origin:50% 50%;overflow-x:clip;-webkit-mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent);mask-image:linear-gradient(90deg,transparent,#000 11%,#000 89%,transparent)}
         .gc-v3-marquee-track{position:relative;width:0;height:0;transform-style:preserve-3d}
-        .gc-v3-marquee-card{--gc-card-panel:170px;position:absolute;top:0;left:0;height:min(58vh,600px);aspect-ratio:4/5;margin-top:calc(min(58vh,600px) / -2);margin-left:calc(min(58vh,600px) * 0.4 * -1);border:1px solid rgba(255,255,255,.13);border-radius:26px;overflow:hidden;background:#102733;box-shadow:0 28px 64px rgba(0,0,0,.48);will-change:transform,opacity;backface-visibility:hidden}
+        .gc-v3-marquee-card{--gc-card-panel:150px;position:absolute;top:0;left:0;height:min(58vh,600px);aspect-ratio:4/5;margin-top:calc(min(58vh,600px) / -2);margin-left:calc(min(58vh,600px) * 0.4 * -1);border:1px solid rgba(255,255,255,.13);border-radius:26px;overflow:hidden;background:#102733;box-shadow:0 28px 64px rgba(0,0,0,.48);will-change:transform,opacity;backface-visibility:hidden}
         .gc-v3-marquee-card>img{position:absolute;left:0;right:0;top:0;width:100%;height:calc(100% - var(--gc-card-panel));object-fit:cover;display:block}
         .gc-v3-marquee-fade{position:absolute;left:0;right:0;top:0;height:calc(100% - var(--gc-card-panel));background:linear-gradient(180deg,rgba(21,43,56,.02) 58%,rgba(10,31,41,.25) 100%);pointer-events:none}
         .gc-v3-marquee-cat{position:absolute;top:16px;left:16px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(4px);color:#fff4e8;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
         .gc-v3-marquee-body{position:absolute;left:0;right:0;bottom:0;height:var(--gc-card-panel);box-sizing:border-box;padding:15px 15px 12px;display:flex;flex-direction:column;align-items:center;border-top:1px solid rgba(255,255,255,.14);background:linear-gradient(155deg,#102b38,#0b202b);box-shadow:0 -12px 28px rgba(4,19,27,.12),inset 0 1px 0 rgba(255,255,255,.05);color:#fff4e8;text-align:center}
-        .gc-v3-marquee-body strong{min-height:44px;display:flex;align-items:center;justify-content:center;font-size:clamp(17px,1.55vw,21px);font-weight:750;line-height:1.1;letter-spacing:-.02em;text-shadow:0 2px 10px rgba(0,0,0,.35)}
-        .gc-v3-marquee-body p{margin:3px 0 11px;font-size:14.5px;font-weight:750;line-height:1;letter-spacing:.01em;color:#ffc19f}
+        .gc-v3-marquee-body strong{min-height:40px;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,1.45vw,19px);font-weight:750;line-height:1.1;letter-spacing:-.02em;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+        .gc-v3-marquee-body p{margin:3px 0 11px;font-size:18px;font-weight:800;line-height:1.05;letter-spacing:-.01em;color:#ffc19f}
         .gc-v3-marquee-criteria{width:100%;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:750;color:#ffe2cd;flex-wrap:wrap}
         .gc-v3-marquee-criteria span{padding:6px 10px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(255,193,159,.17);line-height:1}
         .gc-v3-marquee-criteria i{display:none}
         @media(max-width:640px){
-          .gc-v3-marquee-card{--gc-card-panel:158px;height:min(52vh,480px);margin-top:calc(min(52vh,480px) / -2);margin-left:calc(min(52vh,480px) * 0.4 * -1);border-radius:22px}
-          .gc-v3-marquee-body{padding:14px 10px 11px}.gc-v3-marquee-body strong{min-height:40px;font-size:16.5px}.gc-v3-marquee-body p{font-size:14px;margin-bottom:9px}.gc-v3-marquee-criteria{gap:5px;font-size:11.5px}.gc-v3-marquee-criteria span{padding:5px 8px}
+          .gc-v3-marquee-card{--gc-card-panel:140px;height:min(52vh,480px);margin-top:calc(min(52vh,480px) / -2);margin-left:calc(min(52vh,480px) * 0.4 * -1);border-radius:22px}
+          .gc-v3-marquee-body{padding:14px 10px 11px}.gc-v3-marquee-body strong{min-height:36px;font-size:15.5px}.gc-v3-marquee-body p{font-size:16px;margin-bottom:8px}.gc-v3-marquee-criteria{gap:5px;font-size:11.5px}.gc-v3-marquee-criteria span{padding:5px 8px}
           .gc-v3-marquee{perspective:900px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
         }
         .gc-v2-node{position:absolute;z-index:3;width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#294b59;border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 24px rgba(3,18,27,.28);opacity:.38;transform:scale(.86);transition:.42s cubic-bezier(.2,.8,.2,1)}.gc-v2-node[data-active=true]{opacity:1;transform:scale(1);background:linear-gradient(145deg,#ffc19f,#ef735f);color:#17303e;box-shadow:0 0 0 7px rgba(239,115,95,.12),0 12px 28px rgba(3,18,27,.34)}.gc-v2-node-1{left:4.5%;top:144px}.gc-v2-node-2{left:67%;top:98px}.gc-v2-node-3{right:2%;top:82px}
@@ -2355,15 +2355,14 @@ export default function Home() {
         .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         /* The bead riding the leading end of the thread. */
         /* ── The thread ──
-           One continuous conduit down the middle of the whole journey: always
-           there, always flowing. The pulses run at the same cadence through
-           every section and only the colour changes as you pass from one to
-           the next, so it reads as a single line carrying you down rather than
-           a segment that draws itself and stops at each stop. */
-        .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 24%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--phase-color) 26%,transparent)}
-        .gc-v3-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 46px,color-mix(in srgb,var(--phase-color) 30%,transparent) 60px,var(--phase-color) 74px,color-mix(in srgb,var(--phase-color) 30%,transparent) 88px,transparent 102px 148px);animation:gcThreadFlow 2.3s linear infinite}
-        /* One tile of the repeat, so the loop is seamless. */
-        @keyframes gcThreadFlow{to{transform:translateY(148px)}}
+           A ladder of rungs rather than a glowing tube: the column is masked
+           into short dashes, and a band of light runs down through them. The
+           travel reads as descent without the line itself being the subject.
+           The mask is static; only the band moves. */
+        .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:16px;margin-left:-8px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 22%,transparent);-webkit-mask-image:repeating-linear-gradient(180deg,#000 0 3px,transparent 3px 21px);mask-image:repeating-linear-gradient(180deg,#000 0 3px,transparent 3px 21px)}
+        .gc-v3-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 84px,color-mix(in srgb,var(--phase-color) 45%,transparent) 126px,#fff4e8 168px,color-mix(in srgb,var(--phase-color) 45%,transparent) 210px,transparent 252px 336px);animation:gcThreadFlow 3.4s linear infinite}
+        /* One tile of the repeat, so the run never seams. */
+        @keyframes gcThreadFlow{to{transform:translateY(336px)}}
         .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
@@ -2456,7 +2455,7 @@ export default function Home() {
            under it. Offsets are in vw so they stay pinned to the edges at any
            width. Each card is thrown from inside the box on its own arc and
            lands with a bounce, then breathes. */
-        .gc-v3-pops{position:absolute;z-index:4;left:50%;bottom:clamp(40px,6vh,72px);width:0;height:0;pointer-events:none}
+        .gc-v3-pops{position:absolute;z-index:1;left:50%;bottom:clamp(40px,6vh,72px);width:0;height:0;pointer-events:none}
         .gc-v3-pop{position:absolute;left:0;bottom:0;width:clamp(72px,7.4vw,102px);aspect-ratio:4/5;margin-left:calc(clamp(72px,7.4vw,102px) / -2);border:1px solid rgba(255,255,255,.16);border-radius:14px;overflow:hidden;background:#0f2733;box-shadow:0 18px 34px rgba(3,18,27,.5);opacity:0}
         .gc-v3-pop>img{position:absolute;left:0;right:0;top:0;width:100%;height:68%;object-fit:cover;display:block}
         .gc-v3-pop>b{position:absolute;left:0;right:0;bottom:0;height:32%;box-sizing:border-box;padding:0 6px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,.12);background:linear-gradient(155deg,#102b38,#0b202b);color:#fff4e8;font:750 8.5px/1.1 'Hanken Grotesk',sans-serif;text-align:center}
@@ -2464,22 +2463,38 @@ export default function Home() {
         .gc-v3-pop[data-slot="1"]{--pop-x:-30;--pop-y:-34px;--pop-tilt:6deg}
         .gc-v3-pop[data-slot="2"]{--pop-x:30;--pop-y:-34px;--pop-tilt:-6deg}
         .gc-v3-pop[data-slot="3"]{--pop-x:40;--pop-y:0px;--pop-tilt:9deg}
-        .gc-v3-start[data-active=true] .gc-v3-pop{animation:gcPopOut .95s cubic-bezier(.22,.72,.3,1) both,gcPopBreathe 3.4s ease-in-out infinite}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.35s,2.3s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:1.5s,2.45s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
-        @keyframes gcPopOut{
-          0%{opacity:0;transform:translate(0,var(--pop-from-y,-220px)) scale(.06) rotate(0)}
-          14%{opacity:1}
-          52%{transform:translate(calc(var(--pop-x) * 1.04vw),calc(var(--pop-y) - clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
-          76%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) + 7px)) scale(.97) rotate(var(--pop-tilt))}
-          89%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 9px)) scale(1.02) rotate(var(--pop-tilt))}
-          100%{opacity:1;transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) scale(1) rotate(var(--pop-tilt))}
-        }
-        @keyframes gcPopBreathe{
+        /* Once they have landed the cards don't stay put: each drifts on its own
+           loop, running out to the edges and back across the screen. They sit
+           below the copy and the search box so they pass behind them rather
+           than over. Waypoints are multiples of each card's own landing offset,
+           so one path serves every breakpoint. */
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation:gcPopOut .95s 1.35s cubic-bezier(.22,.72,.3,1) both,gcDriftA 26s 2.3s linear infinite}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation:gcPopOut .95s 1.5s cubic-bezier(.22,.72,.3,1) both,gcDriftB 31s 2.45s linear infinite}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation:gcPopOut .95s 1.65s cubic-bezier(.22,.72,.3,1) both,gcDriftC 28s 2.6s linear infinite}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation:gcPopOut .95s 1.8s cubic-bezier(.22,.72,.3,1) both,gcDriftD 34s 2.75s linear infinite}
+        @keyframes gcDriftA{
           0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
-          50%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 7px)) rotate(calc(var(--pop-tilt) * .82))}
+          26%{transform:translate(calc(var(--pop-x) * 1.08vw),-30vh) rotate(calc(var(--pop-tilt) + 10deg))}
+          52%{transform:translate(calc(var(--pop-x) * .46vw),-54vh) rotate(calc(var(--pop-tilt) - 12deg))}
+          78%{transform:translate(calc(var(--pop-x) * 1.06vw),-21vh) rotate(calc(var(--pop-tilt) + 5deg))}
+        }
+        @keyframes gcDriftB{
+          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
+          22%{transform:translate(calc(var(--pop-x) * .34vw),-40vh) rotate(calc(var(--pop-tilt) - 9deg))}
+          48%{transform:translate(calc(var(--pop-x) * 1.46vw),-58vh) rotate(calc(var(--pop-tilt) + 13deg))}
+          74%{transform:translate(calc(var(--pop-x) * 1.34vw),-12vh) rotate(calc(var(--pop-tilt) - 6deg))}
+        }
+        @keyframes gcDriftC{
+          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
+          24%{transform:translate(calc(var(--pop-x) * 1.44vw),-24vh) rotate(calc(var(--pop-tilt) + 11deg))}
+          50%{transform:translate(calc(var(--pop-x) * .3vw),-52vh) rotate(calc(var(--pop-tilt) - 14deg))}
+          76%{transform:translate(calc(var(--pop-x) * 1.3vw),-35vh) rotate(calc(var(--pop-tilt) + 7deg))}
+        }
+        @keyframes gcDriftD{
+          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
+          28%{transform:translate(calc(var(--pop-x) * 1.07vw),-46vh) rotate(calc(var(--pop-tilt) - 8deg))}
+          54%{transform:translate(calc(var(--pop-x) * .5vw),-18vh) rotate(calc(var(--pop-tilt) + 12deg))}
+          80%{transform:translate(calc(var(--pop-x) * 1.1vw),-49vh) rotate(calc(var(--pop-tilt) - 5deg))}
         }
         @media(max-width:900px){
           .gc-v3-pops{bottom:clamp(34px,5vh,56px)}
@@ -2512,7 +2527,7 @@ export default function Home() {
         .gc-v3-parcel-bit:nth-of-type(7){--bit-x:118px;--bit-y:-26px;--bit-r:-190deg;width:14px;height:5px;background:#ef735f}
         .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-58px;--bit-y:-104px;--bit-r:120deg;border-radius:50%}
         .gc-v3-parcel-bit:nth-of-type(9){--bit-x:52px;--bit-y:-110px;--bit-r:-140deg;border-radius:50%;background:#fff4e8}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1s .12s cubic-bezier(.16,.82,.2,1.06) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1.25s .12s cubic-bezier(.28,.62,.3,1) both}
         .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .7s .12s cubic-bezier(.18,.86,.24,1.14) both}
         .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .5s .5s cubic-bezier(.16,.86,.22,1.16) both}
         .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .8s .26s cubic-bezier(.2,.8,.3,1) both}
@@ -2522,7 +2537,7 @@ export default function Home() {
         .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(7){animation-delay:.29s}
         .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(8){animation-delay:.36s}
         .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(9){animation-delay:.32s}
-        @keyframes gcLidOff{0%{opacity:1;transform:translateY(0) rotate(0)}18%{transform:translateY(2px) rotate(0)}55%{opacity:1;transform:translateY(-58px) rotate(-15deg)}100%{opacity:0;transform:translateY(-96px) rotate(-26deg)}}
+        @keyframes gcLidOff{0%{transform:translate(0,0) rotate(0)}12%{transform:translate(0,4px) rotate(0)}42%{transform:translate(calc(var(--lid-x,86px) * .3),calc(var(--lid-y,40px) - 124px)) rotate(-58deg)}68%{transform:translate(calc(var(--lid-x,86px) * .74),calc(var(--lid-y,40px) - 58px)) rotate(-126deg)}86%{transform:translate(var(--lid-x,86px),calc(var(--lid-y,40px) + 5px)) rotate(-178deg)}93%{transform:translate(var(--lid-x,86px),calc(var(--lid-y,40px) - 8px)) rotate(-190deg)}100%{transform:translate(var(--lid-x,86px),var(--lid-y,40px)) rotate(-196deg)}}
         @keyframes gcBoxSpring{0%{transform:scale(1,1)}22%{transform:scale(1.1,.86)}52%{transform:scale(.95,1.08)}100%{transform:scale(1,1)}}
         @keyframes gcParcelContents{0%{opacity:0;transform:translateY(16px) scale(.5)}70%{opacity:1;transform:translateY(-3px) scale(1.08)}100%{opacity:1;transform:none}}
         @keyframes gcParcelBurst{0%{opacity:0;transform:scale(.24)}30%{opacity:.95}100%{opacity:0;transform:scale(1.5)}}
@@ -2530,7 +2545,7 @@ export default function Home() {
         @media(max-width:900px){
           .gc-v3-parcel{width:84px;height:76px;margin-bottom:20px}
           .gc-v3-parcel-box{width:60px;height:52px;margin-left:-30px;border-radius:12px}
-          .gc-v3-parcel-lid{width:72px;height:17px;margin-left:-36px;top:12px}
+          .gc-v3-parcel-lid{width:72px;height:17px;margin-left:-36px;top:12px;--lid-x:70px;--lid-y:34px}
           .gc-v3-parcel-burst{width:170px;height:170px;margin:-85px 0 0 -85px}
           .gc-v3-parcel-bit:nth-of-type(4){--bit-x:-70px;--bit-y:-58px}
           .gc-v3-parcel-bit:nth-of-type(5){--bit-x:64px;--bit-y:-66px}
@@ -2539,7 +2554,7 @@ export default function Home() {
           .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-42px;--bit-y:-76px}
           .gc-v3-parcel-bit:nth-of-type(9){--bit-x:38px;--bit-y:-80px}
         }
-        .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:100px 24px 90px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
+        .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:64px 24px 150px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
         @keyframes gcSearchArrival{0%,100%{transform:scale(1)}50%{transform:scale(1.014)}}
         /* ── Phase choreographies ──
            Every keyframe below animates only opacity and transform. The set
@@ -2625,7 +2640,7 @@ export default function Home() {
         
         @keyframes gcStartReveal{0%{opacity:0;transform:translateY(60px) scale(.86)}100%{opacity:1;transform:none}}
         @keyframes gcSearchReveal{0%{opacity:0;transform:translateY(32px) scaleX(.7)}68%{opacity:1;transform:translateY(-3px) scaleX(1.02)}100%{opacity:1;transform:none}}
-        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:28px;padding:82px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:28px;padding:82px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:56px 18px 120px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
         @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:100%}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:13.5px}.gc-v3-scroll-cue b{width:10px;height:10px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
         @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:20px;width:min(270px,calc(100% - 44px));min-width:0}}
@@ -2816,7 +2831,7 @@ export default function Home() {
                             twice at once. */}
                         {[...GIFT_SHOWCASE, ...GIFT_SHOWCASE].map((item, i) => (
                           <div key={i} className="gc-v3-marquee-card">
-                            <img src={item.photo} alt="" loading={i < 4 ? "eager" : "lazy"} decoding="async" style={{ objectPosition:item.position }} />
+                            <img src={item.photo} alt="" loading={i < 4 ? "eager" : "lazy"} decoding="async" />
                             <div className="gc-v3-marquee-fade" />
                             <span className="gc-v3-marquee-cat">{item.category}</span>
                             <div className="gc-v3-marquee-body">
@@ -2892,7 +2907,7 @@ export default function Home() {
                             {/* Not lazy: these three enter from scale(.08),
                                 so a lazy loader can decide they're too small
                                 to be "in view" and never fetch them. */}
-                            <img src={item.photo} alt="" decoding="async" style={{ objectPosition:item.position }} />
+                            <img src={item.photo} alt="" decoding="async" />
                             <span>{String(i + 1).padStart(2, "0")}</span>
                             <div className="gc-v3-result-body">
                               <strong>{item.title}</strong>
@@ -2928,7 +2943,7 @@ export default function Home() {
                     <div className="gc-v3-pops" aria-hidden="true">
                       {PARCEL_POPS.map((item, i) => (
                         <span key={item.title} className="gc-v3-pop" data-slot={i}>
-                          <img src={item.photo} alt="" decoding="async" style={{ objectPosition:item.position }} />
+                          <img src={item.photo} alt="" decoding="async" />
                           <b>{item.title}</b>
                         </span>
                       ))}
