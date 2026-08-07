@@ -82,10 +82,16 @@ const PHASE_DWELL_MS = 5400;
 const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4]];
 
 const ENGINE_RESULTS = [
-  { label:"Outdoor",   score:88 },
-  { label:"Terrazzo",  score:64 },
-  { label:"Cucina",    score:47 },
+  { label:"Outdoor",  score:88 },
+  { label:"Terrazzo", score:71 },
+  { label:"Cucina",   score:58 },
+  { label:"Casa",     score:39 },
+  { label:"Tech",     score:24 },
+  { label:"Moda",     score:11 },
 ];
+/* Where the "idee valutate" counter lands, and how long it takes. */
+const ANALYSED_TARGET = 1284;
+const ANALYSED_MS = 1500;
 
 const AMAZON_TAG = "gifty0de-21";
 // Testing phase: we only have an amazon.it affiliate link, so force every
@@ -1148,6 +1154,7 @@ export default function Home() {
   const [landingProgress, setLandingProgress] = useState(0);
   const [landingActivePhase, setLandingActivePhase] = useState(0);
   const [typedCount, setTypedCount] = useState(0);
+  const [analysedCount, setAnalysedCount] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
   // Set when the mobile landing bar's free-text answer is used to fill
   // g.relationship directly — step 0 then skips its own relationship
@@ -1348,6 +1355,49 @@ export default function Home() {
     const id = window.setTimeout(() => scrollLandingTo(next), PHASE_DWELL_MS);
     return () => window.clearTimeout(id);
   }, [screen, landingActivePhase]);
+
+  /* ── Phase 2's counter. Runs the tally up while the columns build, so the
+     panel reads as work happening rather than a static result. ── */
+  useEffect(() => {
+    if (screen !== "landing") return;
+    if (landingActivePhase !== 2) { setAnalysedCount(0); return; }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setAnalysedCount(ANALYSED_TARGET);
+      return;
+    }
+    const started = performance.now();
+    const id = window.setInterval(() => {
+      const t = Math.min(1, (performance.now() - started) / ANALYSED_MS);
+      // Ease out, so it sprints then settles onto the final number.
+      setAnalysedCount(Math.round(ANALYSED_TARGET * (1 - Math.pow(1 - t, 3))));
+      if (t >= 1) window.clearInterval(id);
+    }, 40);
+    return () => window.clearInterval(id);
+  }, [screen, landingActivePhase]);
+
+  /* ── The cards have to leave from inside the parcel, so the distance from
+     where they come to rest up to the box is measured rather than guessed —
+     it changes with viewport height, and a fixed offset had them starting
+     level with the search bar instead. ── */
+  useEffect(() => {
+    if (screen !== "landing") return;
+    const measure = () => {
+      const pops = document.querySelector<HTMLElement>(".gc-v3-pops");
+      const box = document.querySelector<HTMLElement>(".gc-v3-parcel-box");
+      if (!pops || !box) return;
+      const card = pops.querySelector<HTMLElement>(".gc-v3-pop");
+      if (!card) return;
+      const from = box.getBoundingClientRect();
+      const origin = pops.getBoundingClientRect();
+      // The cards hang by their bottom edge off a zero-height origin, so half
+      // a card has to come back to put their centre inside the box.
+      const half = card.offsetHeight / 2;
+      pops.style.setProperty("--pop-from-y", `${Math.round(from.top + from.height / 2 - origin.top + half)}px`);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [screen]);
 
   /* ── Phase 1: type the example message out, character by character.
      Rewinds whenever you leave the phase so it replays on the way back. ── */
@@ -2314,7 +2364,7 @@ export default function Home() {
         .gc-v3-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 46px,color-mix(in srgb,var(--phase-color) 30%,transparent) 60px,var(--phase-color) 74px,color-mix(in srgb,var(--phase-color) 30%,transparent) 88px,transparent 102px 148px);animation:gcThreadFlow 2.3s linear infinite}
         /* One tile of the repeat, so the loop is seamless. */
         @keyframes gcThreadFlow{to{transform:translateY(148px)}}
-        .gc-v3-phase-inner{position:relative;top:0;min-height:calc(100dvh - 78px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
+        .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
            the copy and gets squeezed to ~2/3 of the space it has elsewhere. */
@@ -2337,33 +2387,37 @@ export default function Home() {
         .gc-v3-rail-stop:hover{color:#fff4e8}.gc-v3-rail-stop:hover i{border-color:rgba(255,255,255,.55)}
         @keyframes gcRailPulse{0%,100%{transform:scale(1);opacity:.42}50%{transform:scale(1.22);opacity:0}}
 
-        /* ── Phase 2: the analysis running ──
-           Details stream in already tagged, a wave of activation crosses the
-           grid, three weighted directions come out ranked. Transform and
-           opacity only, like the rest of the journey. */
-        .gc-v3-engine{width:min(540px,100%);display:flex;flex-direction:column;align-items:stretch;gap:14px}
-        .gc-v3-engine-feed{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-        .gc-v3-engine-feed span{display:inline-flex;align-items:center;gap:6px;padding:6px 11px 6px 7px;border:1px solid rgba(126,214,203,.26);border-radius:999px;background:rgba(126,214,203,.09);color:#dff3ef;font:700 12px 'Hanken Grotesk',sans-serif;opacity:0}
-        .gc-v3-engine-feed b{padding:3px 6px;border-radius:999px;background:rgba(126,214,203,.22);color:#7ed6cb;font-size:8.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-        .gc-v3-engine-core{position:relative;padding:16px 18px;border:1px solid rgba(126,214,203,.22);border-radius:18px;background:linear-gradient(150deg,rgba(17,48,60,.96),rgba(12,36,47,.92))}
-        .gc-v3-engine-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:5px}
-        .gc-v3-engine-grid i{aspect-ratio:1;border-radius:2px;background:rgba(126,214,203,.16);opacity:.35}
-        .gc-v3-engine-badge{position:absolute;right:14px;top:-9px;padding:3px 9px;border-radius:999px;background:#7ed6cb;color:#0d2731;font:900 8.5px 'Hanken Grotesk',sans-serif;letter-spacing:.16em}
-        .gc-v3-engine-out{display:flex;flex-direction:column;gap:9px}
-        .gc-v3-engine-out>div{display:grid;grid-template-columns:78px 1fr 30px;align-items:center;gap:10px;opacity:0}
-        .gc-v3-engine-out small{color:#cfe3e0;font:750 12px 'Hanken Grotesk',sans-serif}
-        .gc-v3-engine-out i{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
-        .gc-v3-engine-out i>b{position:absolute;inset:0;border-radius:999px;background:linear-gradient(90deg,#7ed6cb,#ffc19f);transform-origin:0 50%;transform:scaleX(0)}
-        .gc-v3-engine-out em{color:#ffc19f;font:900 13px 'Hanken Grotesk',sans-serif;font-style:normal;text-align:right}
+        /* ── Phase 2: the analytics readout ──
+           Chips carrying what phase 1 said, a plot that builds column by
+           column, a sweep crossing it, and a live tally. Transform and
+           opacity only. */
+        .gc-v3-scope{width:min(540px,100%);box-sizing:border-box;padding:16px 18px 14px;border:1px solid rgba(126,214,203,.22);border-radius:20px;background:linear-gradient(155deg,rgba(17,48,60,.96),rgba(11,33,44,.94));box-shadow:0 22px 46px rgba(2,18,27,.36)}
+        .gc-v3-scope-head{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+        .gc-v3-scope-head>i{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;animation:gcScopeLive 1.4s ease-in-out infinite}
+        .gc-v3-scope-head>b{color:#dff3ef;font:800 11px 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase}
+        .gc-v3-scope-head>em{margin-left:auto;color:#7ed6cb;font:800 12px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
+        .gc-v3-scope-chips{display:flex;flex-wrap:wrap;gap:5px;padding:12px 0 16px}
+        .gc-v3-scope-chips span{display:inline-flex;align-items:center;gap:5px;padding:5px 9px 5px 5px;border-radius:999px;background:rgba(126,214,203,.1);color:#dff3ef;font:700 11px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-scope-chips b{padding:3px 6px;border-radius:999px;background:rgba(126,214,203,.2);color:#7ed6cb;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+        .gc-v3-scope-plot{position:relative;height:148px;display:grid;grid-template-columns:repeat(6,1fr);align-items:end;gap:8px;overflow:hidden;border-radius:10px}
+        .gc-v3-scope-plot>div{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+        .gc-v3-scope-plot em{color:#8fa9a8;font:800 10.5px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums;opacity:0}
+        .gc-v3-scope-plot b{width:100%;height:calc(var(--h,.5) * 96px);border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#7ed6cb,rgba(126,214,203,.28));transform-origin:50% 100%;transform:scaleY(0)}
+        .gc-v3-scope-plot [data-top=true] b{background:linear-gradient(180deg,#ffd9bd,#ef735f)}
+        .gc-v3-scope-plot [data-top=true] em{color:#ffc19f}
+        .gc-v3-scope-plot small{color:#7e999a;font:750 9px 'Hanken Grotesk',sans-serif;letter-spacing:.02em;white-space:nowrap}
+        .gc-v3-scope-sweep{position:absolute;z-index:2;top:0;bottom:0;left:0;width:80px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(126,214,203,.26),transparent);opacity:0}
+        @keyframes gcScopeLive{0%,100%{opacity:.35;scale:.8}50%{opacity:1;scale:1.15}}
         @media(max-width:900px){
-          .gc-v3-engine{gap:11px}
-          .gc-v3-engine-feed span{padding:5px 9px 5px 6px;font-size:11px;gap:5px}
-          .gc-v3-engine-feed b{font-size:7.5px;padding:3px 5px}
-          .gc-v3-engine-core{padding:13px 13px}
-          .gc-v3-engine-grid{gap:4px}
-          .gc-v3-engine-out>div{grid-template-columns:66px 1fr 26px;gap:8px}
-          .gc-v3-engine-out small{font-size:11px}
-          .gc-v3-engine-out em{font-size:12px}
+          .gc-v3-scope{padding:13px 13px 12px;border-radius:17px}
+          .gc-v3-scope-head>b{font-size:10px}.gc-v3-scope-head>em{font-size:11px}
+          .gc-v3-scope-chips{gap:4px;padding:10px 0 13px}
+          .gc-v3-scope-chips span{font-size:10px;padding:4px 8px 4px 4px}
+          .gc-v3-scope-chips b{font-size:7px;padding:3px 5px}
+          .gc-v3-scope-plot{height:126px;gap:6px}
+          .gc-v3-scope-plot b{height:calc(var(--h,.5) * 80px)}
+          .gc-v3-scope-plot small{font-size:8px}
+          .gc-v3-scope-plot em{font-size:9.5px}
         }
         @media(max-width:900px){
           .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
@@ -2384,7 +2438,7 @@ export default function Home() {
         .gc-v3-result-body strong{color:#fff4e8;font:750 14px/1.12 'Hanken Grotesk',sans-serif;letter-spacing:-.01em}
         .gc-v3-result-criteria{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
         .gc-v3-result-criteria span{padding:4px 8px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.15);color:#ffe2cd;font:750 10.5px 'Hanken Grotesk',sans-serif;line-height:1}
-        .gc-v3-next{position:absolute;left:50%;bottom:26px;z-index:8;min-width:285px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
+        .gc-v3-next{position:absolute;left:50%;bottom:26px;z-index:8;min-width:285px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next>strong>i{margin-left:5px;color:#5d7480;font-style:normal;font-weight:800}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
         /* ── The thread's last run, and the parcel it arrives at ──
            The two diagonal beams that used to split apart here are gone: the
            line comes straight down out of phase 3, reaches the parcel, and
@@ -2416,7 +2470,7 @@ export default function Home() {
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
         @keyframes gcPopOut{
-          0%{opacity:0;transform:translate(0,calc(-1 * clamp(150px,22vh,240px))) scale(.06) rotate(0)}
+          0%{opacity:0;transform:translate(0,var(--pop-from-y,-220px)) scale(.06) rotate(0)}
           14%{opacity:1}
           52%{transform:translate(calc(var(--pop-x) * 1.04vw),calc(var(--pop-y) - clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
           76%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) + 7px)) scale(.97) rotate(var(--pop-tilt))}
@@ -2524,28 +2578,35 @@ export default function Home() {
         /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
            that matter light up in turn, drop into the core as signals, the core
            absorbs each one, then the directions rise out of it. */
-        /* Phase 2 sequence: tokens stream in (0-0.7s) → activation crosses the
-           grid diagonally (0.7-1.4s) → the ranked bars fill (1.4s+). */
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span{animation:gcTokenIn .42s cubic-bezier(.16,.86,.22,1.12) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(1){animation-delay:.04s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(2){animation-delay:.16s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(3){animation-delay:.28s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(4){animation-delay:.4s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-feed span:nth-child(5){animation-delay:.52s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-core{animation:gcCardLand .5s .3s cubic-bezier(.16,.86,.22,1.04) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-grid i{animation:gcCellFire 1.15s cubic-bezier(.3,.7,.4,1) infinite;animation-delay:calc(.62s + var(--cell,0) * .055s)}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div{animation:gcRankIn .44s cubic-bezier(.16,.86,.22,1.1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(1){animation-delay:1.32s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(2){animation-delay:1.46s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(3){animation-delay:1.6s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out i>b{animation:gcBarFill .72s cubic-bezier(.2,.8,.28,1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(1) i>b{animation-delay:1.44s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(2) i>b{animation-delay:1.58s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-engine-out>div:nth-child(3) i>b{animation-delay:1.72s}
-        @keyframes gcTokenIn{0%{opacity:0;transform:translateX(-26px) scale(.86)}70%{opacity:1;transform:translateX(3px) scale(1.03)}100%{opacity:1;transform:none}}
-        @keyframes gcCellFire{0%,72%,100%{opacity:.3;transform:scale(1)}18%{opacity:1;transform:scale(1.32)}44%{opacity:.55;transform:scale(1.06)}}
-        @keyframes gcRankIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
-        @keyframes gcBarFill{0%{transform:scaleX(0)}100%{transform:scaleX(var(--bar,1))}}
+        /* Phase 2 sequence: panel lands → chips drop in (0.2-0.7s) → sweep
+           crosses the plot (0.75s) → columns build left to right (0.85s+) with
+           their values appearing as each one tops out. */
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span{animation:gcChipDrop .38s cubic-bezier(.16,.86,.24,1.14) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(1){animation-delay:.2s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(2){animation-delay:.3s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(3){animation-delay:.4s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(4){animation-delay:.5s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(5){animation-delay:.6s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-sweep{animation:gcScopeSweep 1.5s .75s cubic-bezier(.4,0,.5,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot b{animation:gcColumnRise .58s cubic-bezier(.18,.84,.24,1.06) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot em{animation:gcValueIn .3s ease-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(2) b{animation-delay:.85s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(3) b{animation-delay:.95s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(4) b{animation-delay:1.05s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(5) b{animation-delay:1.15s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(6) b{animation-delay:1.25s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(7) b{animation-delay:1.35s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(2) em{animation-delay:1.35s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(3) em{animation-delay:1.45s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(4) em{animation-delay:1.55s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(5) em{animation-delay:1.65s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(6) em{animation-delay:1.75s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(7) em{animation-delay:1.85s}
+        @keyframes gcChipDrop{0%{opacity:0;transform:translateY(-14px) scale(.8)}70%{opacity:1;transform:translateY(2px) scale(1.04)}100%{opacity:1;transform:none}}
+        @keyframes gcScopeSweep{0%{opacity:0;transform:translateX(-90px)}14%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translateX(560px)}}
+        @keyframes gcColumnRise{0%{transform:scaleY(0)}72%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
+        @keyframes gcValueIn{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}
         /* Phase 3 — dealing a hand. The three cards arrive as one stack from
            below, then fan out centre, left, right, one after another. */
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}
@@ -2564,8 +2625,8 @@ export default function Home() {
         
         @keyframes gcStartReveal{0%{opacity:0;transform:translateY(60px) scale(.86)}100%{opacity:1;transform:none}}
         @keyframes gcSearchReveal{0%{opacity:0;transform:translateY(32px) scaleX(.7)}68%{opacity:1;transform:translateY(-3px) scaleX(1.02)}100%{opacity:1;transform:none}}
-        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:58px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
-        @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:calc(100dvh - 78px)}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:13.5px}.gc-v3-scroll-cue b{width:10px;height:10px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:28px;padding:82px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:88px 18px 44px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:100%}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:13.5px}.gc-v3-scroll-cue b{width:10px;height:10px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
         @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:20px;width:min(270px,calc(100% - 44px));min-width:0}}
         @media(max-width:900px){.gc-v3-start{padding-bottom:82px}.gc-v3-legal{bottom:calc(14px + env(safe-area-inset-bottom));gap:7px;font-size:12px}}        
@@ -2782,7 +2843,7 @@ export default function Home() {
                         </div>
                         <span className="gc-v3-float-chip gc-v3-chip-a">Montagna</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Casa nuova</span>
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare <i>(1/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
@@ -2791,42 +2852,29 @@ export default function Home() {
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
                       <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Classifica le informazioni e le utilizza per costruire una rigorosa analisi.</p></div>
-                      {/* The analysis shown as it happens: a beam sweeps the
-                          sentence, the three words that matter light up and
-                          fall into the core as signals, the core turns them
-                          into directions. Each stage is a CSS animation keyed
-                          off data-active, so it replays on every arrival. */}
-                      {/* The analysis as a machine you can watch run: the
-                          details stream in as tagged tokens, a wave of
-                          activation crosses the grid, and three weighted
-                          directions come out ranked. */}
-                      <div className="gc-v3-art gc-v3-engine">
-                        <div className="gc-v3-engine-feed" aria-hidden="true">
+                      {/* A readout you can watch work: the details lifted from
+                          phase 1 drop in as chips, a sweep crosses the plot,
+                          and the categories build up as columns while the count
+                          of ideas weighed runs. */}
+                      <div className="gc-v3-art gc-v3-scope">
+                        <div className="gc-v3-scope-head" aria-hidden="true">
+                          <i/><b>Analisi del profilo</b><em>{analysedCount.toLocaleString("it-IT")} idee valutate</em>
+                        </div>
+                        <div className="gc-v3-scope-chips" aria-hidden="true">
                           {ENGINE_TOKENS.map(token => (
-                            <span key={token.label} data-kind={token.kind}><b>{token.kind}</b>{token.label}</span>
+                            <span key={token.label}><b>{token.kind}</b>{token.label}</span>
                           ))}
                         </div>
-                        <div className="gc-v3-engine-core" aria-hidden="true">
-                          <div className="gc-v3-engine-grid">
-                            {Array.from({ length: 36 }, (_, cell) => (
-                              /* Column + row, so the activation crosses the grid
-                                 as a diagonal wave rather than row by row. */
-                              <i key={cell} style={{ ["--cell" as string]: (cell % 12) + Math.floor(cell / 12) }} />
-                            ))}
-                          </div>
-                          <span className="gc-v3-engine-badge">GIFTY AI</span>
-                        </div>
-                        <div className="gc-v3-engine-out" aria-hidden="true">
-                          {ENGINE_RESULTS.map(result => (
-                            <div key={result.label} style={{ ["--bar" as string]: result.score / 100 }}>
-                              <small>{result.label}</small>
-                              <i><b/></i>
-                              <em>{result.score}</em>
+                        <div className="gc-v3-scope-plot" aria-hidden="true">
+                          <i className="gc-v3-scope-sweep"/>
+                          {ENGINE_RESULTS.map((result, i) => (
+                            <div key={result.label} data-top={i === 0} style={{ ["--h" as string]: result.score / 100 }}>
+                              <em>{result.score}</em><b/><small>{result.label}</small>
                             </div>
                           ))}
                         </div>
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare <i>(2/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
@@ -2853,7 +2901,7 @@ export default function Home() {
                           </article>
                         ))}
                       </div>
-                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-start")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
+                      <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-start")}><strong>Scorri in basso per continuare <i>(3/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
                   </section>
 
