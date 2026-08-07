@@ -2355,14 +2355,16 @@ export default function Home() {
         .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         /* The bead riding the leading end of the thread. */
         /* ── The thread ──
-           A ladder of rungs rather than a glowing tube: the column is masked
-           into short dashes, and a band of light runs down through them. The
-           travel reads as descent without the line itself being the subject.
-           The mask is static; only the band moves. */
-        .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:16px;margin-left:-8px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 22%,transparent);-webkit-mask-image:repeating-linear-gradient(180deg,#000 0 3px,transparent 3px 21px);mask-image:repeating-linear-gradient(180deg,#000 0 3px,transparent 3px 21px)}
-        .gc-v3-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 84px,color-mix(in srgb,var(--phase-color) 45%,transparent) 126px,#fff4e8 168px,color-mix(in srgb,var(--phase-color) 45%,transparent) 210px,transparent 252px 336px);animation:gcThreadFlow 3.4s linear infinite}
-        /* One tile of the repeat, so the run never seams. */
-        @keyframes gcThreadFlow{to{transform:translateY(336px)}}
+           One unbroken line down the middle, with a torch running down it. The
+           torch takes exactly as long to reach the bottom as the phase takes to
+           hand over, so it arrives as the page turns. */
+        .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 30%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--phase-color) 22%,transparent)}
+        .gc-v3-thread>b{position:absolute;left:-9px;right:-9px;top:0;height:132px;border-radius:50%;background:radial-gradient(ellipse 50% 50% at 50% 78%,#fff4e8 0 14%,var(--phase-color) 34%,color-mix(in srgb,var(--phase-color) 42%,transparent) 58%,transparent 74%);opacity:0}
+        .gc-v3-phase[data-active=true] .gc-v3-thread>b{animation:gcTorchDown 4.6s linear both,gcTorchFlicker .55s ease-in-out infinite}
+        /* Sits above the line's top edge at the start and clears the bottom at
+           the end, so the run covers the full height of the phase. */
+        @keyframes gcTorchDown{0%{opacity:0;transform:translateY(-132px)}5%{opacity:1}92%{opacity:1}100%{opacity:0;transform:translateY(100dvh)}}
+        @keyframes gcTorchFlicker{0%,100%{scale:1 1}50%{scale:1.18 .92}}
         .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
@@ -2463,38 +2465,17 @@ export default function Home() {
         .gc-v3-pop[data-slot="1"]{--pop-x:-30;--pop-y:-34px;--pop-tilt:6deg}
         .gc-v3-pop[data-slot="2"]{--pop-x:30;--pop-y:-34px;--pop-tilt:-6deg}
         .gc-v3-pop[data-slot="3"]{--pop-x:40;--pop-y:0px;--pop-tilt:9deg}
-        /* Once they have landed the cards don't stay put: each drifts on its own
-           loop, running out to the edges and back across the screen. They sit
-           below the copy and the search box so they pass behind them rather
-           than over. Waypoints are multiples of each card's own landing offset,
-           so one path serves every breakpoint. */
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation:gcPopOut .95s 1.35s cubic-bezier(.22,.72,.3,1) both,gcDriftA 26s 2.3s linear infinite}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation:gcPopOut .95s 1.5s cubic-bezier(.22,.72,.3,1) both,gcDriftB 31s 2.45s linear infinite}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation:gcPopOut .95s 1.65s cubic-bezier(.22,.72,.3,1) both,gcDriftC 28s 2.6s linear infinite}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation:gcPopOut .95s 1.8s cubic-bezier(.22,.72,.3,1) both,gcDriftD 34s 2.75s linear infinite}
-        @keyframes gcDriftA{
+        /* They arrive one after another and stay put in the bottom corners,
+           just breathing. Sitting below the copy and the search box so they
+           never sit over them. */
+        .gc-v3-start[data-active=true] .gc-v3-pop{animation:gcPopOut .95s cubic-bezier(.22,.72,.3,1) both,gcPopBreathe 3.4s ease-in-out infinite}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.35s,2.3s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:1.5s,2.45s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
+        @keyframes gcPopBreathe{
           0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
-          26%{transform:translate(calc(var(--pop-x) * 1.08vw),-30vh) rotate(calc(var(--pop-tilt) + 10deg))}
-          52%{transform:translate(calc(var(--pop-x) * .46vw),-54vh) rotate(calc(var(--pop-tilt) - 12deg))}
-          78%{transform:translate(calc(var(--pop-x) * 1.06vw),-21vh) rotate(calc(var(--pop-tilt) + 5deg))}
-        }
-        @keyframes gcDriftB{
-          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
-          22%{transform:translate(calc(var(--pop-x) * .34vw),-40vh) rotate(calc(var(--pop-tilt) - 9deg))}
-          48%{transform:translate(calc(var(--pop-x) * 1.46vw),-58vh) rotate(calc(var(--pop-tilt) + 13deg))}
-          74%{transform:translate(calc(var(--pop-x) * 1.34vw),-12vh) rotate(calc(var(--pop-tilt) - 6deg))}
-        }
-        @keyframes gcDriftC{
-          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
-          24%{transform:translate(calc(var(--pop-x) * 1.44vw),-24vh) rotate(calc(var(--pop-tilt) + 11deg))}
-          50%{transform:translate(calc(var(--pop-x) * .3vw),-52vh) rotate(calc(var(--pop-tilt) - 14deg))}
-          76%{transform:translate(calc(var(--pop-x) * 1.3vw),-35vh) rotate(calc(var(--pop-tilt) + 7deg))}
-        }
-        @keyframes gcDriftD{
-          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
-          28%{transform:translate(calc(var(--pop-x) * 1.07vw),-46vh) rotate(calc(var(--pop-tilt) - 8deg))}
-          54%{transform:translate(calc(var(--pop-x) * .5vw),-18vh) rotate(calc(var(--pop-tilt) + 12deg))}
-          80%{transform:translate(calc(var(--pop-x) * 1.1vw),-49vh) rotate(calc(var(--pop-tilt) - 5deg))}
+          50%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 7px)) rotate(calc(var(--pop-tilt) * .82))}
         }
         @media(max-width:900px){
           .gc-v3-pops{bottom:clamp(34px,5vh,56px)}
@@ -2505,13 +2486,13 @@ export default function Home() {
           .gc-v3-pop[data-slot="2"]{--pop-x:14;--pop-y:-58px}
           .gc-v3-pop[data-slot="3"]{--pop-x:33;--pop-y:0px}
         }
-        /* The last run of the thread, hung off the parcel so it meets the lid
-           at any viewport height. Brighter and thicker than the rest — this is
         /* The thread's last run, hung off the parcel so it meets the lid at any
-           viewport height, and brighter than the rest — this is where it lands. */
-        .gc-v3-parcel-thread{position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);overflow:hidden;background:rgba(255,195,111,.3);box-shadow:0 0 24px rgba(239,115,95,.45)}
-        .gc-v3-parcel-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 46px,rgba(255,195,111,.35) 60px,#ffd9bd 74px,rgba(239,115,95,.4) 88px,transparent 102px 148px);animation:gcThreadFlow 2.3s linear infinite}
-        /* Where it arrives: a steady glow on the lid, brightening as the flow lands. */
+           viewport height. The torch runs it, arrives on the lid, and that
+           arrival is what opens the box. */
+        .gc-v3-parcel-thread{position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);overflow:visible;background:rgba(255,195,111,.34);box-shadow:0 0 20px rgba(239,115,95,.4)}
+        .gc-v3-parcel-thread>b{position:absolute;left:-10px;right:-10px;top:0;height:120px;border-radius:50%;background:radial-gradient(ellipse 50% 50% at 50% 78%,#fff4e8 0 16%,#ffc36f 36%,rgba(239,115,95,.45) 60%,transparent 76%);opacity:0}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-thread>b{animation:gcTorchArrive 1.15s cubic-bezier(.3,.1,.5,1) both,gcTorchFlicker .55s ease-in-out infinite}
+        @keyframes gcTorchArrive{0%{opacity:0;transform:translateY(-120px)}8%{opacity:1}84%{opacity:1;transform:translateY(calc(clamp(200px,40vh,380px) - 60px))}100%{opacity:0;transform:translateY(clamp(200px,40vh,380px))}}
         .gc-v3-parcel-thread:after{content:"";position:absolute;left:50%;bottom:-7px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 24%,#ffc36f 58%,transparent 72%);animation:gcThreadLand 2.3s ease-in-out infinite}
         @keyframes gcThreadLand{0%,100%{opacity:.45;scale:.8}52%{opacity:1;scale:1.25}}
         .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,180,.55),rgba(239,115,95,.16) 42%,transparent 66%);opacity:0}
@@ -2527,18 +2508,18 @@ export default function Home() {
         .gc-v3-parcel-bit:nth-of-type(7){--bit-x:118px;--bit-y:-26px;--bit-r:-190deg;width:14px;height:5px;background:#ef735f}
         .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-58px;--bit-y:-104px;--bit-r:120deg;border-radius:50%}
         .gc-v3-parcel-bit:nth-of-type(9){--bit-x:52px;--bit-y:-110px;--bit-r:-140deg;border-radius:50%;background:#fff4e8}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1.25s .12s cubic-bezier(.28,.62,.3,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .7s .12s cubic-bezier(.18,.86,.24,1.14) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .5s .5s cubic-bezier(.16,.86,.22,1.16) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .8s .26s cubic-bezier(.2,.8,.3,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit{animation:gcBitFly .95s .26s cubic-bezier(.12,.72,.2,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(5){animation-delay:.3s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(6){animation-delay:.34s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(7){animation-delay:.29s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(8){animation-delay:.36s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(9){animation-delay:.32s}
-        @keyframes gcLidOff{0%{transform:translate(0,0) rotate(0)}12%{transform:translate(0,4px) rotate(0)}42%{transform:translate(calc(var(--lid-x,86px) * .3),calc(var(--lid-y,40px) - 124px)) rotate(-58deg)}68%{transform:translate(calc(var(--lid-x,86px) * .74),calc(var(--lid-y,40px) - 58px)) rotate(-126deg)}86%{transform:translate(var(--lid-x,86px),calc(var(--lid-y,40px) + 5px)) rotate(-178deg)}93%{transform:translate(var(--lid-x,86px),calc(var(--lid-y,40px) - 8px)) rotate(-190deg)}100%{transform:translate(var(--lid-x,86px),var(--lid-y,40px)) rotate(-196deg)}}
-        @keyframes gcBoxSpring{0%{transform:scale(1,1)}22%{transform:scale(1.1,.86)}52%{transform:scale(.95,1.08)}100%{transform:scale(1,1)}}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1.05s .06s cubic-bezier(.2,.5,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .62s .06s cubic-bezier(.2,.8,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .48s .38s cubic-bezier(.18,.8,.26,1.08) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .78s .12s cubic-bezier(.2,.8,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit{animation:gcBitFly .9s .16s cubic-bezier(.16,.66,.24,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(5){animation-delay:.2s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(6){animation-delay:.23s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(7){animation-delay:.19s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(8){animation-delay:.25s}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(9){animation-delay:.21s}
+        @keyframes gcLidOff{0%{transform:translate(0,0) rotate(0)}38%{transform:translate(calc(var(--lid-x,86px) * .34),calc(var(--lid-y,40px) - 116px)) rotate(-74deg)}100%{transform:translate(var(--lid-x,86px),var(--lid-y,40px)) rotate(-196deg)}}
+        @keyframes gcBoxSpring{0%{transform:scale(1,1)}34%{transform:scale(1.07,.9)}100%{transform:scale(1,1)}}
         @keyframes gcParcelContents{0%{opacity:0;transform:translateY(16px) scale(.5)}70%{opacity:1;transform:translateY(-3px) scale(1.08)}100%{opacity:1;transform:none}}
         @keyframes gcParcelBurst{0%{opacity:0;transform:scale(.24)}30%{opacity:.95}100%{opacity:0;transform:scale(1.5)}}
         @keyframes gcBitFly{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}18%{opacity:1}100%{opacity:0;transform:translate(var(--bit-x),var(--bit-y)) scale(1.05) rotate(var(--bit-r))}}
