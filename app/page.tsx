@@ -74,13 +74,12 @@ const ENGINE_TOKENS = [
   { kind:"ritmo",     label:"ogni weekend" },
   { kind:"abitudine", label:"cucina per altri" },
 ];
-/* How long the spark takes to run a phase's thread — and therefore how long
-   you stay on a phase before it hands over to the next. Kept in sync with
-   the gcThreadDrop / gcSparkDrop durations in the stylesheet. */
+/* How long you stay on a phase before it hands over to the next. Long
+   enough to read the copy after its entrance has finished playing. */
 const PHASE_DWELL_MS = 5400;
 
 /* The five ideas that spill out of the parcel once it opens. */
-const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4], GIFT_SHOWCASE[2]];
+const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4]];
 
 const ENGINE_RESULTS = [
   { label:"Outdoor",   score:88 },
@@ -2305,18 +2304,16 @@ export default function Home() {
         @keyframes gcScrollPulse{0%,100%{transform:translateY(0)}45%{transform:translateY(6px)}}
         .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         /* The bead riding the leading end of the thread. */
-        /* The thread only exists where the spark has been. It runs the length
-           of the active phase over PHASE_DWELL_MS and hands over when it lands;
-           a phase already passed keeps its line lit. */
-        .gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(color-mix(in srgb,var(--phase-color) 45%,transparent),var(--phase-color));box-shadow:0 0 26px color-mix(in srgb,var(--phase-color) 55%,transparent)}
-        .gc-v3-phase[data-done=true]:before{transform:scaleY(1)}
-        .gc-v3-phase[data-active=true]:before{animation:gcThreadDrop 5.4s linear both}
-        /* The spark riding its leading end. */
-        .gc-v3-phase:after{content:"";position:absolute;z-index:3;left:50%;top:0;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 24%,var(--phase-color) 62%,transparent 72%);box-shadow:0 0 22px var(--phase-color),0 0 46px color-mix(in srgb,var(--phase-color) 60%,transparent);opacity:0}
-        .gc-v3-phase[data-active=true]:after{animation:gcSparkDrop 5.4s linear both,gcSparkPulse .9s ease-in-out infinite}
-        @keyframes gcThreadDrop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-        @keyframes gcSparkDrop{0%{opacity:0;transform:translateY(0)}4%{opacity:1}94%{opacity:1}100%{opacity:0;transform:translateY(100dvh)}}
-        @keyframes gcSparkPulse{0%,100%{scale:1}50%{scale:1.35}}
+        /* ── The thread ──
+           One continuous conduit down the middle of the whole journey: always
+           there, always flowing. The pulses run at the same cadence through
+           every section and only the colour changes as you pass from one to
+           the next, so it reads as a single line carrying you down rather than
+           a segment that draws itself and stops at each stop. */
+        .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 24%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--phase-color) 26%,transparent)}
+        .gc-v3-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 46px,color-mix(in srgb,var(--phase-color) 30%,transparent) 60px,var(--phase-color) 74px,color-mix(in srgb,var(--phase-color) 30%,transparent) 88px,transparent 102px 148px);animation:gcThreadFlow 2.3s linear infinite}
+        /* One tile of the repeat, so the loop is seamless. */
+        @keyframes gcThreadFlow{to{transform:translateY(148px)}}
         .gc-v3-phase-inner{position:relative;top:0;min-height:calc(100dvh - 78px);box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:70px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         /* Mirrored phases put the art in column 1, so mirror the track sizes
            too — otherwise the artwork lands in the narrow column meant for
@@ -2400,65 +2397,54 @@ export default function Home() {
            exactly on the lid at every viewport height instead of stopping
            short of it. */
         /* ── What the parcel spills out ──
-           Each card starts inside the box, tiny, and is thrown out on its own
-           arc to a slot along the foot of the screen, landing with a bounce
-           and then breathing. Everything is transform and opacity. */
-        .gc-v3-pops{position:absolute;z-index:4;left:50%;bottom:clamp(46px,7vh,74px);width:0;height:0;pointer-events:none}
-        .gc-v3-pop{position:absolute;left:0;bottom:0;width:clamp(74px,8vw,104px);aspect-ratio:4/5;margin-left:calc(clamp(74px,8vw,104px) / -2);border:1px solid rgba(255,255,255,.16);border-radius:14px;overflow:hidden;background:#0f2733;box-shadow:0 18px 34px rgba(3,18,27,.5);opacity:0}
+           Two clusters hugging the bottom corners, deliberately away from the
+           middle column: the search bar lives there and the cards were landing
+           under it. Offsets are in vw so they stay pinned to the edges at any
+           width. Each card is thrown from inside the box on its own arc and
+           lands with a bounce, then breathes. */
+        .gc-v3-pops{position:absolute;z-index:4;left:50%;bottom:clamp(40px,6vh,72px);width:0;height:0;pointer-events:none}
+        .gc-v3-pop{position:absolute;left:0;bottom:0;width:clamp(72px,7.4vw,102px);aspect-ratio:4/5;margin-left:calc(clamp(72px,7.4vw,102px) / -2);border:1px solid rgba(255,255,255,.16);border-radius:14px;overflow:hidden;background:#0f2733;box-shadow:0 18px 34px rgba(3,18,27,.5);opacity:0}
         .gc-v3-pop>img{position:absolute;left:0;right:0;top:0;width:100%;height:68%;object-fit:cover;display:block}
         .gc-v3-pop>b{position:absolute;left:0;right:0;bottom:0;height:32%;box-sizing:border-box;padding:0 6px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(255,255,255,.12);background:linear-gradient(155deg,#102b38,#0b202b);color:#fff4e8;font:750 8.5px/1.1 'Hanken Grotesk',sans-serif;text-align:center}
-        .gc-v3-pop[data-slot="0"]{--pop-x:-2.15;--pop-tilt:-9deg}
-        .gc-v3-pop[data-slot="1"]{--pop-x:-1.08;--pop-tilt:5deg}
-        .gc-v3-pop[data-slot="2"]{--pop-x:0;--pop-tilt:-3deg}
-        .gc-v3-pop[data-slot="3"]{--pop-x:1.08;--pop-tilt:7deg}
-        .gc-v3-pop[data-slot="4"]{--pop-x:2.15;--pop-tilt:-6deg}
+        .gc-v3-pop[data-slot="0"]{--pop-x:-40;--pop-y:0px;--pop-tilt:-10deg}
+        .gc-v3-pop[data-slot="1"]{--pop-x:-30;--pop-y:-34px;--pop-tilt:6deg}
+        .gc-v3-pop[data-slot="2"]{--pop-x:30;--pop-y:-34px;--pop-tilt:-6deg}
+        .gc-v3-pop[data-slot="3"]{--pop-x:40;--pop-y:0px;--pop-tilt:9deg}
         .gc-v3-start[data-active=true] .gc-v3-pop{animation:gcPopOut .95s cubic-bezier(.22,.72,.3,1) both,gcPopBreathe 3.4s ease-in-out infinite}
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.35s,2.3s}
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:1.5s,2.45s}
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
         .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="4"]{animation-delay:1.95s,2.9s}
         @keyframes gcPopOut{
           0%{opacity:0;transform:translate(0,calc(-1 * clamp(150px,22vh,240px))) scale(.06) rotate(0)}
           14%{opacity:1}
-          52%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px) * 1.04),calc(-1 * clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
-          76%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),6px) scale(.97) rotate(var(--pop-tilt))}
-          89%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),-9px) scale(1.02) rotate(var(--pop-tilt))}
-          100%{opacity:1;transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),0) scale(1) rotate(var(--pop-tilt))}
+          52%{transform:translate(calc(var(--pop-x) * 1.04vw),calc(var(--pop-y) - clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
+          76%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) + 7px)) scale(.97) rotate(var(--pop-tilt))}
+          89%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 9px)) scale(1.02) rotate(var(--pop-tilt))}
+          100%{opacity:1;transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) scale(1) rotate(var(--pop-tilt))}
         }
         @keyframes gcPopBreathe{
-          0%,100%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),0) rotate(var(--pop-tilt))}
-          50%{transform:translate(calc(var(--pop-x) * clamp(74px,8vw,104px)),-7px) rotate(calc(var(--pop-tilt) * .82))}
+          0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
+          50%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 7px)) rotate(calc(var(--pop-tilt) * .82))}
         }
         @media(max-width:900px){
-          .gc-v3-pops{bottom:clamp(40px,6vh,60px)}
-          .gc-v3-pop{width:60px;margin-left:-30px;border-radius:11px}
+          .gc-v3-pops{bottom:clamp(34px,5vh,56px)}
+          .gc-v3-pop{width:62px;margin-left:-31px;border-radius:11px}
           .gc-v3-pop>b{font-size:7px;padding:0 4px}
-          .gc-v3-pop[data-slot="0"]{--pop-x:-2.1}
-          .gc-v3-pop[data-slot="1"]{--pop-x:-1.05}
-          .gc-v3-pop[data-slot="3"]{--pop-x:1.05}
-          .gc-v3-pop[data-slot="4"]{--pop-x:2.1}
-          @keyframes gcPopOut{
-            0%{opacity:0;transform:translate(0,-160px) scale(.06)}
-            14%{opacity:1}
-            52%{transform:translate(calc(var(--pop-x) * 62px),-46px) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
-            76%{transform:translate(calc(var(--pop-x) * 60px),5px) scale(.97) rotate(var(--pop-tilt))}
-            89%{transform:translate(calc(var(--pop-x) * 60px),-7px) scale(1.02) rotate(var(--pop-tilt))}
-            100%{opacity:1;transform:translate(calc(var(--pop-x) * 60px),0) scale(1) rotate(var(--pop-tilt))}
-          }
-          @keyframes gcPopBreathe{
-            0%,100%{transform:translate(calc(var(--pop-x) * 60px),0) rotate(var(--pop-tilt))}
-            50%{transform:translate(calc(var(--pop-x) * 60px),-5px) rotate(calc(var(--pop-tilt) * .82))}
-          }
+          .gc-v3-pop[data-slot="0"]{--pop-x:-33;--pop-y:0px}
+          .gc-v3-pop[data-slot="1"]{--pop-x:-14;--pop-y:-58px}
+          .gc-v3-pop[data-slot="2"]{--pop-x:14;--pop-y:-58px}
+          .gc-v3-pop[data-slot="3"]{--pop-x:33;--pop-y:0px}
         }
         /* The last run of the thread, hung off the parcel so it meets the lid
            at any viewport height. Brighter and thicker than the rest — this is
-           where it arrives. */
-        .gc-v3-parcel:before{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);transform-origin:50% 0;transform:scaleY(0);background:linear-gradient(#ffc36f,#ef735f);box-shadow:0 0 30px rgba(239,115,95,.7)}
-        .gc-v3-parcel:after{content:"";position:absolute;left:50%;bottom:calc(100% - 22px);width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle,#fff4e8 26%,#ffc36f 60%,transparent 72%);box-shadow:0 0 26px #ef735f,0 0 54px rgba(255,195,111,.7);opacity:0}
-        .gc-v3-start[data-active=true] .gc-v3-parcel:before{animation:gcThreadDrop 1.15s linear both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel:after{animation:gcParcelSpark 1.15s linear both}
-        @keyframes gcParcelSpark{0%{opacity:0;transform:translateY(calc(-1 * clamp(200px,40vh,380px))) scale(.6)}8%{opacity:1}88%{opacity:1;transform:translateY(-14px) scale(1.25)}100%{opacity:0;transform:translateY(0) scale(.4)}}
+        /* The thread's last run, hung off the parcel so it meets the lid at any
+           viewport height, and brighter than the rest — this is where it lands. */
+        .gc-v3-parcel-thread{position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);overflow:hidden;background:rgba(255,195,111,.3);box-shadow:0 0 24px rgba(239,115,95,.45)}
+        .gc-v3-parcel-thread>b{position:absolute;left:0;right:0;top:-100%;height:200%;background:repeating-linear-gradient(180deg,transparent 0 46px,rgba(255,195,111,.35) 60px,#ffd9bd 74px,rgba(239,115,95,.4) 88px,transparent 102px 148px);animation:gcThreadFlow 2.3s linear infinite}
+        /* Where it arrives: a steady glow on the lid, brightening as the flow lands. */
+        .gc-v3-parcel-thread:after{content:"";position:absolute;left:50%;bottom:-7px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 24%,#ffc36f 58%,transparent 72%);animation:gcThreadLand 2.3s ease-in-out infinite}
+        @keyframes gcThreadLand{0%,100%{opacity:.45;scale:.8}52%{opacity:1;scale:1.25}}
         .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,180,.55),rgba(239,115,95,.16) 42%,transparent 66%);opacity:0}
         .gc-v3-parcel-box{position:absolute;left:50%;bottom:0;width:68px;height:60px;margin-left:-34px;border-radius:14px;background:linear-gradient(150deg,#ffc19f,#ef735f 72%);box-shadow:0 16px 34px rgba(4,20,29,.34),inset 0 1px 0 rgba(255,255,255,.5);transform-origin:50% 100%}
         .gc-v3-parcel-box>b{position:absolute;left:50%;top:0;bottom:0;width:8px;margin-left:-4px;background:rgba(23,48,62,.32)}
@@ -2784,7 +2770,8 @@ export default function Home() {
                     <button type="button" className="gc-v3-scroll-cue" onClick={() => scrollLandingTo(".gc-v3-phase-one")}><span>Scorri in basso per continuare</span><b aria-hidden="true"/></button>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-one" data-active={landingActivePhase === 1} data-done={landingActivePhase > 1}>
+                  <section className="gc-v3-phase gc-v3-phase-one" data-active={landingActivePhase === 1}>
+                    <i className="gc-v3-thread" aria-hidden="true"><b/></i>
                     
                     <div className="gc-v3-phase-inner">
                       <div className="gc-v3-copy"><StepRail active={1} onGo={scrollLandingTo} /><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
@@ -2799,7 +2786,8 @@ export default function Home() {
                     </div>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-two" data-active={landingActivePhase === 2} data-done={landingActivePhase > 2}>
+                  <section className="gc-v3-phase gc-v3-phase-two" data-active={landingActivePhase === 2}>
+                    <i className="gc-v3-thread" aria-hidden="true"><b/></i>
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
                       <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Classifica le informazioni e le utilizza per costruire una rigorosa analisi.</p></div>
@@ -2842,7 +2830,8 @@ export default function Home() {
                     </div>
                   </section>
 
-                  <section className="gc-v3-phase gc-v3-phase-three" data-active={landingActivePhase === 3} data-done={landingActivePhase > 3}>
+                  <section className="gc-v3-phase gc-v3-phase-three" data-active={landingActivePhase === 3}>
+                    <i className="gc-v3-thread" aria-hidden="true"><b/></i>
                     
                     <div className="gc-v3-phase-inner">
                       <div className="gc-v3-copy"><StepRail active={3} onGo={scrollLandingTo} /><h2>Scegli il regalo giusto.</h2><p>Ricevi proposte acquistabili direttamente su Amazon. Salva, scarta o rifinisci ogni singola idea.</p></div>
@@ -2873,6 +2862,7 @@ export default function Home() {
                       {/* The thread arrives here and the parcel it has been
                           leading to opens: lid off, box springs, contents up. */}
                       <span className="gc-v3-parcel" aria-hidden="true">
+                        <i className="gc-v3-parcel-thread"><b/></i>
                         <i className="gc-v3-parcel-burst"/>
                         <i className="gc-v3-parcel-lid"><b/></i>
                         <i className="gc-v3-parcel-box"><b/><em><GiftSVG size={26} fill={N.navy3}/></em></i>
