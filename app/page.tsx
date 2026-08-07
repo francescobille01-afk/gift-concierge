@@ -59,6 +59,12 @@ const RESULT_PREVIEW = [
   GIFT_SHOWCASE[4], // monstera            → "odia gli oggetti inutili"
 ];
 
+/* Phase 1's example message. Typed out one character at a time from JS —
+   a CSS reveal can only wipe the finished text, which reads as a shutter
+   opening rather than as somebody writing. */
+const PHASE_ONE_SENTENCE = "“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”";
+const PHASE_ONE_TYPE_MS = 26;
+
 const AMAZON_TAG = "gifty0de-21";
 // Testing phase: we only have an amazon.it affiliate link, so force every
 // Amazon URL onto that domain regardless of which Amazon TLD it came from.
@@ -1119,6 +1125,7 @@ export default function Home() {
   const [landingDisclaimerOpen, setLandingDisclaimerOpen] = useState(false);
   const [landingProgress, setLandingProgress] = useState(0);
   const [landingActivePhase, setLandingActivePhase] = useState(0);
+  const [typedCount, setTypedCount] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
   // Set when the mobile landing bar's free-text answer is used to fill
   // g.relationship directly — step 0 then skips its own relationship
@@ -1293,6 +1300,23 @@ export default function Home() {
     window.addEventListener("resize", onResize);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
   }, [screen]);
+
+  /* ── Phase 1: type the example message out, character by character.
+     Rewinds whenever you leave the phase so it replays on the way back. ── */
+  useEffect(() => {
+    if (landingActivePhase !== 1) { setTypedCount(0); return; }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setTypedCount(PHASE_ONE_SENTENCE.length);
+      return;
+    }
+    let n = 0;
+    const id = window.setInterval(() => {
+      n += 1;
+      setTypedCount(n);
+      if (n >= PHASE_ONE_SENTENCE.length) window.clearInterval(id);
+    }, PHASE_ONE_TYPE_MS);
+    return () => window.clearInterval(id);
+  }, [landingActivePhase]);
 
   /* iOS Safari keeps the focused field and its zoom across React screens.
      Release focus and restore the flow to the top whenever the step changes. */
@@ -2317,21 +2341,20 @@ export default function Home() {
            out under a caret, then the three words Gifty picked up lift off the
            text one at a time. */
         .gc-v3-phase-one[data-active=true] .gc-v3-message-card{animation:gcCardLand .55s .1s cubic-bezier(.16,.86,.22,1.04) both}
-        /* The sentence wraps to three lines, so it types top-down a line at a
-           time (steps(3)) rather than left-to-right — a horizontal wipe would
-           reveal all three lines at once, which doesn't read as writing. The
-           caret steps down with it; both are sized in em so they track the
-           card's font-size at every breakpoint. */
-        .gc-v3-phase-one[data-active=true] .gc-v3-typed-copy{animation:gcTypedReveal 1.05s .42s steps(3,end) both}
-        .gc-v3-phase-one[data-active=true] .gc-v3-message-card:after{content:"";position:absolute;top:34px;left:34px;width:3px;height:1.15em;border-radius:3px;background:#ef735f;animation:gcCaret 1.05s .42s steps(3,end) both}
-        .gc-v3-phase-one[data-active=true] .gc-v3-float-chip{animation:gcChipLift .5s cubic-bezier(.14,.9,.24,1.24) both}
-        .gc-v3-phase-one[data-active=true] .gc-v3-chip-a{animation-delay:1.6s}
-        .gc-v3-phase-one[data-active=true] .gc-v3-chip-b{animation-delay:1.75s}
-        .gc-v3-phase-one[data-active=true] .gc-v3-chip-c{animation-delay:1.9s}
+        /* The caret is a real inline element sitting after the last typed
+           character, so it walks along the text and wraps with it. */
+        .gc-v3-caret{display:inline-block;width:3px;height:.95em;margin-left:3px;vertical-align:-.09em;border-radius:2px;background:#ef735f;animation:gcCaretBlink 1s steps(1,end) infinite}
+        .gc-v3-message-art[data-typed=true] .gc-v3-caret{animation:gcCaretBlink 1s steps(1,end) 3 forwards}
+        @keyframes gcCaretBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
+        /* The chips lift off once the sentence is finished, not on a timer —
+           they mark the words Gifty picked out of what was just written. */
+        .gc-v3-message-art[data-typed=true] .gc-v3-float-chip{animation:gcChipLift .5s cubic-bezier(.14,.9,.24,1.24) both}
+        .gc-v3-message-art[data-typed=true] .gc-v3-chip-a{animation-delay:.12s}
+        .gc-v3-message-art[data-typed=true] .gc-v3-chip-b{animation-delay:.27s}
+        .gc-v3-message-art[data-typed=true] .gc-v3-chip-c{animation-delay:.42s}
+        .gc-v3-message-art:not([data-typed=true]) .gc-v3-float-chip{opacity:0}
         .gc-v3-chip-a{--chip-r:-8deg}.gc-v3-chip-b{--chip-r:7deg}.gc-v3-chip-c{--chip-r:-4deg}
         @keyframes gcCardLand{0%{opacity:0;transform:translateY(46px) scale(.94)}100%{opacity:1;transform:none}}
-        @keyframes gcTypedReveal{0%{clip-path:inset(0 0 100% 0)}100%{clip-path:inset(0 0 0 0)}}
-        @keyframes gcCaret{0%{opacity:1;transform:translateY(0)}99%{opacity:1;transform:translateY(2.5em)}100%{opacity:0;transform:translateY(2.5em)}}
         @keyframes gcChipLift{0%{opacity:0;transform:translateY(16px) scale(.5) rotate(var(--chip-r,0deg))}70%{opacity:1;transform:translateY(-3px) scale(1.06) rotate(var(--chip-r,0deg))}100%{opacity:1;transform:scale(1) rotate(var(--chip-r,0deg))}}
         /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
            that matter light up in turn, drop into the core as signals, the core
@@ -2590,8 +2613,11 @@ export default function Home() {
                     
                     <div className="gc-v3-phase-inner">
                       <div className="gc-v3-copy"><StepRail active={1} onGo={scrollLandingTo} /><h2>Raccontaci com’è.</h2><p>Scrivi tutto insieme: interessi, abitudini, desideri e cose che non sopporta.</p></div>
-                      <div className="gc-v3-art gc-v3-message-art">
-                        <div className="gc-v3-message-card"><span className="gc-v3-typed-copy">“Fa trekking ogni domenica, cucina spesso e odia gli oggetti inutili.”</span><i/><i/><i/></div>
+                      <div className="gc-v3-art gc-v3-message-art" data-typed={typedCount >= PHASE_ONE_SENTENCE.length}>
+                        <div className="gc-v3-message-card">
+                          <span className="gc-v3-typed-copy">{PHASE_ONE_SENTENCE.slice(0, typedCount)}<i className="gc-v3-caret" aria-hidden="true"/></span>
+                          <i/><i/><i/>
+                        </div>
                         <span className="gc-v3-float-chip gc-v3-chip-a">Trekking</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Pratico</span>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare</strong><span className="gc-v3-next-arrow">↓</span></button>
