@@ -35,8 +35,12 @@ const CHOOSE_QUESTION_TOOL: Anthropic.Messages.ToolUnion = {
         enum: QUESTION_LIBRARY.map((q) => q.id),
         description: "The id of the library question that best resolves incertezza_principale.",
       },
+      ready_to_recommend: {
+        type: "boolean",
+        description: "True only when the available information is already specific enough to recommend highly relevant gifts without another clarification.",
+      },
     },
-    required: ["signals", "incertezza_principale", "domanda_id"],
+    required: ["signals", "incertezza_principale", "domanda_id", "ready_to_recommend"],
   },
 };
 
@@ -45,7 +49,10 @@ function buildSystemPrompt(): string {
   return `Sei un esperto di gift recommendation. Analizza le informazioni fornite sull'utente e:
 1. Estrai i segnali chiave (interessi, comportamenti, preferenze, vincoli) dall'osservazione libera.
 2. Identifica l'incertezza principale che, se risolta, aiuterebbe a consigliare meglio.
-3. Scegli UNA domanda tra quelle della libreria che riduce di più questa incertezza.
+3. Decidi se le informazioni sono già abbastanza specifiche per consigliare regali davvero pertinenti.
+4. Se manca ancora qualcosa, scegli UNA domanda tra quelle della libreria che riduce di più questa incertezza.
+
+Considera sufficienti le informazioni solo quando emergono almeno un interesse o comportamento concreto e una preferenza utile sul tipo di regalo, sul modo in cui verrebbe usato, su ciò che possiede già o su ciò che evita. Non dichiarare mai sufficienti le sole informazioni su occasione e budget.
 
 Libreria domande disponibili:
 ${libraryList}
@@ -56,7 +63,7 @@ Chiama sempre choose_question. Non inventare domande fuori dalla libreria.`;
 export async function POST(req: NextRequest) {
   try {
     const body: AdaptiveQuestionRequest = await req.json();
-    const { recipient, observation, previousQuestion, previousAnswer } = body;
+    const { recipient, observation, previousQuestion, previousAnswer, conversation = [], questionCount = 0 } = body;
 
     const userParts = [
       `Rapporto: ${recipient.relation || "non specificato"}`,
@@ -68,6 +75,10 @@ export async function POST(req: NextRequest) {
     if (previousQuestion && previousAnswer) {
       userParts.push(`Domanda precedente: "${previousQuestion}" → risposta: "${previousAnswer}"`);
     }
+    if (conversation.length) {
+      userParts.push(`Conversazione completa:\n${conversation.map(message => `${message.role === "user" ? "Utente" : "Gifty"}: ${message.content}`).join("\n")}`);
+    }
+    userParts.push(`Domande di chiarimento già fatte: ${questionCount}.`);
 
     const response = await client.messages.create({
       model: "claude-haiku-4-5",
@@ -85,7 +96,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No question chosen" }, { status: 502 });
     }
 
-    const input = toolUse.input as { signals: { key: string; value: string }[]; incertezza_principale: string; domanda_id: string };
+    const input = toolUse.input as { signals: { key: string; value: string }[]; incertezza_principale: string; domanda_id: string; ready_to_recommend: boolean };
     const entry = QUESTION_LIBRARY.find((q) => q.id === input.domanda_id) ?? QUESTION_LIBRARY[0];
     const interestLabel = recipient.interests?.split(",")[0]?.trim() || "questo interesse";
 
@@ -94,6 +105,7 @@ export async function POST(req: NextRequest) {
       incertezza_principale: input.incertezza_principale,
       domanda_scelta: entry.question.replace("{interest}", interestLabel),
       opzioni: entry.options,
+      ready_to_recommend: questionCount > 0 && (input.ready_to_recommend || questionCount >= 3),
     };
 
     return NextResponse.json(result);

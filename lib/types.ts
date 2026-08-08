@@ -88,6 +88,7 @@ export interface AdaptiveQuestionResult {
   incertezza_principale: string;
   domanda_scelta: string;
   opzioni: AdaptiveQuestionOption[];
+  ready_to_recommend?: boolean;
 }
 
 export interface AdaptiveQuestionRequest {
@@ -97,6 +98,8 @@ export interface AdaptiveQuestionRequest {
   /** Set on the second adaptive-question round, after the user answered the first. */
   previousQuestion?: string;
   previousAnswer?: string;
+  conversation?: ChatMessage[];
+  questionCount?: number;
 }
 
 /** Gift-direction the user picked in step 5 of the mobile adaptive intake. */

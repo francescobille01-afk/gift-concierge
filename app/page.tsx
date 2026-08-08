@@ -916,6 +916,11 @@ declare global {
 function sliderStepToBudget(step: number) {
   return step <= 20 ? step * 5 : 100 + (step - 20) * 25;
 }
+function normalizeRecipientName(value: string, locale = "it") {
+  return value
+    .toLocaleLowerCase(locale)
+    .replace(/(^|[\s'-])\p{L}/gu, letter => letter.toLocaleUpperCase(locale));
+}
 function parsePriceLow(r: string): number { const m = r.replace(/[, ]/g,"").match(/\d+/); return m ? parseInt(m[0]) : 9999; }
 // Pre-API: the model's price is an estimate, and the link goes to an Amazon
 // search page — so we never show it as an exact price. Widen it into an
@@ -1180,6 +1185,9 @@ export default function Home() {
   const [refining,    setRefining]    = useState(false);
   const [errorMsg,    setErrorMsg]    = useState<string | null>(null);
   const [clueText,    setClueText]    = useState("");
+  const [clueChat,    setClueChat]    = useState<ChatMessage[]>([]);
+  const [adaptiveQuestion, setAdaptiveQuestion] = useState<AdaptiveQuestionResult | null>(null);
+  const [clarificationCount, setClarificationCount] = useState(0);
   const [signals,     setSignals]     = useState<ProfileSignal[]>([]);
   const [signalsBusy, setSignalsBusy] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -1523,7 +1531,7 @@ export default function Home() {
   }
   function restart() {
     const next: Screen = "landing";
-    speechRecognitionRef.current?.abort(); setIsListening(false); setVoiceError(""); setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setActiveSearchId(""); setSelectedFavorite(null); setExpandedFavoriteSearch(null); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
+    speechRecognitionRef.current?.abort(); setIsListening(false); setVoiceError(""); setG(EMPTY); setStep(0); setStepKey(0); setGifts([]); setSortBy("price"); setScreen(next); setViewedEntry(null); setThumbs({}); setConvo([]); setErrorMsg(null); setSkipRelPicker(false); setLandingBarFocused(false); setLandingSheetOpen(false); setMobileFlow(false); setClueText(""); setClueChat([]); setAdaptiveQuestion(null); setClarificationCount(0); setSignals([]); setEditingSignals(false); setResultIndex(0); setFavoriteGifts([]); setActiveSearchId(""); setSelectedFavorite(null); setExpandedFavoriteSearch(null); setRefineBaseGift(null); setRefineText(""); setRefineChoices([]); setRefinementRound(0);
   }
   /* ── API call ── */
   function buildRecipientAndLocale() {
@@ -1662,19 +1670,48 @@ export default function Home() {
     }
   }
 
-  async function organizeClues() {
-    if (clueText.trim().length < 8 || signalsBusy) return;
-    setSignalsBusy(true);
+  function mergeProfileSignals(current: ProfileSignal[], incoming: ProfileSignal[]) {
+    const unique = new Map<string, ProfileSignal>();
+    [...current, ...incoming].forEach(signal => {
+      if (!signal.key?.trim() || !signal.value?.trim()) return;
+      unique.set(`${signal.key.trim().toLocaleLowerCase()}|${signal.value.trim().toLocaleLowerCase()}`, {
+        key:signal.key.trim(), value:signal.value.trim(),
+      });
+    });
+    return [...unique.values()].slice(0, 10);
+  }
+
+  function clueObservation(messages: ChatMessage[]) {
+    return messages
+      .filter(message => message.role === "user")
+      .map((message, index) => `${index === 0 ? "Descrizione iniziale" : `Chiarimento ${index}`}: ${message.content}`)
+      .join("\n");
+  }
+
+  async function generateClarifiedResults(messages: ChatMessage[], inferredSignals: ProfileSignal[]) {
     setScreen("loading");
     setLoadingLine(0);
-    setErrorMsg(null);
-    const { recipient, locale } = buildMobileRecipientAndLocale();
+    setAdaptiveQuestion(null);
+    setSignals(inferredSignals);
+    const observation = clueObservation(messages);
+    const { recipient:baseRecipient, locale } = buildRecipientAndLocale();
+    const recipient = {
+      ...baseRecipient,
+      age:"unknown",
+      relation:"",
+      gender:"",
+      interests:inferredSignals.map(signal => signal.key).join(", "),
+      budgetMin:0,
+      budgetMax:g.budget >= 500 ? 2000 : g.budget,
+      notes:observation,
+    };
     const firstMessage = [
       `Sto cercando un regalo per ${g.recipientName || "questa persona"}.`,
       `Occasione: ${g.occasion || "non specificata"}. Budget massimo: ${sym}${g.budget}.`,
-      `Quello che ho osservato: ${clueText.trim()}.`,
-      "Analizza direttamente queste informazioni e proponi le idee piu personali e acquistabili. Combina gli indizi compatibili e considera direzioni diverse solo quando raccontano lati distinti della persona.",
-    ].join("\n");
+      observation,
+      inferredSignals.length ? `Criteri rilevati: ${inferredSignals.map(signal => `${signal.key}: ${signal.value}`).join("; ")}.` : "",
+      "Ora proponi le idee più personali e acquistabili emerse dall'intera conversazione.",
+    ].filter(Boolean).join("\n");
     try {
       const res = await fetch("/api/chat", {
         method:"POST",
@@ -1685,7 +1722,7 @@ export default function Home() {
       const data: ChatResponse = await res.json();
       const newGifts = normalizeMobileGifts(data.suggestions ?? [], 0);
       if (!newGifts.length) throw new Error("No suggestions");
-      setSignals([]);
+      setClueText(observation);
       setGifts(newGifts);
       setResultIndex(0);
       setConvo([{ role:"user", content:firstMessage }, { role:"assistant", content:data.message ?? "" }]);
@@ -1696,6 +1733,58 @@ export default function Home() {
       setScreen("clues");
     } finally {
       setSignalsBusy(false);
+    }
+  }
+
+  async function organizeClues(messageOverride?: string) {
+    const message = (messageOverride ?? clueText).trim();
+    if (message.length < 2 || signalsBusy) return;
+    const userMessage: ChatMessage = { role:"user", content:message };
+    const nextChat = [...clueChat, userMessage];
+    const previousQuestion = [...clueChat].reverse().find(item => item.role === "assistant")?.content;
+    setClueChat(nextChat);
+    setClueText("");
+    setSignalsBusy(true);
+    setErrorMsg(null);
+    setAdaptiveQuestion(null);
+    const observation = clueObservation(nextChat);
+    const { recipient:baseRecipient, locale } = buildRecipientAndLocale();
+    try {
+      const res = await fetch("/api/adaptive-question", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          recipient:{ ...baseRecipient, notes:observation, budgetMin:0, budgetMax:g.budget },
+          observation,
+          previousQuestion,
+          previousAnswer:previousQuestion ? message : undefined,
+          conversation:nextChat,
+          questionCount:clarificationCount,
+          locale,
+        }),
+      });
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data: AdaptiveQuestionResult = await res.json();
+      const nextSignals = mergeProfileSignals(signals, data.signals ?? []);
+      setSignals(nextSignals);
+      if (data.ready_to_recommend || clarificationCount >= 3) {
+        await generateClarifiedResults(nextChat, nextSignals);
+        return;
+      }
+      setAdaptiveQuestion(data);
+      setClarificationCount(count => count + 1);
+      setClueChat([...nextChat, { role:"assistant", content:data.domanda_scelta }]);
+      setSignalsBusy(false);
+    } catch {
+      if (clarificationCount === 0) {
+        const fallbackQuestion = `Quando ${g.recipientName || "questa persona"} riceve un regalo, apprezza di più qualcosa di utile, personale o da vivere?`;
+        setAdaptiveQuestion({ signals:[], incertezza_principale:"Tipo di regalo", domanda_scelta:fallbackQuestion, opzioni:[] });
+        setClarificationCount(1);
+        setClueChat([...nextChat, { role:"assistant", content:fallbackQuestion }]);
+        setSignalsBusy(false);
+      } else {
+        await generateClarifiedResults(nextChat, signals);
+      }
     }
   }
 
@@ -2319,6 +2408,7 @@ export default function Home() {
         .gc-p2    {animation:gcpulse 1.2s ease-in-out .2s infinite}
         .gc-p3    {animation:gcpulse 1.2s ease-in-out .4s infinite}
         .gc-mobile-textarea::placeholder{color:#9a9698;opacity:1}
+        .gc-flow-clues{gap:0}.gc-clue-chat-heading>span{display:block;margin-bottom:7px;color:#d85e4e;font:850 8px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}.gc-clue-chat-thread{flex:1;min-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:12px 1px 14px;scrollbar-width:thin}.gc-clue-chat-empty{margin:auto 0;padding:15px 16px;border:1px dashed #d8c1aa;border-radius:16px;background:rgba(255,250,244,.56);color:#5f777c}.gc-clue-chat-empty strong{display:block;margin-bottom:5px;color:#17303e;font-size:12px}.gc-clue-chat-empty p{margin:0;font-size:11px;line-height:1.45}.gc-clue-message{display:flex;align-items:flex-start;gap:8px;max-width:88%;animation:gcfade .25s ease both}.gc-clue-message--user{align-self:flex-end;flex-direction:row-reverse}.gc-clue-message-avatar{width:28px;height:28px;flex:0 0 auto;display:grid;place-items:center;border-radius:9px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 5px 12px rgba(239,115,95,.16)}.gc-clue-message>div{padding:9px 11px;border:1px solid #dec8b1;border-radius:5px 15px 15px 15px;background:#fffaf4;box-shadow:0 5px 16px rgba(56,34,28,.05)}.gc-clue-message--user>div{border-color:#efaa98;border-radius:15px 5px 15px 15px;background:#f5d9cf}.gc-clue-message small{display:block;margin-bottom:3px;color:#a45e5b;font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.gc-clue-message p{margin:0;color:#17303e;font-size:12px;line-height:1.45}.gc-clue-typing{display:flex!important;gap:4px;padding:4px 1px}.gc-clue-typing i{width:5px;height:5px;border-radius:50%;background:#ef735f;animation:gcpulse 1s ease-in-out infinite}.gc-clue-typing i:nth-child(2){animation-delay:.16s}.gc-clue-typing i:nth-child(3){animation-delay:.32s}.gc-clue-quick-replies{display:flex;gap:6px;overflow-x:auto;padding:0 0 9px;scrollbar-width:none}.gc-clue-quick-replies button{flex:0 0 auto;padding:7px 11px;border:1px solid #d8b991;border-radius:999px;background:#fff8ef;color:#8f4d48;font:700 10.5px 'Hanken Grotesk',sans-serif;cursor:pointer}.gc-clue-composer{flex:0 0 auto}.gc-clue-composer textarea{min-height:84px;padding:14px 88px 14px 14px;border:1.5px solid #d5a16c;border-radius:19px;background:#fffdf9;font-size:16px;line-height:1.4;box-shadow:0 8px 24px rgba(91,45,39,.08)}.gc-clue-composer-actions{position:absolute;right:9px;bottom:9px;display:flex;align-items:center;gap:6px}.gc-clue-composer-actions button{width:34px;height:34px;padding:0;display:grid;place-items:center;border-radius:50%;cursor:pointer}.gc-clue-composer-actions .gc-voice-button{border:1px solid #ddc2a5;background:#f5e8d8;color:#a1534e}.gc-clue-composer-actions .gc-voice-button--active{border-color:#a1534e;background:#a1534e;color:#fff}.gc-clue-send{border:0;background:#ef735f;color:#17303e;font-size:20px;font-weight:800}.gc-clue-send:disabled{background:#d8c7b6;color:#978b80;cursor:not-allowed}.gc-clue-voice-status{padding-top:6px;color:#963f3d;font-size:10px}
         .gc-loader-turn{animation:gcLoaderTurn 7s linear infinite}
         .gc-loader-counter{animation:gcLoaderCounterTurn 7s linear infinite}
         .gc-loader-glow{animation:gcLoaderGlow 2.2s ease-in-out infinite}
@@ -2352,27 +2442,27 @@ export default function Home() {
         .gc-desktop-rail,.gc-desktop-results-grid,.gc-desktop-favorites,.gc-desktop-kicker{display:none}
         @media(min-width:901px){
           .gc-shell:has(.gc-flow-screen){background:#f5e9dc!important}
-          .gc-brand{width:336px!important;max-width:336px!important;padding:0!important;background:radial-gradient(circle at 16% 12%,rgba(239,115,95,.17),transparent 28%),linear-gradient(180deg,#102a36,#173846 58%,#102a36)!important}
+          .gc-brand{width:390px!important;max-width:390px!important;padding:0!important;background:radial-gradient(circle at 16% 12%,rgba(239,115,95,.17),transparent 28%),linear-gradient(180deg,#102a36,#173846 58%,#102a36)!important}
           .gc-brand>:not(.gc-desktop-rail){display:none!important}
-          .gc-desktop-rail{position:relative;z-index:3;height:100%;box-sizing:border-box;padding:28px 24px 24px;display:flex;flex-direction:column}
-          .gc-desktop-rail:before{content:"";position:absolute;left:43px;top:306px;height:174px;width:1px;background:linear-gradient(180deg,rgba(239,115,95,.72),rgba(126,214,203,.5),rgba(255,195,111,.28));box-shadow:0 0 18px rgba(126,214,203,.2)}
+          .gc-desktop-rail{position:relative;z-index:3;height:100%;box-sizing:border-box;padding:32px 30px 26px;display:flex;flex-direction:column}
+          .gc-desktop-rail:before{content:"";position:absolute;left:57px;top:344px;height:216px;width:1px;background:linear-gradient(180deg,rgba(239,115,95,.72),rgba(126,214,203,.5),rgba(255,195,111,.28));box-shadow:0 0 18px rgba(126,214,203,.2)}
           .gc-desktop-rail-brand{display:flex;align-items:center;gap:12px;padding:0;border:0;background:transparent;color:#fff4e8;cursor:pointer}.gc-desktop-rail-brand>span{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 12px 30px rgba(239,115,95,.2)}.gc-desktop-rail-brand>strong{font:800 29px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.045em}
-          .gc-desktop-rail-context{margin:46px 0 48px;padding:20px;border:1px solid rgba(255,244,232,.12);border-radius:18px;background:rgba(255,244,232,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.gc-desktop-rail-context small{color:#ef8a78;font:850 8px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.gc-desktop-rail-context h2{margin:7px 0 3px;color:#fff4e8;font:700 25px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}.gc-desktop-rail-context p{margin:0;color:#a9c2c1;font-size:11px}
-          .gc-desktop-rail-steps{position:relative;display:grid;gap:28px}.gc-desktop-rail-steps>div{position:relative;z-index:1;display:flex;align-items:center;gap:14px;color:#6f8c91}.gc-desktop-rail-steps i{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(255,255,255,.14);border-radius:50%;background:#14313e;color:inherit;font:800 9px 'Hanken Grotesk',sans-serif;font-style:normal;letter-spacing:.05em}.gc-desktop-rail-steps span small{display:block;margin-bottom:2px;font:800 7px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}.gc-desktop-rail-steps span strong{display:block;color:inherit;font:700 14px 'Hanken Grotesk',sans-serif}.gc-desktop-rail-steps>div[data-done=true]{color:#98b9b5}.gc-desktop-rail-steps>div[data-active=true]{color:#fff4e8}.gc-desktop-rail-steps>div[data-active=true] i{border-color:#7ed6cb;background:rgba(126,214,203,.16);color:#7ed6cb;box-shadow:0 0 0 6px rgba(126,214,203,.06),0 0 22px rgba(126,214,203,.24)}.gc-desktop-rail-steps>div[data-active=true] span small{color:#7ed6cb}
+          .gc-desktop-rail-context{margin:52px 0 58px;padding:24px;border:1px solid rgba(255,244,232,.12);border-radius:21px;background:rgba(255,244,232,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.gc-desktop-rail-context small{color:#ef8a78;font:850 9px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.gc-desktop-rail-context h2{margin:9px 0 5px;color:#fff4e8;font:700 31px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}.gc-desktop-rail-context p{margin:0;color:#b8ccca;font-size:13px}
+          .gc-desktop-rail-steps{position:relative;display:grid;gap:32px}.gc-desktop-rail-steps>div{position:relative;z-index:1;display:flex;align-items:center;gap:17px;color:#6f8c91}.gc-desktop-rail-steps i{width:52px;height:52px;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(255,255,255,.14);border-radius:50%;background:#14313e;color:inherit;font:800 11px 'Hanken Grotesk',sans-serif;font-style:normal;letter-spacing:.05em}.gc-desktop-rail-steps span small{display:block;margin-bottom:3px;font:800 8px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}.gc-desktop-rail-steps span strong{display:block;color:inherit;font:700 17px 'Hanken Grotesk',sans-serif}.gc-desktop-rail-steps>div[data-done=true]{color:#98b9b5}.gc-desktop-rail-steps>div[data-active=true]{color:#fff4e8}.gc-desktop-rail-steps>div[data-active=true] i{border-color:#7ed6cb;background:rgba(126,214,203,.16);color:#7ed6cb;box-shadow:0 0 0 7px rgba(126,214,203,.06),0 0 24px rgba(126,214,203,.24)}.gc-desktop-rail-steps>div[data-active=true] span small{color:#7ed6cb}
           .gc-desktop-rail-foot{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px 11px;color:#7f9b9e;font-size:9.5px}.gc-desktop-rail-foot>span{width:100%;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);color:#b8ccca}.gc-desktop-rail-foot a,.gc-desktop-rail-foot button{padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
           .gc-main:not(.gc-main--flush){padding:42px 52px 54px!important;background:radial-gradient(circle at 88% 4%,rgba(239,115,95,.09),transparent 26%),#f5e9dc!important}
           .gc-topnav{min-height:44px;margin-bottom:14px!important}.gc-topnav>div>button{border-color:rgba(255,244,232,.2)!important;background:rgba(255,244,232,.07)!important;color:#fff4e8!important}.gc-desktop-favorites{height:38px;padding:0 13px;border:1px solid rgba(255,244,232,.2);border-radius:999px;background:rgba(255,244,232,.07);display:flex;align-items:center;gap:7px;color:#fff4e8;font:750 12px 'Hanken Grotesk',sans-serif;cursor:pointer}.gc-desktop-favorites>span{color:#ffc19f;font-size:18px}.gc-desktop-favorites>b{min-width:18px;height:18px;display:grid;place-items:center;border-radius:99px;background:#ef735f;color:#17303e;font-size:9px}
           .gc-main[class*="gc-main--"] section.gc-flow-screen{width:100%!important;max-width:1320px!important;min-height:calc(100vh - 96px)!important;height:auto!important;box-sizing:border-box;margin:0 auto!important;padding:18px 10px 48px!important;border:0;border-radius:0;background:transparent!important;box-shadow:none;overflow:visible!important}
           .gc-flow-header{margin:-34px -38px 30px!important;padding:18px 24px 15px!important;border-radius:30px 30px 0 0;box-shadow:none!important}.gc-flow-header>div:first-child{margin-bottom:13px!important}
           .gc-flow-screen .gc-flow-title,.gc-flow-results>h1{margin:0 0 12px!important;color:#17303e!important;font:650 clamp(42px,4vw,58px)/.98 'Bricolage Grotesque',sans-serif!important;letter-spacing:-.055em!important}.gc-flow-screen .gc-flow-lede{max-width:480px;margin:0!important;color:#5f777c!important;font-size:16px!important;line-height:1.55!important}
-          .gc-flow-clues{display:grid!important;grid-template-columns:minmax(240px,.78fr) minmax(0,1.22fr);grid-template-rows:auto auto auto 1fr;column-gap:52px;align-content:center}.gc-flow-clues .gc-flow-title{grid-column:1;grid-row:1;align-self:end}.gc-flow-clues .gc-flow-lede{grid-column:1;grid-row:2}.gc-clue-composer{grid-column:2;grid-row:1/3;min-width:0}.gc-clue-composer textarea{min-height:390px!important;padding:26px 26px 86px!important;border:1.5px solid rgba(239,115,95,.58)!important;border-radius:24px!important;background:#fffaf4!important;font-size:19px!important;box-shadow:0 18px 40px rgba(57,31,27,.09)!important}.gc-clue-composer .gc-voice-button{right:20px!important;bottom:20px!important;min-width:210px!important;justify-content:center}.gc-clue-voice-status{grid-column:2;grid-row:3;padding-top:9px!important}.gc-flow-clues .gc-flow-primary-action{grid-column:2;grid-row:4;width:100%;margin:18px 0 0!important;padding:0!important}.gc-flow-primary-action>button{min-height:58px!important;border-radius:15px!important;background:linear-gradient(145deg,#ef735f,#d85e4e)!important;box-shadow:0 12px 28px rgba(216,94,78,.22)!important;font-size:15px!important}
+          .gc-flow-clues{display:flex!important;flex-direction:column!important;max-width:980px!important;padding-top:8px!important;padding-bottom:28px!important;overflow:hidden!important}.gc-clue-chat-heading{width:100%;max-width:900px;margin:0 auto}.gc-clue-chat-heading .gc-flow-lede{max-width:650px!important}.gc-clue-chat-thread{width:100%;max-width:900px;min-height:250px;margin:12px auto 14px;padding:16px 4px}.gc-clue-chat-empty{max-width:610px;margin:auto}.gc-clue-chat-empty strong{font-size:14px}.gc-clue-chat-empty p{font-size:13px}.gc-clue-message{max-width:72%}.gc-clue-message-avatar{width:34px;height:34px;border-radius:11px}.gc-clue-message>div{padding:12px 15px}.gc-clue-message p{font-size:14px}.gc-clue-quick-replies{width:100%;max-width:900px;margin:0 auto}.gc-clue-quick-replies button{padding:9px 14px;font-size:12px}.gc-flow-clues .gc-clue-composer{width:100%;max-width:900px;margin:0 auto;min-width:0}.gc-flow-clues .gc-clue-composer textarea{min-height:112px!important;padding:20px 112px 20px 22px!important;border:1.5px solid rgba(239,115,95,.58)!important;border-radius:27px!important;background:#fffaf4!important;font-size:17px!important;box-shadow:0 18px 40px rgba(57,31,27,.09)!important}.gc-flow-clues .gc-clue-composer-actions{right:15px;bottom:15px}.gc-flow-clues .gc-clue-composer-actions button{width:42px;height:42px}.gc-flow-clues .gc-clue-voice-status{width:100%;max-width:900px;margin:0 auto;padding-top:8px!important}.gc-flow-primary-action>button{min-height:58px!important;border-radius:15px!important;background:linear-gradient(145deg,#ef735f,#d85e4e)!important;box-shadow:0 12px 28px rgba(216,94,78,.22)!important;font-size:15px!important}
           .gc-flow-signals .gc-signals-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;margin-top:26px}.gc-flow-signals .gc-signals-grid>div{min-height:76px!important;padding:12px 14px!important;border-color:#d8c4b0!important;border-radius:16px!important;box-shadow:0 8px 20px rgba(40,29,25,.05)}.gc-flow-signals .gc-flow-primary-action{width:380px;margin:26px 0 0 auto!important}
           .gc-flow-loading>div:last-child{min-height:560px}.gc-flow-loading .gc-loader-core{background:linear-gradient(145deg,#2b6871,#17303e)!important}.gc-flow-loading h2{font-size:40px!important;color:#17303e!important}
           .gc-main .gc-flow-results{max-width:1400px!important;min-height:100%!important}.gc-flow-results>h1{font-size:50px!important}.gc-mobile-kicker{display:none}.gc-desktop-kicker{display:inline}.gc-mobile-result-deck{display:none}.gc-desktop-results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:24px;padding-bottom:28px}
           .gc-desktop-result-card{min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:22px;background:#102b38;box-shadow:0 18px 40px rgba(7,28,36,.18);transition:transform .22s ease,box-shadow .22s ease}.gc-desktop-result-card:hover{transform:translateY(-5px);box-shadow:0 24px 52px rgba(7,28,36,.26)}.gc-desktop-result-photo{position:relative;height:205px;overflow:hidden}.gc-desktop-result-photo:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#102b38)}.gc-desktop-result-photo img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .5s ease}.gc-desktop-result-card:hover .gc-desktop-result-photo img{transform:scale(1.035)}.gc-desktop-result-photo>span{position:absolute;z-index:2;left:13px;top:13px;padding:5px 9px;border:1px solid rgba(255,255,255,.25);border-radius:99px;background:rgba(10,31,41,.56);backdrop-filter:blur(6px);color:#fff4e8;font-size:8px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.gc-desktop-result-photo>button{position:absolute;z-index:3;right:12px;top:12px;width:36px;height:36px;border:1px solid rgba(255,255,255,.36);border-radius:50%;background:rgba(10,31,41,.56);backdrop-filter:blur(6px);color:#ffc19f;font-size:20px;cursor:pointer}.gc-desktop-result-body{padding:4px 17px 17px;color:#fff4e8}.gc-desktop-result-body>small{color:#7ed6cb;font-size:8px;font-weight:850;letter-spacing:.16em}.gc-desktop-result-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:7px 0}.gc-desktop-result-title h2{margin:0;color:#fff4e8;font:700 19px/1.08 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}.gc-desktop-result-title strong{flex:0 0 auto;color:#ffc19f;font:700 16px 'Bricolage Grotesque',sans-serif}.gc-desktop-result-body>p{height:53px;margin:0 0 14px;overflow:hidden;color:#b8ccca;font-size:11.5px;line-height:1.5}.gc-desktop-result-actions{display:grid;grid-template-columns:1.15fr .85fr;gap:7px}.gc-desktop-result-actions a,.gc-desktop-result-actions button{min-height:40px;box-sizing:border-box;display:grid;place-items:center;padding:8px;border-radius:10px;font:750 10.5px 'Hanken Grotesk',sans-serif;text-align:center;text-decoration:none;cursor:pointer}.gc-desktop-result-actions a{border:0;background:#ef735f;color:#102a36}.gc-desktop-result-actions button{border:1px solid rgba(255,244,232,.25);background:rgba(255,244,232,.07);color:#fff4e8}.gc-desktop-discard{width:100%;margin-top:7px;padding:4px;border:0;background:transparent;color:#789499;font-size:9.5px;cursor:pointer}
           .gc-main .gc-flow-refine{max-width:930px!important}.gc-flow-refine textarea{min-height:200px!important;padding:18px!important;border-radius:18px!important}.gc-main .gc-flow-favorites,.gc-main .gc-flow-favorite-detail{max-width:940px!important}
         }
-        @media(min-width:901px) and (max-width:1400px){.gc-brand{width:310px!important;max-width:310px!important}.gc-main:not(.gc-main--flush){padding-left:34px!important;padding-right:34px!important}.gc-desktop-results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gc-flow-clues{column-gap:38px;grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr)}}
+        @media(min-width:901px) and (max-width:1400px){.gc-brand{width:350px!important;max-width:350px!important}.gc-main:not(.gc-main--flush){padding-left:34px!important;padding-right:34px!important}.gc-desktop-results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
           input:not([type=range]),textarea,select{font-size:16px!important}
           .gc-mobile-header{display:flex!important}
@@ -3334,6 +3424,7 @@ export default function Home() {
               const submitLandingAnswer = () => {
                 if (!g.recipientName.trim() || !g.occasion?.trim()) return;
                 (document.activeElement as HTMLElement | null)?.blur();
+                setG(previous => ({ ...previous, recipientName:normalizeRecipientName(previous.recipientName.trim(), lang.t) }));
                 setActiveSearchId(`favorite-search-${Date.now()}`);
                 setFavoriteGifts([]);
                 setLandingSheetOpen(false);
@@ -3404,7 +3495,7 @@ export default function Home() {
                             </span>
                             <div style={{ flex:1, minWidth:0 }}>
                               <label htmlFor="gc-landing-recipient">{landingForm.nameLabel}</label>
-                              <input id="gc-landing-recipient" autoFocus type="text" autoComplete="off" value={g.recipientName} onChange={e => setG(p => ({ ...p, recipientName:e.target.value }))} placeholder={landingForm.namePlaceholder}/>
+                              <input id="gc-landing-recipient" autoFocus type="text" autoComplete="off" value={g.recipientName} onChange={e => setG(p => ({ ...p, recipientName:normalizeRecipientName(e.target.value, lang.t) }))} placeholder={landingForm.namePlaceholder}/>
                             </div>
                           </div>
 
@@ -3450,25 +3541,43 @@ export default function Home() {
               {/* MOBILE FLOW — clues → signals → results → refinement */}
               {mobileFlow && screen === "clues" && (
                 <section className="gc-fade gc-flow-screen gc-flow-clues" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
-                  <h1 className="gc-flow-title" style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
-                  <p className="gc-flow-lede" style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
+                  <header className="gc-clue-chat-heading">
+                    <span>CONVERSAZIONE GUIDATA</span>
+                    <h1 className="gc-flow-title" style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
+                    <p className="gc-flow-lede" style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Parti da ciò che sai. Gifty farà solo le domande utili prima di cercare.</p>
+                  </header>
+                  <div className="gc-clue-chat-thread" aria-live="polite">
+                    {clueChat.length === 0 ? (
+                      <div className="gc-clue-chat-empty">
+                        <strong>Più dettagli concreti dai, meno domande serviranno.</strong>
+                        <p>Esempio: {g.recipientName || "Luca"} gioca a padel, viaggia spesso per lavoro, ha già racchetta e scarpe e preferisce cose pratiche.</p>
+                      </div>
+                    ) : clueChat.map((message, index) => (
+                      <div key={`${message.role}-${index}`} className={`gc-clue-message gc-clue-message--${message.role}`}>
+                        {message.role === "assistant" && <span className="gc-clue-message-avatar"><GiftSVG size={14} fill="#17303e"/></span>}
+                        <div><small>{message.role === "assistant" ? "Gifty AI" : "Tu"}</small><p>{message.content}</p></div>
+                      </div>
+                    ))}
+                    {signalsBusy && <div className="gc-clue-message gc-clue-message--assistant"><span className="gc-clue-message-avatar"><GiftSVG size={14} fill="#17303e"/></span><div><small>Gifty AI</small><p className="gc-clue-typing"><i/><i/><i/></p></div></div>}
+                  </div>
+                  {adaptiveQuestion?.opzioni?.length ? (
+                    <div className="gc-clue-quick-replies">
+                      {adaptiveQuestion.opzioni.map(option => <button key={option.id} type="button" disabled={signalsBusy} onClick={() => organizeClues(option.label)}>{option.label}</button>)}
+                    </div>
+                  ) : null}
                   <div className="gc-clue-composer" style={{ position:"relative" }}>
                     <textarea id="gc-clue-text" className="gc-mobile-textarea" value={clueText} onChange={event => setClueText(event.target.value)}
-                      placeholder={`Esempio: ${g.recipientName || "Luca"} gioca a padel due volte a settimana, lavora spesso in viaggio e si lamenta che il borsone è sempre disordinato. Ha già racchetta e scarpe; preferisce cose pratiche e non ama i regali decorativi.`}
-                      style={{ width:"100%", minHeight:210, resize:"none", boxSizing:"border-box", padding:"16px 15px 70px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
-                    <button type="button" onClick={toggleVoiceInput} aria-label={isListening ? "Interrompi registrazione" : "Parla invece di scrivere"}
-                      className={isListening ? "gc-voice-button gc-voice-button--active" : "gc-voice-button"}
-                      style={{ position:"absolute", right:12, bottom:12, minHeight:42, padding:"0 15px", border:`1px solid ${isListening ? C.maroon : "#d8b991"}`, borderRadius:999, background:isListening ? C.maroon : "#f5e8d8", color:isListening ? "#fff" : C.maroon, display:"flex", alignItems:"center", gap:8, fontSize:12, fontWeight:800, cursor:"pointer", boxShadow:"0 5px 14px rgba(91,45,39,.16)" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.9"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"/></svg>{isListening ? "Ferma" : "Parla invece di scrivere"}
-                    </button>
+                      onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); organizeClues(); } }}
+                      placeholder={clueChat.length ? "Scrivi la tua risposta…" : `Raccontami cosa sai di ${g.recipientName || "questa persona"}…`}
+                      style={{ width:"100%", resize:"none", boxSizing:"border-box", color:C.ink, fontFamily:BODY }}/>
+                    <div className="gc-clue-composer-actions">
+                      <button type="button" onClick={toggleVoiceInput} aria-label={isListening ? "Interrompi registrazione" : "Parla invece di scrivere"} className={isListening ? "gc-voice-button gc-voice-button--active" : "gc-voice-button"}>
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.9"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"/></svg>
+                      </button>
+                      <button type="button" className="gc-clue-send" onClick={() => organizeClues()} disabled={clueText.trim().length < (clueChat.length ? 2 : 8) || signalsBusy} aria-label="Invia messaggio">↑</button>
+                    </div>
                   </div>
-                  {(voiceError || isListening) && <div className="gc-clue-voice-status" style={{ minHeight:17, paddingTop:7, color:voiceError ? "#963f3d" : C.maroon, fontSize:10.5 }}>{voiceError || "Ti ascolto… il testo apparirà qui sopra."}</div>}
-                  <div className="gc-flow-primary-action" style={{ marginTop:"auto", paddingTop:12 }}>
-                    <button type="button" onClick={organizeClues} disabled={clueText.trim().length < 8 || signalsBusy}
-                      style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:clueText.trim().length >= 8 ? C.maroon : "#ccb9a6", color:"#fff", fontSize:13.5, fontWeight:700, cursor:clueText.trim().length >= 8 ? "pointer" : "not-allowed", boxShadow:clueText.trim().length >= 8 ? "0 8px 20px rgba(124,63,63,.22)" : "none" }}>
-                      {signalsBusy ? "Analizzo le informazioni…" : "Analizza le informazioni"}
-                    </button>
-                  </div>
+                  {(voiceError || isListening || errorMsg) && <div className="gc-clue-voice-status">{errorMsg || voiceError || "Ti ascolto… il testo apparirà nel messaggio."}</div>}
                 </section>
               )}
 
