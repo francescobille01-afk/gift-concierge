@@ -74,10 +74,11 @@ const ENGINE_TOKENS = [
   { kind:"ritmo",     label:"ogni weekend" },
   { kind:"abitudine", label:"cucina per altri" },
 ];
-/* How long you stay on a phase before it hands over to the next, and how
-   long the opening screen holds before it carries you into step 1. */
-const PHASE_DWELL_MS = 4600;
-const HERO_DWELL_MS = 5000;
+/* How long each stop holds before it hands over. Phase 1 waits for the
+   sentence to finish typing; 2 and 3 resolve sooner so they don't linger.
+   Kept in step with the --dwell values on each phase in the stylesheet. */
+const PHASE_DWELL_MS = [4600, 3400, 3400];
+const HERO_DWELL_MS = 3800;
 
 /* The five ideas that spill out of the parcel once it opens. */
 const PARCEL_POPS = [GIFT_SHOWCASE[1], GIFT_SHOWCASE[6], GIFT_SHOWCASE[0], GIFT_SHOWCASE[4]];
@@ -1352,7 +1353,8 @@ export default function Home() {
     if (landingActivePhase > 3) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const next = [".gc-v3-phase-one", ".gc-v3-phase-two", ".gc-v3-phase-three", ".gc-v3-start"][landingActivePhase];
-    const id = window.setTimeout(() => scrollLandingTo(next), landingActivePhase === 0 ? HERO_DWELL_MS : PHASE_DWELL_MS);
+    const dwell = landingActivePhase === 0 ? HERO_DWELL_MS : PHASE_DWELL_MS[landingActivePhase - 1];
+    const id = window.setTimeout(() => scrollLandingTo(next), dwell);
     return () => window.clearTimeout(id);
   }, [screen, landingActivePhase]);
 
@@ -2346,13 +2348,15 @@ export default function Home() {
            replaces sat on top of the artwork like a tooltip; this reads as
            part of the page and the whole unit bobs as one. */
         .gc-v3-scroll-cue{position:relative;z-index:5;flex:0 0 auto;margin-top:18px;padding:6px 12px;border:0;border-radius:0;background:none;box-shadow:none;display:flex;flex-direction:column;align-items:center;gap:9px;color:#e8dccd;font:inherit;text-align:center;cursor:pointer;animation:gcScrollBob 1.8s ease-in-out infinite}
-        .gc-v3-scroll-cue:hover{color:#fff4e8}
-        .gc-v3-scroll-cue span{padding:0;border:0;background:none;box-shadow:none;color:inherit;font-size:clamp(13px,1.15vw,15px);font-weight:650;letter-spacing:.01em;white-space:nowrap;animation:none}
-        .gc-v3-scroll-cue b{width:11px;height:11px;border-right:2.5px solid #ef735f;border-bottom:2.5px solid #ef735f;border-radius:0 0 2px 0;transform:rotate(45deg);animation:none}
+        .gc-v3-scroll-cue{color:#fff4e8}
+        .gc-v3-scroll-cue:before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:330px;height:104px;margin:-52px 0 0 -165px;border-radius:50%;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(239,115,95,.32),rgba(239,115,95,.1) 46%,transparent 72%);animation:gcCueHalo 2.6s ease-in-out infinite}
+        @keyframes gcCueHalo{0%,100%{opacity:.5;transform:scale(.86)}50%{opacity:1;transform:scale(1.08)}}
+        .gc-v3-scroll-cue span{padding:0;border:0;background:none;box-shadow:none;color:inherit;font-size:clamp(15.5px,1.45vw,19px);font-weight:800;letter-spacing:.005em;white-space:nowrap;text-shadow:0 2px 18px rgba(0,0,0,.45);animation:none}
+        .gc-v3-scroll-cue b{width:14px;height:14px;border-right:3px solid #ef735f;border-bottom:3px solid #ef735f;border-radius:0 0 2px 0;transform:rotate(45deg);animation:none}
         .gc-v3-next-arrow{animation:gcScrollPulse 1.8s ease-in-out infinite}
         @keyframes gcScrollBob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
         @keyframes gcScrollPulse{0%,100%{transform:translateY(0)}45%{transform:translateY(6px)}}
-        .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-two{--phase-color:#7ed6cb}.gc-v3-phase-three{--phase-color:#ffc36f}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
+        .gc-v3-phase{--phase-color:#ef735f;position:relative;height:100dvh;min-height:100dvh;overflow:hidden;border-top:1px solid rgba(255,255,255,.06);scroll-snap-align:start;scroll-snap-stop:always}.gc-v3-phase-one{--dwell:4.6s}.gc-v3-phase-two{--phase-color:#7ed6cb;--dwell:3.4s}.gc-v3-phase-three{--phase-color:#ffc36f;--dwell:3.4s}.gc-v3-phase:before{content:"";position:absolute;z-index:2;left:50%;top:0;bottom:0;width:1.5px;transform-origin:50% 0;transform:scaleY(var(--thread-fill,0));background:color-mix(in srgb,var(--phase-color) 62%,transparent);box-shadow:0 0 20px color-mix(in srgb,var(--phase-color) 34%,transparent)}
         /* The bead riding the leading end of the thread. */
         /* ── The thread ──
            One unbroken line down the middle, with a torch running down it. The
@@ -2360,11 +2364,10 @@ export default function Home() {
            hand over, so it arrives as the page turns. */
         .gc-v3-thread{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;overflow:hidden;background:color-mix(in srgb,var(--phase-color) 30%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--phase-color) 22%,transparent)}
         .gc-v3-thread>b{position:absolute;left:-9px;right:-9px;top:0;height:132px;border-radius:50%;background:radial-gradient(ellipse 50% 50% at 50% 78%,#fff4e8 0 14%,var(--phase-color) 34%,color-mix(in srgb,var(--phase-color) 42%,transparent) 58%,transparent 74%);opacity:0}
-        .gc-v3-phase[data-active=true] .gc-v3-thread>b{animation:gcTorchDown 4.6s linear both,gcTorchFlicker .55s ease-in-out infinite}
+        .gc-v3-phase[data-active=true] .gc-v3-thread>b{animation:gcTorchDown var(--dwell,4.6s) linear both}
         /* Sits above the line's top edge at the start and clears the bottom at
            the end, so the run covers the full height of the phase. */
         @keyframes gcTorchDown{0%{opacity:0;transform:translateY(-132px)}5%{opacity:1}92%{opacity:1}100%{opacity:0;transform:translateY(100dvh)}}
-        @keyframes gcTorchFlicker{0%,100%{scale:1 1}50%{scale:1.18 .92}}
         .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(72px,22vw,300px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         .gc-v3-copy{position:relative;z-index:5;transition:transform .12s linear,opacity .12s linear}.gc-v3-copy small{display:inline-flex;align-items:center;gap:8px;color:var(--phase-color);font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-copy small:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--phase-color);box-shadow:0 0 0 5px color-mix(in srgb,var(--phase-color) 13%,transparent),0 0 18px var(--phase-color)}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
         .gc-v3-art{position:relative;z-index:3;min-height:410px;transition:transform .12s linear,opacity .12s linear;will-change:transform,opacity}.gc-v3-message-art{display:grid;place-items:center}.gc-v3-message-card{position:relative;width:min(470px,88%);min-height:210px;box-sizing:border-box;padding:34px;border:1px solid rgba(255,193,159,.35);border-radius:30px;background:linear-gradient(145deg,rgba(255,244,232,.98),rgba(239,225,213,.95));box-shadow:0 35px 80px rgba(3,18,27,.36);color:#203746;font-family:Georgia,serif;font-size:clamp(21px,2.3vw,31px);line-height:1.25}.gc-v3-message-card i{position:absolute;bottom:22px;width:7px;height:7px;border-radius:50%;background:#ef735f}.gc-v3-message-card i:nth-child(2){left:34px}.gc-v3-message-card i:nth-child(3){left:48px;opacity:.6}.gc-v3-message-card i:nth-child(4){left:62px;opacity:.3}
@@ -2438,7 +2441,7 @@ export default function Home() {
         .gc-v3-result-body strong{color:#fff4e8;font:750 14px/1.12 'Hanken Grotesk',sans-serif;letter-spacing:-.01em}
         .gc-v3-result-criteria{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
         .gc-v3-result-criteria span{padding:4px 8px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.15);color:#ffe2cd;font:750 10.5px 'Hanken Grotesk',sans-serif;line-height:1}
-        .gc-v3-next{position:absolute;left:50%;bottom:26px;z-index:8;min-width:285px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next>strong>i{margin-left:5px;color:#5d7480;font-style:normal;font-weight:800}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
+        .gc-v3-next{position:absolute;left:50%;bottom:48px;z-index:8;min-width:344px;min-height:58px;transform:translateX(-50%);padding:7px 8px 7px 20px;border:1px solid color-mix(in srgb,var(--phase-color) 48%,white);border-radius:999px;background:#fff4e8;box-shadow:0 14px 34px rgba(3,18,27,.32),0 0 0 6px color-mix(in srgb,var(--phase-color) 11%,transparent);display:flex;align-items:center;justify-content:space-between;gap:18px;color:#17303e;white-space:nowrap;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}.gc-v3-next:hover{transform:translateX(-50%) translateY(-3px);box-shadow:0 18px 38px rgba(3,18,27,.38),0 0 0 9px color-mix(in srgb,var(--phase-color) 14%,transparent)}.gc-v3-next>strong{color:#17303e;font:850 14px/1.2 'Hanken Grotesk',sans-serif}.gc-v3-next>strong>i{margin-left:5px;color:#5d7480;font-style:normal;font-weight:800}.gc-v3-next-arrow{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.42);border-radius:50%;background:linear-gradient(145deg,color-mix(in srgb,var(--phase-color) 55%,#ffdec8),var(--phase-color));color:#17303e;font-size:17px;animation:gcScrollPulse 1.8s ease-in-out infinite}
         /* ── The thread's last run, and the parcel it arrives at ──
            The two diagonal beams that used to split apart here are gone: the
            line comes straight down out of phase 3, reaches the parcel, and
@@ -2446,16 +2449,10 @@ export default function Home() {
            descent is scroll-driven, the opening is opacity and transform. */
         .gc-v3-start{--phase-color:#ffc19f}
         .gc-v3-start:before,.gc-v3-start:after{content:none}
-        .gc-v3-parcel{position:relative;z-index:3;display:block;width:96px;height:86px;margin:0 auto 26px}
-        /* Hung off the parcel rather than off the section, so the thread lands
-           exactly on the lid at every viewport height instead of stopping
-           short of it. */
         /* ── What the parcel spills out ──
-           Two clusters hugging the bottom corners, deliberately away from the
-           middle column: the search bar lives there and the cards were landing
-           under it. Offsets are in vw so they stay pinned to the edges at any
-           width. Each card is thrown from inside the box on its own arc and
-           lands with a bounce, then breathes. */
+           Two clusters hugging the bottom corners, away from the middle column
+           where the search bar lives. Offsets are in vw so they stay pinned to
+           the edges at any width. They leave the box only after it bursts. */
         .gc-v3-pops{position:absolute;z-index:1;left:50%;bottom:clamp(40px,6vh,72px);width:0;height:0;pointer-events:none}
         .gc-v3-pop{position:absolute;left:0;bottom:0;width:clamp(72px,7.4vw,102px);aspect-ratio:4/5;margin-left:calc(clamp(72px,7.4vw,102px) / -2);border:1px solid rgba(255,255,255,.16);border-radius:14px;overflow:hidden;background:#0f2733;box-shadow:0 18px 34px rgba(3,18,27,.5);opacity:0}
         .gc-v3-pop>img{position:absolute;left:0;right:0;top:0;width:100%;height:68%;object-fit:cover;display:block}
@@ -2464,14 +2461,21 @@ export default function Home() {
         .gc-v3-pop[data-slot="1"]{--pop-x:-30;--pop-y:-34px;--pop-tilt:6deg}
         .gc-v3-pop[data-slot="2"]{--pop-x:30;--pop-y:-34px;--pop-tilt:-6deg}
         .gc-v3-pop[data-slot="3"]{--pop-x:40;--pop-y:0px;--pop-tilt:9deg}
-        /* They arrive one after another and stay put in the bottom corners,
-           just breathing. Sitting below the copy and the search box so they
-           never sit over them. */
         .gc-v3-start[data-active=true] .gc-v3-pop{animation:gcPopOut .95s cubic-bezier(.22,.72,.3,1) both,gcPopBreathe 3.4s ease-in-out infinite}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.35s,2.3s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:1.5s,2.45s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:1.65s,2.6s}
-        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:1.8s,2.75s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="0"]{animation-delay:1.85s,2.8s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="1"]{animation-delay:2s,2.95s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="2"]{animation-delay:2.15s,3.1s}
+        .gc-v3-start[data-active=true] .gc-v3-pop[data-slot="3"]{animation-delay:2.3s,3.25s}
+        /* Thrown from inside the box — the start point is measured from the box
+           at runtime, so it holds at any viewport height. */
+        @keyframes gcPopOut{
+          0%{opacity:0;transform:translate(0,var(--pop-from-y,-220px)) scale(.06) rotate(0)}
+          14%{opacity:1}
+          52%{transform:translate(calc(var(--pop-x) * 1.04vw),calc(var(--pop-y) - clamp(46px,7vh,80px))) scale(1.06) rotate(calc(var(--pop-tilt) * 1.4))}
+          76%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) + 7px)) scale(.97) rotate(var(--pop-tilt))}
+          89%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 9px)) scale(1.02) rotate(var(--pop-tilt))}
+          100%{opacity:1;transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) scale(1) rotate(var(--pop-tilt))}
+        }
         @keyframes gcPopBreathe{
           0%,100%{transform:translate(calc(var(--pop-x) * 1vw),var(--pop-y)) rotate(var(--pop-tilt))}
           50%{transform:translate(calc(var(--pop-x) * 1vw),calc(var(--pop-y) - 7px)) rotate(calc(var(--pop-tilt) * .82))}
@@ -2485,54 +2489,80 @@ export default function Home() {
           .gc-v3-pop[data-slot="2"]{--pop-x:14;--pop-y:-58px}
           .gc-v3-pop[data-slot="3"]{--pop-x:33;--pop-y:0px}
         }
-        /* The thread's last run, hung off the parcel so it meets the lid at any
-           viewport height. The torch runs it, arrives on the lid, and that
-           arrival is what opens the box. */
-        .gc-v3-parcel-thread{position:absolute;left:50%;bottom:calc(100% - 22px);width:2.5px;margin-left:-1.25px;height:clamp(200px,40vh,380px);overflow:visible;background:rgba(255,195,111,.34);box-shadow:0 0 20px rgba(239,115,95,.4)}
-        .gc-v3-parcel-thread>b{position:absolute;left:-10px;right:-10px;top:0;height:120px;border-radius:50%;background:radial-gradient(ellipse 50% 50% at 50% 78%,#fff4e8 0 16%,#ffc36f 36%,rgba(239,115,95,.45) 60%,transparent 76%);opacity:0}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-thread>b{animation:gcTorchArrive 1.15s cubic-bezier(.3,.1,.5,1) both,gcTorchFlicker .55s ease-in-out infinite}
-        @keyframes gcTorchArrive{0%{opacity:0;transform:translateY(-120px)}8%{opacity:1}84%{opacity:1;transform:translateY(calc(clamp(200px,40vh,380px) - 60px))}100%{opacity:0;transform:translateY(clamp(200px,40vh,380px))}}
-        .gc-v3-parcel-thread:after{content:"";position:absolute;left:50%;bottom:-7px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 24%,#ffc36f 58%,transparent 72%);animation:gcThreadLand 2.3s ease-in-out infinite}
-        @keyframes gcThreadLand{0%,100%{opacity:.45;scale:.8}52%{opacity:1;scale:1.25}}
-        .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,180,.55),rgba(239,115,95,.16) 42%,transparent 66%);opacity:0}
+        /* ── The parcel ──
+           Everything here hangs off the torch's arrival at 1.15s. The box used
+           to fly open at 0.06s, a full second before the flame reached it, so
+           the arrival and the opening read as two unrelated events. Now the
+           parcel braces while the light comes down, and only bursts when it
+           lands. */
+        .gc-v3-parcel{position:relative;z-index:3;display:block;width:96px;height:86px;margin:0 auto 26px}
+        .gc-v3-parcel-burst{position:absolute;left:50%;top:52%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,232,.7),rgba(255,195,111,.32) 34%,rgba(239,115,95,.12) 56%,transparent 70%);opacity:0}
         .gc-v3-parcel-box{position:absolute;left:50%;bottom:0;width:68px;height:60px;margin-left:-34px;border-radius:14px;background:linear-gradient(150deg,#ffc19f,#ef735f 72%);box-shadow:0 16px 34px rgba(4,20,29,.34),inset 0 1px 0 rgba(255,255,255,.5);transform-origin:50% 100%}
         .gc-v3-parcel-box>b{position:absolute;left:50%;top:0;bottom:0;width:8px;margin-left:-4px;background:rgba(23,48,62,.32)}
         .gc-v3-parcel-box>em{position:absolute;left:0;right:0;top:14px;display:grid;place-items:center;opacity:0}
         .gc-v3-parcel-lid{position:absolute;left:50%;top:14px;width:82px;height:20px;margin-left:-41px;border-radius:8px;background:linear-gradient(150deg,#ffd9bd,#ffc19f 78%);box-shadow:0 8px 18px rgba(4,20,29,.3),inset 0 1px 0 rgba(255,255,255,.6);transform-origin:50% 100%}
         .gc-v3-parcel-lid>b{position:absolute;left:50%;bottom:100%;width:8px;height:11px;margin-left:-4px;border-radius:3px 3px 0 0;background:#ffd9bd}
+
         .gc-v3-parcel-bit{position:absolute;left:50%;top:34%;width:7px;height:7px;margin:-3px 0 0 -3px;border-radius:2px;background:#ffc36f;opacity:0}
-        .gc-v3-parcel-bit:nth-of-type(4){--bit-x:-96px;--bit-y:-74px;--bit-r:-210deg;background:#ef735f}
-        .gc-v3-parcel-bit:nth-of-type(5){--bit-x:88px;--bit-y:-86px;--bit-r:240deg}
-        .gc-v3-parcel-bit:nth-of-type(6){--bit-x:-124px;--bit-y:-18px;--bit-r:160deg;width:5px;height:14px}
-        .gc-v3-parcel-bit:nth-of-type(7){--bit-x:118px;--bit-y:-26px;--bit-r:-190deg;width:14px;height:5px;background:#ef735f}
-        .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-58px;--bit-y:-104px;--bit-r:120deg;border-radius:50%}
-        .gc-v3-parcel-bit:nth-of-type(9){--bit-x:52px;--bit-y:-110px;--bit-r:-140deg;border-radius:50%;background:#fff4e8}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1.05s .06s cubic-bezier(.2,.5,.3,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .62s .06s cubic-bezier(.2,.8,.3,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .48s .38s cubic-bezier(.18,.8,.26,1.08) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .78s .12s cubic-bezier(.2,.8,.3,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit{animation:gcBitFly .9s .16s cubic-bezier(.16,.66,.24,1) both}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(5){animation-delay:.2s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(6){animation-delay:.23s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(7){animation-delay:.19s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(8){animation-delay:.25s}
-        .gc-v3-start[data-active=true] .gc-v3-parcel-bit:nth-of-type(9){animation-delay:.21s}
-        @keyframes gcLidOff{0%{transform:translate(0,0) rotate(0)}38%{transform:translate(calc(var(--lid-x,86px) * .34),calc(var(--lid-y,40px) - 116px)) rotate(-74deg)}100%{transform:translate(var(--lid-x,86px),var(--lid-y,40px)) rotate(-196deg)}}
-        @keyframes gcBoxSpring{0%{transform:scale(1,1)}34%{transform:scale(1.07,.9)}100%{transform:scale(1,1)}}
+        .gc-v3-parcel-bit[data-bit="0"]{--bit-x:-104px;--bit-y:-86px;--bit-r:-230deg;background:#ef735f}
+        .gc-v3-parcel-bit[data-bit="1"]{--bit-x:96px;--bit-y:-98px;--bit-r:250deg}
+        .gc-v3-parcel-bit[data-bit="2"]{--bit-x:-136px;--bit-y:-22px;--bit-r:170deg;width:5px;height:15px}
+        .gc-v3-parcel-bit[data-bit="3"]{--bit-x:128px;--bit-y:-30px;--bit-r:-200deg;width:15px;height:5px;background:#ef735f}
+        .gc-v3-parcel-bit[data-bit="4"]{--bit-x:-62px;--bit-y:-118px;--bit-r:130deg;border-radius:50%}
+        .gc-v3-parcel-bit[data-bit="5"]{--bit-x:58px;--bit-y:-124px;--bit-r:-150deg;border-radius:50%;background:#fff4e8}
+        .gc-v3-parcel-bit[data-bit="6"]{--bit-x:-30px;--bit-y:-140px;--bit-r:200deg;background:#fff4e8}
+        .gc-v3-parcel-bit[data-bit="7"]{--bit-x:26px;--bit-y:-146px;--bit-r:-260deg;width:5px;height:13px;background:#ffd9bd}
+        .gc-v3-parcel-bit[data-bit="8"]{--bit-x:-160px;--bit-y:-64px;--bit-r:290deg;width:6px;height:6px;border-radius:50%;background:#ef735f}
+        .gc-v3-parcel-bit[data-bit="9"]{--bit-x:152px;--bit-y:-72px;--bit-r:-280deg;width:13px;height:4px}
+        .gc-v3-parcel-bit[data-bit="10"]{--bit-x:-88px;--bit-y:-150px;--bit-r:150deg;width:4px;height:12px;background:#fff4e8}
+        .gc-v3-parcel-bit[data-bit="11"]{--bit-x:84px;--bit-y:-156px;--bit-r:-170deg}
+        .gc-v3-parcel-bit[data-bit="12"]{--bit-x:-118px;--bit-y:-112px;--bit-r:210deg;border-radius:50%;background:#ffd9bd}
+        .gc-v3-parcel-bit[data-bit="13"]{--bit-x:112px;--bit-y:-120px;--bit-r:-240deg;width:4px;height:14px;background:#ef735f}
+
+        /* Anticipation, then impact. */
+        .gc-v3-start[data-active=true] .gc-v3-parcel{animation:gcParcelBrace 1.15s cubic-bezier(.5,0,.85,.5) both}
+        .gc-v3-start[data-active=true] .gc-v3-start-inner{animation:gcStartReveal .85s .18s cubic-bezier(.14,.86,.2,1) both,gcImpactShake .5s 1.15s cubic-bezier(.36,.07,.19,.97) forwards}
+        .gc-v3-start[data-active=true] .gc-v3-search-bar{animation:gcSearchReveal .8s .5s cubic-bezier(.14,.88,.24,1.12) both,gcSearchArrival 2.8s 1.9s ease-in-out infinite}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-lid{animation:gcLidOff 1.15s 1.15s cubic-bezier(.2,.5,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box{animation:gcBoxSpring .68s 1.15s cubic-bezier(.2,.8,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-box>em{animation:gcParcelContents .5s 1.5s cubic-bezier(.18,.8,.26,1.08) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-burst{animation:gcParcelBurst .85s 1.15s cubic-bezier(.2,.8,.3,1) both}
+        .gc-v3-start[data-active=true] .gc-v3-parcel-bit{animation:gcBitFly 1.05s cubic-bezier(.16,.66,.24,1) both;animation-delay:calc(1.15s + var(--bit-stagger,0s))}
+        .gc-v3-parcel-bit[data-bit="1"],.gc-v3-parcel-bit[data-bit="6"]{--bit-stagger:.03s}
+        .gc-v3-parcel-bit[data-bit="2"],.gc-v3-parcel-bit[data-bit="7"]{--bit-stagger:.06s}
+        .gc-v3-parcel-bit[data-bit="3"],.gc-v3-parcel-bit[data-bit="8"]{--bit-stagger:.09s}
+        .gc-v3-parcel-bit[data-bit="4"],.gc-v3-parcel-bit[data-bit="9"]{--bit-stagger:.12s}
+        .gc-v3-parcel-bit[data-bit="5"],.gc-v3-parcel-bit[data-bit="10"]{--bit-stagger:.15s}
+        .gc-v3-parcel-bit[data-bit="11"]{--bit-stagger:.05s}
+        .gc-v3-parcel-bit[data-bit="12"]{--bit-stagger:.11s}
+        .gc-v3-parcel-bit[data-bit="13"]{--bit-stagger:.08s}
+
+        @keyframes gcParcelBrace{0%{transform:scale(1)}72%{transform:scale(1.05)}100%{transform:scale(1.12)}}
+        @keyframes gcImpactShake{0%{transform:translate(0,0) scale(1)}12%{transform:translate(-7px,3px) scale(1.014)}26%{transform:translate(6px,-4px) scale(1.01)}42%{transform:translate(-5px,-2px) scale(1.006)}58%{transform:translate(4px,3px) scale(1.003)}74%{transform:translate(-2px,-1px) scale(1)}100%{transform:none}}
+        @keyframes gcLidOff{0%{transform:translate(0,0) rotate(0)}34%{transform:translate(calc(var(--lid-x,86px) * .3),calc(var(--lid-y,40px) - 142px)) rotate(-66deg)}100%{transform:translate(var(--lid-x,86px),var(--lid-y,40px)) rotate(-196deg)}}
+        @keyframes gcBoxSpring{0%{transform:scale(1,1)}30%{transform:scale(1.12,.86)}100%{transform:scale(1,1)}}
         @keyframes gcParcelContents{0%{opacity:0;transform:translateY(16px) scale(.5)}70%{opacity:1;transform:translateY(-3px) scale(1.08)}100%{opacity:1;transform:none}}
-        @keyframes gcParcelBurst{0%{opacity:0;transform:scale(.24)}30%{opacity:.95}100%{opacity:0;transform:scale(1.5)}}
-        @keyframes gcBitFly{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}18%{opacity:1}100%{opacity:0;transform:translate(var(--bit-x),var(--bit-y)) scale(1.05) rotate(var(--bit-r))}}
+        @keyframes gcParcelBurst{0%{opacity:0;transform:scale(.2)}26%{opacity:1}100%{opacity:0;transform:scale(1.6)}}
+        @keyframes gcBitFly{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}14%{opacity:1}100%{opacity:0;transform:translate(var(--bit-x),var(--bit-y)) scale(1.1) rotate(var(--bit-r))}}
         @media(max-width:900px){
           .gc-v3-parcel{width:84px;height:76px;margin-bottom:20px}
           .gc-v3-parcel-box{width:60px;height:52px;margin-left:-30px;border-radius:12px}
           .gc-v3-parcel-lid{width:72px;height:17px;margin-left:-36px;top:12px;--lid-x:70px;--lid-y:34px}
           .gc-v3-parcel-burst{width:170px;height:170px;margin:-85px 0 0 -85px}
-          .gc-v3-parcel-bit:nth-of-type(4){--bit-x:-70px;--bit-y:-58px}
-          .gc-v3-parcel-bit:nth-of-type(5){--bit-x:64px;--bit-y:-66px}
-          .gc-v3-parcel-bit:nth-of-type(6){--bit-x:-88px;--bit-y:-14px}
-          .gc-v3-parcel-bit:nth-of-type(7){--bit-x:84px;--bit-y:-20px}
-          .gc-v3-parcel-bit:nth-of-type(8){--bit-x:-42px;--bit-y:-76px}
-          .gc-v3-parcel-bit:nth-of-type(9){--bit-x:38px;--bit-y:-80px}
+          .gc-v3-parcel-bit[data-bit="0"]{--bit-x:-74px;--bit-y:-62px}
+          .gc-v3-parcel-bit[data-bit="1"]{--bit-x:68px;--bit-y:-70px}
+          .gc-v3-parcel-bit[data-bit="2"]{--bit-x:-96px;--bit-y:-18px}
+          .gc-v3-parcel-bit[data-bit="3"]{--bit-x:90px;--bit-y:-24px}
+          .gc-v3-parcel-bit[data-bit="4"]{--bit-x:-46px;--bit-y:-84px}
+          .gc-v3-parcel-bit[data-bit="5"]{--bit-x:42px;--bit-y:-88px}
+          .gc-v3-parcel-bit[data-bit="6"]{--bit-x:-22px;--bit-y:-100px}
+          .gc-v3-parcel-bit[data-bit="7"]{--bit-x:20px;--bit-y:-104px}
+          .gc-v3-parcel-bit[data-bit="8"]{--bit-x:-112px;--bit-y:-46px}
+          .gc-v3-parcel-bit[data-bit="9"]{--bit-x:106px;--bit-y:-52px}
+          .gc-v3-parcel-bit[data-bit="10"]{--bit-x:-62px;--bit-y:-106px}
+          .gc-v3-parcel-bit[data-bit="11"]{--bit-x:60px;--bit-y:-110px}
+          .gc-v3-parcel-bit[data-bit="12"]{--bit-x:-84px;--bit-y:-80px}
+          .gc-v3-parcel-bit[data-bit="13"]{--bit-x:80px;--bit-y:-86px}
         }
         .gc-v3-start{position:relative;min-height:92dvh;overflow:hidden;display:grid;place-items:center;padding:64px 24px 150px;box-sizing:border-box;background:radial-gradient(circle at 50% 45%,rgba(239,115,95,.18),transparent 38%)}.gc-v3-start-inner{position:relative;z-index:3;width:min(620px,100%);text-align:center;will-change:transform,opacity}.gc-v3-start-inner>p{margin:0 0 8px;color:#ef735f;font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-start-inner h2{margin:0;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(46px,6vw,78px);font-weight:650;line-height:1;letter-spacing:-.05em}.gc-v3-start-sub{display:block;margin:15px auto 28px;color:#b9ccca;font-size:14px}.gc-v3-search-bar{width:100%;min-height:68px;padding:8px 13px 8px 10px;display:flex;align-items:center;gap:13px;border:2px solid #ef735f;border-radius:999px;background:#fffaf4;box-shadow:0 0 0 7px rgba(239,115,95,.13),0 22px 50px rgba(3,18,27,.32);color:#203746;cursor:pointer;text-align:left;animation:gcSearchArrival 2.8s ease-in-out infinite}.gc-v3-search-bar>span{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:#203746;color:#fff4e8}.gc-v3-search-bar strong{flex:1;font-size:16px}.gc-v3-search-bar b{font-size:28px;color:#ef735f}.gc-v3-legal{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;color:#a9bfbc;font-size:12.5px}.gc-v3-legal a,.gc-v3-legal>button:not(.gc-v2-info){padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
         @keyframes gcSearchArrival{0%,100%{transform:scale(1)}50%{transform:scale(1.014)}}
@@ -2612,6 +2642,9 @@ export default function Home() {
         .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(2){animation-delay:.04s}
         .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(1){animation-delay:.18s}
         .gc-v3-phase-three[data-active=true] .gc-v3-result-art article:nth-child(3){animation-delay:.32s}
+        /* Lost in an earlier edit while its usage stayed behind, so the shine
+           on the phase-3 cards silently never played. */
+        @keyframes gcCardShine{0%{opacity:0;transform:translateX(-80%) rotate(12deg)}35%{opacity:1}100%{opacity:0;transform:translateX(90%) rotate(12deg)}}
         @keyframes gcDeal{0%{opacity:0;transform:translate(0,120px) rotate(0deg) scale(.88)}60%{opacity:1;transform:translate(calc(var(--result-x) * 1.07),-6px) rotate(calc(var(--result-r) * 1.12)) scale(1.02)}100%{opacity:1;transform:translateX(var(--result-x)) rotate(var(--result-r))}}
         @media(max-width:900px){
           .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-87px}
@@ -2622,9 +2655,9 @@ export default function Home() {
         @keyframes gcStartReveal{0%{opacity:0;transform:translateY(60px) scale(.86)}100%{opacity:1;transform:none}}
         @keyframes gcSearchReveal{0%{opacity:0;transform:translateY(32px) scaleX(.7)}68%{opacity:1;transform:translateY(-3px) scaleX(1.02)}100%{opacity:1;transform:none}}
         @media(max-width:900px){.gc-landing-v2-header{height:64px;padding:10px 16px}.gc-v3-journey{margin-top:-64px}.gc-v3-hero{padding:80px 0 16px}.gc-v3-hero h1{font-size:clamp(26px,7.4vw,36px)}.gc-v3-hero .gc-v2-benefits{margin-top:11px;font-size:11px}.gc-v3-scroll-cue{margin-top:12px;justify-content:center}.gc-v3-phase:before{left:24px}.gc-v3-phase-inner{top:0;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:28px;padding:82px 20px 82px}.gc-v3-reverse .gc-v3-copy,.gc-v3-reverse .gc-v3-art{order:initial}.gc-v3-copy{width:100%;padding-left:24px;box-sizing:border-box}.gc-v3-copy small{font-size:8.5px}.gc-v3-copy h2{margin:8px 0 9px;font-size:clamp(35px,10vw,45px)}.gc-v3-copy p{font-size:14px;line-height:1.45}.gc-v3-art{width:100%;min-height:300px}.gc-v3-message-card{min-height:170px;padding:25px;font-size:21px;border-radius:23px}.gc-v3-chip-a{left:0;top:8%}.gc-v3-chip-b{right:0;top:22%}.gc-v3-chip-c{right:7%;bottom:5%}.gc-v3-ai-core{width:96px;height:96px;border-radius:27px}.gc-v3-ai-core span{font-size:32px}.gc-v3-orbit-one{width:230px;height:145px}.gc-v3-orbit-two{width:300px;height:205px}.gc-v3-signal{padding:7px 10px;font-size:10px}.gc-v3-result-art article{--gc-result-panel:64px;width:150px;height:212px;padding:0;border-radius:18px}.gc-v3-result-art article:nth-child(1){transform:translateX(-87px) rotate(-12deg)}.gc-v3-result-art article:nth-child(2){transform:translateY(-15px)}.gc-v3-result-art article:nth-child(3){transform:translateX(87px) rotate(12deg)}.gc-v3-result-body{padding:8px 7px;gap:5px}.gc-v3-result-body strong{font-size:11.5px}.gc-v3-result-criteria span{padding:3px 6px;font-size:9px}.gc-v3-result-art article>span{width:22px;height:22px;top:8px;right:8px;font-size:9.5px}.gc-v3-start{min-height:100dvh;padding:56px 18px 120px}.gc-v3-start-inner h2{font-size:48px}.gc-v3-start-sub{font-size:12px}.gc-v3-search-bar{min-height:64px}.gc-v3-next{bottom:24px}}
-        @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:100%}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:13.5px}.gc-v3-scroll-cue b{width:10px;height:10px}}
+        @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:100%}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:16px}.gc-v3-scroll-cue b{width:13px;height:13px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
-        @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:20px;width:min(270px,calc(100% - 44px));min-width:0}}
+        @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:36px;width:min(310px,calc(100% - 36px));min-width:0}}
         @media(max-width:900px){.gc-v3-start{padding-bottom:82px}.gc-v3-legal{bottom:calc(14px + env(safe-area-inset-bottom));gap:7px;font-size:12px}}        
         @media(max-width:900px){.gc-v2-wordmark{gap:7px}.gc-v2-wordmark strong{line-height:.86}.gc-v2-wordmark small{line-height:1.15}}
         @media(prefers-reduced-motion:reduce){.gc-main.gc-main--flush{scroll-behavior:auto}.gc-v3-hero-glow,.gc-v3-scroll-cue,.gc-v3-scroll-cue span,.gc-v3-scroll-cue b,.gc-v3-next-arrow,.gc-v3-orbit,.gc-v3-search-bar{animation:none!important}.gc-v3-art{transition:none!important}.gc-v3-start-inner{opacity:1!important;transform:none!important}.gc-v3-phase[data-active=true],.gc-v3-phase[data-active=true] *,.gc-v3-phase[data-active=true]:before,.gc-v3-phase[data-active=true]:after,.gc-v3-start[data-active=true],.gc-v3-start[data-active=true] *,.gc-v3-start[data-active=true]:before,.gc-v3-start[data-active=true]:after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important}}
@@ -2920,10 +2953,14 @@ export default function Home() {
                         <i className="gc-v3-parcel-burst"/>
                         <i className="gc-v3-parcel-lid"><b/></i>
                         <i className="gc-v3-parcel-box"><b/><em><GiftSVG size={26} fill={N.navy3}/></em></i>
-                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
-                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
-                        <i className="gc-v3-parcel-bit"/><i className="gc-v3-parcel-bit"/>
-                      </span><p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
+                        {/* Indexed explicitly rather than by nth-of-type: adding
+                            the thread above once shifted every confetti piece by
+                            one and left the last with no trajectory at all. */}
+                        {Array.from({ length: 14 }, (_, n) => (
+                          <i key={n} className="gc-v3-parcel-bit" data-bit={n} />
+                        ))}
+                      </span>
+                      <p>ORA TOCCA A TE</p><h2>Inizia la ricerca.</h2>
                       <span className="gc-v3-start-sub">Partiamo da Nome, Occasione e Budget.</span>
                       <button type="button" className="gc-v3-search-bar" onClick={() => { setLandingSheetOpen(true); setLandingBarFocused(true); }}>
                         <span aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5.5 20c.6-4 2.8-6 6.5-6s5.9 2 6.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg></span><strong>{g.recipientName || landingForm.nameLabel}</strong><b>›</b>
