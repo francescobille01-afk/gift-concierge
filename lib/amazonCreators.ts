@@ -20,8 +20,10 @@ const API_HOST = "https://creatorsapi.amazon";
 const MARKETPLACE = "www.amazon.it";
 const PARTNER_TAG = "gifty0de-21";
 
-/** Refresh this long before the hour is up, so a call never races expiry. */
-const TOKEN_SKEW_MS = 5 * 60 * 1000;
+/** Refresh this long before the hour is up, so a call never races expiry.
+ *  Ten minutes rather than five: a long-lived server handed out a token it
+ *  still believed in and got TokenExpired back, and the margin costs nothing. */
+const TOKEN_SKEW_MS = 10 * 60 * 1000;
 
 export interface AmazonItem {
   asin: string;
@@ -125,8 +127,11 @@ async function callApi(operation: string, body: Record<string, unknown>): Promis
     // An expired token looks like a hard failure but isn't — drop it and the
     // next attempt fetches a fresh one.
     if (res.status === 401) {
+      // Drop the token and let the next pass mint a fresh one. The short wait
+      // matters: Amazon hands back the same token for repeated requests in
+      // quick succession, so retrying instantly can re-fetch the dead one.
       cachedToken = null;
-      if (attempt < MAX_ATTEMPTS) continue;
+      if (attempt < MAX_ATTEMPTS) { await wait(250); continue; }
     }
 
     if (!shouldRetry(res.status) || attempt === MAX_ATTEMPTS) break;
