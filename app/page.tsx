@@ -2387,40 +2387,44 @@ export default function Home() {
         .gc-v3-rail-stop:hover{color:#fff4e8}.gc-v3-rail-stop:hover i{border-color:rgba(255,255,255,.55)}
         @keyframes gcRailPulse{0%,100%{transform:scale(1);opacity:.42}50%{transform:scale(1.22);opacity:0}}
 
-        /* ── Phase 2: the sift ──
-           Candidates pour down out of the profile, the filter turns most of
-           them away, three come through. Says the same thing the counter says
-           — thousands weighed, a handful kept — without drawing a chart.
-           Transform and opacity only. */
-        .gc-v3-sift{width:min(460px,100%);box-sizing:border-box;padding:15px 17px 14px;border:1px solid rgba(126,214,203,.2);border-radius:20px;background:linear-gradient(155deg,rgba(17,48,60,.96),rgba(11,33,44,.94));box-shadow:0 22px 46px rgba(2,18,27,.36)}
-        .gc-v3-sift-head{display:flex;align-items:center;gap:8px;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.07)}
-        .gc-v3-sift-head>i{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;animation:gcSiftLive 1.4s ease-in-out infinite}
-        .gc-v3-sift-head>b{color:#dff3ef;font:800 10.5px 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase}
-        .gc-v3-sift-head>em{margin-left:auto;color:#7ed6cb;font:800 12px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
-        .gc-v3-sift-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:11px 0 4px}
-        .gc-v3-sift-tags span{padding:4px 9px;border-radius:999px;background:rgba(126,214,203,.12);color:#cfe8e3;font:700 10.5px 'Hanken Grotesk',sans-serif;opacity:0}
-
-        .gc-v3-sift-stage{position:relative;height:132px;overflow:hidden}
-        .gc-v3-sift-rain{position:absolute;inset:0}
-        .gc-v3-sift-rain i{position:absolute;top:-10px;left:var(--lane);width:7px;height:9px;margin-left:-3.5px;border-radius:2px;background:rgba(126,214,203,.55);opacity:0}
-        /* The filter: two edges closing to a neck, with the light at the gap. */
-        .gc-v3-sift-funnel{position:absolute;left:0;right:0;bottom:16px;height:2px;pointer-events:none}
-        .gc-v3-sift-funnel>i{position:absolute;bottom:0;width:44%;height:1.5px;background:linear-gradient(90deg,transparent,rgba(126,214,203,.75));transform-origin:100% 50%;transform:rotate(-15deg)}
-        .gc-v3-sift-funnel>i:first-child{left:0}
-        .gc-v3-sift-funnel>i:last-of-type{right:0;background:linear-gradient(90deg,rgba(126,214,203,.75),transparent);transform-origin:0 50%;transform:rotate(15deg)}
-        .gc-v3-sift-funnel>b{position:absolute;left:50%;bottom:-4px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 22%,#7ed6cb 60%,transparent 74%);animation:gcSiftNeck 1.1s ease-in-out infinite}
-
-        .gc-v3-sift-out{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding-top:12px}
-        .gc-v3-sift-out span{display:inline-flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(255,193,159,.14);color:#ffe2cd;font:750 11.5px 'Hanken Grotesk',sans-serif;opacity:0}
-        .gc-v3-sift-out b{padding:3px 7px;border-radius:999px;background:rgba(239,115,95,.9);color:#17303e;font-size:10px;font-weight:900;font-variant-numeric:tabular-nums}
-        @keyframes gcSiftLive{0%,100%{opacity:.35;scale:.8}50%{opacity:1;scale:1.15}}
-        @keyframes gcSiftNeck{0%,100%{opacity:.5;scale:.75}50%{opacity:1;scale:1.3}}
+        /* ── Phase 2: Gifty AI map ──
+           The animation explains the real product loop: details from the
+           message enter the AI, become weighted insights, then point to gifts. */
+        .gc-v3-ai-map{width:min(500px,100%);box-sizing:border-box;padding:16px 17px 15px;border:1px solid rgba(126,214,203,.24);border-radius:24px;background:radial-gradient(circle at 50% 48%,rgba(126,214,203,.12),transparent 34%),linear-gradient(155deg,rgba(17,48,60,.98),rgba(8,29,40,.96));box-shadow:0 28px 58px rgba(2,18,27,.4),inset 0 1px 0 rgba(255,255,255,.06)}
+        .gc-v3-ai-map-head{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .gc-v3-ai-map-head>i{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;box-shadow:0 0 0 5px rgba(126,214,203,.1),0 0 18px rgba(126,214,203,.7)}
+        .gc-v3-ai-map-head>b{color:#dff3ef;font:850 10.5px 'Hanken Grotesk',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+        .gc-v3-ai-map-head>em{margin-left:auto;color:#7ed6cb;font:800 11px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
+        .gc-v3-ai-map-flow{position:relative;display:grid;grid-template-columns:1fr 48px 92px 48px 1fr;align-items:center;min-height:188px;padding:8px 0 5px}
+        .gc-v3-ai-input,.gc-v3-ai-insights{display:flex;flex-direction:column;gap:7px}
+        .gc-v3-ai-input>small,.gc-v3-ai-insights>small,.gc-v3-ai-gifts>small{color:#76969a;font:850 8px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}
+        .gc-v3-ai-input span{align-self:flex-end;max-width:115px;padding:6px 9px;border:1px solid rgba(255,193,159,.24);border-radius:9px;background:rgba(255,193,159,.08);color:#f5d8c5;font:750 10px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-ai-insights span{display:flex;align-items:center;gap:6px;padding:6px 7px;border:1px solid rgba(126,214,203,.2);border-radius:9px;background:rgba(126,214,203,.08);color:#dff3ef;font:750 10px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-ai-insights span>i{width:5px;height:5px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;box-shadow:0 0 8px rgba(126,214,203,.7)}
+        .gc-v3-ai-insights span>b{margin-left:auto;color:#7ed6cb;font-size:9px;font-variant-numeric:tabular-nums}
+        .gc-v3-ai-beam{position:relative;height:2px;overflow:hidden;background:rgba(126,214,203,.12)}
+        .gc-v3-ai-beam:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#7ed6cb,transparent);transform:translateX(-110%)}
+        .gc-v3-ai-beam>i{position:absolute;top:50%;right:0;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:#fff4e8;box-shadow:0 0 13px #7ed6cb;opacity:0}
+        .gc-v3-ai-beam-out{transform:scaleX(-1)}
+        .gc-v3-ai-brain{position:relative;width:82px;height:82px;margin:auto;display:grid;place-items:center;border:1px solid rgba(126,214,203,.48);border-radius:26px;background:linear-gradient(145deg,rgba(126,214,203,.24),rgba(239,115,95,.13));box-shadow:0 0 0 8px rgba(126,214,203,.05),0 18px 34px rgba(1,16,24,.34)}
+        .gc-v3-ai-brain:before{content:"";position:absolute;inset:9px;border:1px solid rgba(255,244,232,.16);border-radius:20px}
+        .gc-v3-ai-brain>b{position:relative;color:#fff4e8;font:850 27px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.06em}
+        .gc-v3-ai-brain>small{position:absolute;bottom:13px;color:#7ed6cb;font:850 6.5px 'Hanken Grotesk',sans-serif;letter-spacing:.16em}
+        .gc-v3-ai-brain>i{position:absolute;width:7px;height:7px;border-radius:50%;background:#7ed6cb;opacity:.34}.gc-v3-ai-brain>i:nth-child(1){left:13px;top:16px}.gc-v3-ai-brain>i:nth-child(2){right:13px;top:16px}.gc-v3-ai-brain>i:nth-child(3){left:13px;bottom:16px}
+        .gc-v3-ai-gifts{padding-top:11px;border-top:1px solid rgba(255,255,255,.07)}
+        .gc-v3-ai-gifts>div{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}
+        .gc-v3-ai-gifts span{min-width:0;padding:7px 8px;border:1px solid rgba(255,193,159,.24);border-radius:10px;background:rgba(255,193,159,.1);color:#ffe2cd;font:750 9.5px/1.15 'Hanken Grotesk',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0}
+        .gc-v3-ai-gifts span>b{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:6px;border-radius:6px;background:#ef735f;color:#17303e;font-size:8px}
         @media(max-width:900px){
-          .gc-v3-sift{padding:13px 13px 12px;border-radius:17px}
-          .gc-v3-sift-head>b{font-size:9.5px}.gc-v3-sift-head>em{font-size:11px}
-          .gc-v3-sift-stage{height:112px}
-          .gc-v3-sift-out span{padding:6px 7px 6px 10px;font-size:10.5px}
-          .gc-v3-sift-tags span{font-size:9.5px;padding:4px 8px}
+          .gc-v3-ai-map{padding:12px 12px 11px;border-radius:18px}
+          .gc-v3-ai-map-head{padding-bottom:9px}.gc-v3-ai-map-head>b{font-size:9px}.gc-v3-ai-map-head>em{font-size:9.5px}
+          .gc-v3-ai-map-flow{grid-template-columns:1fr 24px 72px 24px 1fr;min-height:142px;padding:5px 0 3px}
+          .gc-v3-ai-input,.gc-v3-ai-insights{gap:4px}.gc-v3-ai-input>small,.gc-v3-ai-insights>small,.gc-v3-ai-gifts>small{font-size:6.8px}
+          .gc-v3-ai-input span,.gc-v3-ai-insights span{padding:4px 5px;border-radius:7px;font-size:8px}
+          .gc-v3-ai-input span{max-width:88px}.gc-v3-ai-insights span>b{font-size:7px}
+          .gc-v3-ai-brain{width:62px;height:62px;border-radius:20px}.gc-v3-ai-brain:before{inset:7px;border-radius:15px}.gc-v3-ai-brain>b{font-size:21px}.gc-v3-ai-brain>small{bottom:9px;font-size:5px}
+          .gc-v3-ai-brain>i{width:5px;height:5px}.gc-v3-ai-brain>i:nth-child(1){left:10px;top:12px}.gc-v3-ai-brain>i:nth-child(2){right:10px;top:12px}.gc-v3-ai-brain>i:nth-child(3){left:10px;bottom:12px}
+          .gc-v3-ai-gifts{padding-top:8px}.gc-v3-ai-gifts>div{gap:4px;margin-top:5px}.gc-v3-ai-gifts span{padding:5px;font-size:7.5px}.gc-v3-ai-gifts span>b{width:16px;height:16px;margin-right:3px;font-size:6px}
         }
         @media(max-width:900px){
           .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
@@ -2600,39 +2604,31 @@ export default function Home() {
         .gc-v3-chip-a{--chip-r:-8deg}.gc-v3-chip-b{--chip-r:7deg}.gc-v3-chip-c{--chip-r:-4deg}
         @keyframes gcCardLand{0%{opacity:0;transform:translateY(46px) scale(.94)}100%{opacity:1;transform:none}}
         @keyframes gcChipLift{0%{opacity:0;transform:translateY(16px) scale(.5) rotate(var(--chip-r,0deg))}70%{opacity:1;transform:translateY(-3px) scale(1.06) rotate(var(--chip-r,0deg))}100%{opacity:1;transform:scale(1) rotate(var(--chip-r,0deg))}}
-        /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
-           that matter light up in turn, drop into the core as signals, the core
-           absorbs each one, then the directions rise out of it. */
-        /* Phase 2 sequence: panel lands → the profile's details settle in as
-           tags (0.2-0.7s) → candidates start pouring (0.7s) and keep pouring →
-           the three that survive the filter come out (1.6s+). */
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span{animation:gcChipDrop .38s cubic-bezier(.16,.86,.24,1.14) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(1){animation-delay:.2s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(2){animation-delay:.3s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(3){animation-delay:.4s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(4){animation-delay:.5s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(5){animation-delay:.6s}
-        /* Each candidate has its own lane, clock and sideways drift, so the
-           fall reads as a shower rather than a marching row. Most fade against
-           the filter; the run is endless because the weighing never stops. */
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-rain i{
-          animation:gcSiftFall var(--dur,2.4s) linear infinite;
-          animation-delay:calc(.7s + var(--delay,0s));
-        }
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span{animation:gcDirectionRise .5s cubic-bezier(.14,.86,.22,1.14) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(1){animation-delay:1.6s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(2){animation-delay:1.74s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(3){animation-delay:1.88s}
-        @keyframes gcSiftFall{
-          0%{opacity:0;transform:translate(0,0) rotate(0)}
-          12%{opacity:1}
-          /* Turned away at the filter, not through it. */
-          78%{opacity:.85;transform:translate(var(--drift,0px),96px) rotate(24deg)}
-          100%{opacity:0;transform:translate(calc(var(--drift,0px) * 2.4),126px) rotate(52deg)}
-        }
-        @keyframes gcChipDrop{0%{opacity:0;transform:translateY(-14px) scale(.8)}70%{opacity:1;transform:translateY(2px) scale(1.04)}100%{opacity:1;transform:none}}
-        @keyframes gcDirectionRise{0%{opacity:0;transform:translateY(20px) scale(.8)}70%{opacity:1;transform:translateY(-3px) scale(1.04)}100%{opacity:1;transform:none}}
+        /* Phase 2 — message details travel into Gifty AI; the core makes the
+           connection visible, then insights and matching gifts resolve. */
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-map{animation:gcCardLand .48s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-map-head>i{animation:gcAiLive 1.15s .35s ease-in-out infinite}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-input span{animation:gcClueFeed .48s cubic-bezier(.16,.86,.24,1.1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-input span:nth-child(2){animation-delay:.18s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-input span:nth-child(3){animation-delay:.3s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-input span:nth-child(4){animation-delay:.42s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-input span:nth-child(5){animation-delay:.54s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-beam-in:after{animation:gcBeamIn .72s .56s ease-in-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-beam-in>i{animation:gcSignalTravel .72s .56s ease-in-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-brain{animation:gcAiThink .82s .9s cubic-bezier(.2,.75,.25,1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-brain>i{animation:gcAiNode 1s 1.05s ease-in-out infinite}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-brain>i:nth-child(2){animation-delay:1.2s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-brain>i:nth-child(3){animation-delay:1.35s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-beam-out:after{animation:gcBeamIn .66s 1.35s ease-in-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-beam-out>i{animation:gcSignalTravel .66s 1.35s ease-in-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-insights span{animation:gcInsightResolve .45s cubic-bezier(.14,.88,.24,1.12) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-insights span:nth-child(2){animation-delay:1.62s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-insights span:nth-child(3){animation-delay:1.76s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-insights span:nth-child(4){animation-delay:1.9s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-gifts span{animation:gcGiftMatch .5s cubic-bezier(.14,.88,.24,1.12) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-gifts span:nth-child(1){animation-delay:2.08s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-gifts span:nth-child(2){animation-delay:2.2s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-gifts span:nth-child(3){animation-delay:2.32s}
+        @keyframes gcAiLive{0%,100%{opacity:.35;transform:scale(.78)}50%{opacity:1;transform:scale(1.18)}}
+        @keyframes gcClueFeed{0%{opacity:0;transform:translateX(-24px) scale(.84)}72%{opacity:1;transform:translateX(3px) scale(1.03)}100%{opacity:1;transform:none}}
+        @keyframes gcBeamIn{0%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
+        @keyframes gcSignalTravel{0%{opacity:0;transform:translateX(-38px) scale(.6)}20%,78%{opacity:1}100%{opacity:0;transform:translateX(2px) scale(1.25)}}
+        @keyframes gcAiThink{0%{opacity:0;transform:scale(.72) rotate(-8deg)}58%{opacity:1;transform:scale(1.1) rotate(2deg)}100%{opacity:1;transform:none;box-shadow:0 0 0 8px rgba(126,214,203,.05),0 18px 34px rgba(1,16,24,.34)}}
+        @keyframes gcAiNode{0%,100%{opacity:.28;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+        @keyframes gcInsightResolve{0%{opacity:0;transform:translateX(22px) scale(.84)}70%{opacity:1;transform:translateX(-3px) scale(1.03)}100%{opacity:1;transform:none}}
+        @keyframes gcGiftMatch{0%{opacity:0;transform:translateY(16px) scale(.82)}70%{opacity:1;transform:translateY(-2px) scale(1.02)}100%{opacity:1;transform:none}}
         /* Phase 3 — dealing a hand. The three cards arrive as one stack from
            below, then fan out centre, left, right, one after another. */
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}
@@ -2658,6 +2654,20 @@ export default function Home() {
         @media(max-width:900px){.gc-landing-v2-header{height:78px;padding:15px 14px 8px}.gc-v3-journey{margin-top:-78px}.gc-v3-hero{padding-top:94px}.gc-v3-phase-inner{top:0;min-height:100%}.gc-v2-brand{gap:10px;padding:0}.gc-v2-logo{width:46px;height:46px;border-radius:14px}.gc-v2-wordmark{gap:4px}.gc-v2-wordmark strong{font-size:32px;line-height:.88}.gc-v2-wordmark small{font-size:7px}.gc-v2-actions{gap:7px}.gc-v2-pill{height:42px;min-width:42px}.gc-v2-favorites{width:42px;padding:0}.gc-v2-language{padding:0 10px}.gc-v2-language strong{font-size:11px}.gc-v3-hero .gc-v2-benefits{gap:8px;margin-top:13px}.gc-v3-hero .gc-v2-benefits span{gap:5px;padding:0;font-size:10.5px}.gc-v3-hero .gc-v2-benefits i{width:10px}.gc-v3-scroll-cue{margin-top:16px;padding:6px 12px;gap:8px}.gc-v3-scroll-cue span{padding:0;font-size:16px}.gc-v3-scroll-cue b{width:13px;height:13px}}
         .gc-v3-start{scroll-snap-align:start;scroll-snap-stop:always}
         @media(max-width:900px){.gc-v3-phase-inner{gap:20px;padding:42px 20px 94px}.gc-v3-art{min-height:260px}.gc-v3-message-card{min-height:150px}.gc-v3-next{bottom:36px;width:min(310px,calc(100% - 36px));min-width:0}}
+        @media(max-width:640px){
+          .gc-v3-hero{padding:90px 0 18px;background:transparent}
+          .gc-v3-hero-copy{padding:0 16px}
+          .gc-v3-hero h1{max-width:370px;font-size:clamp(21px,6vw,25px);line-height:1.08;letter-spacing:-.035em}
+          .gc-v3-hero h1 br{display:none}
+          .gc-v3-hero h1 em{display:inline;margin:0 0 0 .18em;letter-spacing:-.025em}
+          .gc-v3-hero .gc-v2-benefits{margin-top:15px;margin-bottom:4px}
+          .gc-v3-marquee{margin-top:17px;margin-bottom:8px;perspective:820px}
+          .gc-v3-marquee-card{--gc-mobile-card-h:clamp(278px,39dvh,330px);--gc-card-panel:94px;height:var(--gc-mobile-card-h);margin-top:calc(var(--gc-mobile-card-h) * -.5);margin-left:calc(var(--gc-mobile-card-h) * -.4);border-radius:18px}
+          .gc-v3-marquee-cat{top:10px;left:10px;padding:4px 8px;font-size:8px}
+          .gc-v3-marquee-body{padding:9px 8px 8px}.gc-v3-marquee-body strong{min-height:25px;font-size:12px;line-height:1.05}.gc-v3-marquee-body p{margin:2px 0 6px;font-size:12px}.gc-v3-marquee-criteria{gap:3px;font-size:8px}.gc-v3-marquee-criteria span{padding:3px 5px}
+          .gc-v3-scroll-cue{margin-top:7px;gap:6px}.gc-v3-scroll-cue:before{height:78px;margin-top:-39px}.gc-v3-scroll-cue span{font-size:14px}.gc-v3-scroll-cue b{width:11px;height:11px}
+          .gc-v3-phase-two .gc-v3-phase-inner,.gc-v3-phase-three .gc-v3-phase-inner{padding-top:96px}
+        }
         @media(max-width:900px){.gc-v3-start{padding-bottom:82px}.gc-v3-legal{bottom:calc(14px + env(safe-area-inset-bottom));gap:7px;font-size:12px}}        
         @media(max-width:900px){.gc-v2-wordmark{gap:7px}.gc-v2-wordmark strong{line-height:.86}.gc-v2-wordmark small{line-height:1.15}}
         @media(prefers-reduced-motion:reduce){.gc-main.gc-main--flush{scroll-behavior:auto}.gc-v3-hero-glow,.gc-v3-scroll-cue,.gc-v3-scroll-cue span,.gc-v3-scroll-cue b,.gc-v3-next-arrow,.gc-v3-orbit,.gc-v3-search-bar{animation:none!important}.gc-v3-art{transition:none!important}.gc-v3-start-inner{opacity:1!important;transform:none!important}.gc-v3-phase[data-active=true],.gc-v3-phase[data-active=true] *,.gc-v3-phase[data-active=true]:before,.gc-v3-phase[data-active=true]:after,.gc-v3-start[data-active=true],.gc-v3-start[data-active=true] *,.gc-v3-start[data-active=true]:before,.gc-v3-start[data-active=true]:after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important}}
@@ -2880,37 +2890,37 @@ export default function Home() {
                     <i className="gc-v3-thread" aria-hidden="true"><b/></i>
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
-                      <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Classifica le informazioni e le utilizza per costruire una rigorosa analisi.</p></div>
-                      {/* The sift: candidates pour in from the profile, most
-                          fall away against the filter, three come through. It
-                          is what the counter is actually saying — thousands
-                          weighed, a handful kept. */}
-                      <div className="gc-v3-art gc-v3-sift">
-                        <div className="gc-v3-sift-head" aria-hidden="true">
-                          <i/><b>Analisi del profilo</b><em>{analysedCount.toLocaleString("it-IT")} idee valutate</em>
+                      <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty AI collega gli indizi.</h2><p>Trasforma ciò che racconti in insight utili e li confronta con migliaia di idee regalo.</p></div>
+                      <div className="gc-v3-art gc-v3-ai-map" aria-label="Gifty AI trasforma gli indizi in insight e idee regalo">
+                        <div className="gc-v3-ai-map-head" aria-hidden="true">
+                          <i/><b>Gifty AI</b><em>{analysedCount.toLocaleString("it-IT")} idee confrontate</em>
                         </div>
-                        <div className="gc-v3-sift-tags" aria-hidden="true">
-                          {ENGINE_TOKENS.map(token => <span key={token.label}>{token.label}</span>)}
-                        </div>
-                        <div className="gc-v3-sift-stage" aria-hidden="true">
-                          <div className="gc-v3-sift-rain">
-                            {Array.from({ length: 22 }, (_, n) => (
-                              /* Spread across the width, each on its own clock so
-                                 the fall never looks like a marching row. */
-                              <i key={n} style={{
-                                ["--lane" as string]: `${4 + (n * 37) % 92}%`,
-                                ["--delay" as string]: `${(n * 0.29) % 3.2}s`,
-                                ["--dur" as string]: `${2.1 + (n % 5) * 0.32}s`,
-                                ["--drift" as string]: `${((n % 7) - 3) * 9}px`,
-                              }} />
+                        <div className="gc-v3-ai-map-flow" aria-hidden="true">
+                          <div className="gc-v3-ai-input">
+                            <small>INDIZI</small>
+                            {ENGINE_TOKENS.slice(0, 4).map(token => <span key={token.label}>{token.label}</span>)}
+                          </div>
+                          <div className="gc-v3-ai-beam gc-v3-ai-beam-in"><i/></div>
+                          <div className="gc-v3-ai-brain">
+                            <i/><i/><i/>
+                            <b>AI</b>
+                            <small>COLLEGA</small>
+                          </div>
+                          <div className="gc-v3-ai-beam gc-v3-ai-beam-out"><i/></div>
+                          <div className="gc-v3-ai-insights">
+                            <small>INSIGHT</small>
+                            {ENGINE_RESULTS.slice(0, 3).map(result => (
+                              <span key={result.label}><i/>{result.label}<b>{result.score}%</b></span>
                             ))}
                           </div>
-                          <span className="gc-v3-sift-funnel"><i/><i/><b/></span>
                         </div>
-                        <div className="gc-v3-sift-out" aria-hidden="true">
-                          {ENGINE_RESULTS.slice(0, 3).map(result => (
-                            <span key={result.label}>{result.label}<b>{result.score}</b></span>
-                          ))}
+                        <div className="gc-v3-ai-gifts" aria-hidden="true">
+                          <small>REGALI PIÙ AFFINI</small>
+                          <div>
+                            {RESULT_PREVIEW.map((item, index) => (
+                              <span key={item.title}><b>{String(index + 1).padStart(2, "0")}</b>{item.title}</span>
+                            ))}
+                          </div>
                         </div>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare <i>(2/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
