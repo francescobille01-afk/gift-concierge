@@ -62,7 +62,7 @@ const RESULT_PREVIEW = [
 /* Phase 1's example message. Typed out one character at a time from JS —
    a CSS reveal can only wipe the finished text, which reads as a shutter
    opening rather than as somebody writing. */
-const PHASE_ONE_SENTENCE = "“Mio fratello si è appena trasferito e ha un terrazzo tutto suo. Va in montagna ogni weekend e la domenica cucina per gli amici.”";
+const PHASE_ONE_SENTENCE = "“Francesco si è appena trasferito e ha un terrazzo tutto suo. Va in montagna ogni weekend e la domenica cucina per gli amici.”";
 const PHASE_ONE_TYPE_MS = 19;
 
 /* Phase 2's worked example: what the message in phase 1 gets classified
@@ -2585,6 +2585,32 @@ export default function Home() {
           .gc-v3-ai-brain>i{width:5px;height:5px}.gc-v3-ai-brain>i:nth-child(1){left:10px;top:12px}.gc-v3-ai-brain>i:nth-child(2){right:10px;top:12px}.gc-v3-ai-brain>i:nth-child(3){left:10px;bottom:12px}
           .gc-v3-ai-gifts{padding-top:8px}.gc-v3-ai-gifts>div{gap:4px;margin-top:5px}.gc-v3-ai-gifts span{padding:5px;font-size:7.5px}.gc-v3-ai-gifts span>b{width:16px;height:16px;margin-right:3px;font-size:6px}
         }
+        /* Phase 2 stays deliberately open: clues, AI and criteria are three
+           separate moments rather than one dashboard-shaped block. */
+        .gc-v3-ai-canvas{position:relative;width:min(540px,100%);height:350px;min-height:0;margin:auto}
+        .gc-v3-ai-routes{position:absolute;inset:10px 0 0;width:100%;height:330px;overflow:visible}
+        .gc-v3-ai-routes path{fill:none;stroke:rgba(126,214,203,.34);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:5 9;opacity:.22}
+        .gc-v3-ai-count{position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(126,214,203,.2);border-radius:999px;background:rgba(13,39,51,.7);color:#b9d9d5;font:750 9px 'Hanken Grotesk',sans-serif;letter-spacing:.08em;white-space:nowrap;opacity:0}
+        .gc-v3-ai-count i{width:6px;height:6px;border-radius:50%;background:#7ed6cb;box-shadow:0 0 13px rgba(126,214,203,.95)}
+        .gc-v3-ai-clues,.gc-v3-ai-findings{position:absolute;top:54px;display:flex;flex-direction:column;gap:15px}
+        .gc-v3-ai-clues{left:0;width:132px}.gc-v3-ai-findings{right:0;width:152px}
+        .gc-v3-ai-clues>small,.gc-v3-ai-findings>small{margin-bottom:1px;color:#7d9a9e;font:850 7.5px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}
+        .gc-v3-ai-clues span{align-self:flex-start;padding:8px 12px;border:1px solid rgba(255,193,159,.32);border-radius:999px;background:rgba(255,193,159,.1);box-shadow:0 10px 24px rgba(3,18,27,.2);color:#ffd8c2;font:800 10.5px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-ai-orb{position:absolute;left:50%;top:52%;width:120px;height:120px;transform:translate(-50%,-45%);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(126,214,203,.52);border-radius:50%;background:radial-gradient(circle at 38% 28%,rgba(255,255,255,.22),transparent 20%),linear-gradient(145deg,rgba(126,214,203,.3),rgba(239,115,95,.18));box-shadow:0 0 0 9px rgba(126,214,203,.05),0 22px 55px rgba(2,18,27,.38),0 0 42px rgba(126,214,203,.16);opacity:0}
+        .gc-v3-ai-orb>span{color:#fff4e8;font:700 25px/1 'Bricolage Grotesque',sans-serif}.gc-v3-ai-orb>b{margin-top:5px;color:#fff4e8;font:850 15px 'Hanken Grotesk',sans-serif}.gc-v3-ai-orb>small{margin-top:2px;color:#7ed6cb;font:850 6px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}
+        .gc-v3-ai-orb>i{position:absolute;inset:-1px;border:1px solid rgba(126,214,203,.28);border-radius:50%;opacity:0}.gc-v3-ai-orb>i:nth-child(2){inset:10px}.gc-v3-ai-orb>i:nth-child(3){inset:21px}
+        .gc-v3-ai-findings span{display:flex;align-items:center;gap:7px;padding:8px 9px;border:1px solid rgba(126,214,203,.25);border-radius:11px;background:rgba(126,214,203,.09);box-shadow:0 10px 24px rgba(3,18,27,.2);color:#e1f2ef;font:750 10px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-ai-findings span i{width:5px;height:5px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;box-shadow:0 0 9px rgba(126,214,203,.85)}.gc-v3-ai-findings span b{margin-left:auto;color:#7ed6cb;font-size:9px;font-variant-numeric:tabular-nums}
+        @media(max-width:900px){
+          .gc-v3-ai-canvas{width:100%;height:248px}
+          .gc-v3-ai-routes{inset:0;height:248px}
+          .gc-v3-ai-count{top:0;padding:5px 8px;font-size:7px}
+          .gc-v3-ai-clues,.gc-v3-ai-findings{top:39px;gap:10px}.gc-v3-ai-clues{left:0;width:88px}.gc-v3-ai-findings{right:0;width:100px}
+          .gc-v3-ai-clues>small,.gc-v3-ai-findings>small{font-size:6px;letter-spacing:.12em}
+          .gc-v3-ai-clues span{padding:5px 7px;font-size:7.8px}
+          .gc-v3-ai-orb{top:54%;width:78px;height:78px}.gc-v3-ai-orb>span{font-size:17px}.gc-v3-ai-orb>b{margin-top:3px;font-size:10.5px}.gc-v3-ai-orb>small{font-size:4.5px}
+          .gc-v3-ai-findings span{gap:4px;padding:5px 6px;border-radius:8px;font-size:7.5px}.gc-v3-ai-findings span b{font-size:6.5px}
+        }
         @media(max-width:900px){
           .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
         }
@@ -2788,6 +2814,22 @@ export default function Home() {
         @keyframes gcAiNode{0%,100%{opacity:.28;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
         @keyframes gcInsightResolve{0%{opacity:0;transform:translateX(22px) scale(.84)}70%{opacity:1;transform:translateX(-3px) scale(1.03)}100%{opacity:1;transform:none}}
         @keyframes gcGiftMatch{0%{opacity:0;transform:translateY(16px) scale(.82)}70%{opacity:1;transform:translateY(-2px) scale(1.02)}100%{opacity:1;transform:none}}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-count{animation:gcAiCountIn .38s .08s ease-out both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-routes path{animation:gcRouteFlow 1.8s .3s linear infinite}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-routes path:nth-child(2),.gc-v3-phase-two[data-active=true] .gc-v3-ai-routes path:nth-child(5){animation-delay:.42s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-routes path:nth-child(3),.gc-v3-phase-two[data-active=true] .gc-v3-ai-routes path:nth-child(6){animation-delay:.54s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-clues span{animation:gcOpenClueIn .42s cubic-bezier(.16,.86,.24,1.08) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-clues span:nth-child(2){animation-delay:.16s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-clues span:nth-child(3){animation-delay:.3s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-clues span:nth-child(4){animation-delay:.44s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-orb{animation:gcOrbArrive .64s .58s cubic-bezier(.15,.86,.24,1.08) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-orb>i{animation:gcOrbRing 1.85s 1.05s ease-out infinite}.gc-v3-phase-two[data-active=true] .gc-v3-ai-orb>i:nth-child(2){animation-delay:1.28s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-orb>i:nth-child(3){animation-delay:1.51s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-findings span{animation:gcFindingIn .43s cubic-bezier(.14,.88,.24,1.1) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-ai-findings span:nth-child(2){animation-delay:1.08s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-findings span:nth-child(3){animation-delay:1.24s}.gc-v3-phase-two[data-active=true] .gc-v3-ai-findings span:nth-child(4){animation-delay:1.4s}
+        @keyframes gcAiCountIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+        @keyframes gcRouteFlow{0%{stroke-dashoffset:0;opacity:.18}50%{opacity:.78}100%{stroke-dashoffset:-56;opacity:.28}}
+        @keyframes gcOpenClueIn{0%{opacity:0;transform:translateX(-20px) scale(.86)}72%{opacity:1;transform:translateX(2px) scale(1.03)}100%{opacity:1;transform:none}}
+        @keyframes gcOrbArrive{0%{opacity:0;transform:translate(-50%,-45%) scale(.52) rotate(-8deg)}70%{opacity:1;transform:translate(-50%,-45%) scale(1.08) rotate(2deg)}100%{opacity:1;transform:translate(-50%,-45%) scale(1)}}
+        @keyframes gcOrbRing{0%{opacity:.48;transform:scale(.72)}100%{opacity:0;transform:scale(1.62)}}
+        @keyframes gcFindingIn{0%{opacity:0;transform:translateX(20px) scale(.86)}72%{opacity:1;transform:translateX(-2px) scale(1.03)}100%{opacity:1;transform:none}}
         /* Phase 3 — dealing a hand. The three cards arrive as one stack from
            below, then fan out centre, left, right, one after another. */
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}
@@ -3065,7 +3107,6 @@ export default function Home() {
                           <span className="gc-v3-typed-copy">{PHASE_ONE_SENTENCE.slice(0, typedCount)}<i className="gc-v3-caret" aria-hidden="true"/></span>
                           <i/><i/><i/>
                         </div>
-                        <span className="gc-v3-float-chip gc-v3-chip-a">Montagna</span><span className="gc-v3-float-chip gc-v3-chip-b">Cucina</span><span className="gc-v3-float-chip gc-v3-chip-c">Casa nuova</span>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-two")}><strong>Scorri in basso per continuare <i>(1/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
                     </div>
@@ -3076,36 +3117,27 @@ export default function Home() {
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
                       <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty AI collega gli indizi.</h2><p>Trasforma ciò che racconti in insight utili e li confronta con migliaia di idee regalo.</p></div>
-                      <div className="gc-v3-art gc-v3-ai-map" aria-label="Gifty AI trasforma gli indizi in insight e idee regalo">
-                        <div className="gc-v3-ai-map-head" aria-hidden="true">
-                          <i/><b>Gifty AI</b><em>{analysedCount.toLocaleString("it-IT")} idee confrontate</em>
+                      <div className="gc-v3-art gc-v3-ai-canvas" aria-label="Gifty AI collega gli indizi e identifica i criteri più utili">
+                        <svg className="gc-v3-ai-routes" viewBox="0 0 520 330" preserveAspectRatio="none" aria-hidden="true">
+                          <path d="M108 72 C190 72 183 150 252 162"/>
+                          <path d="M92 160 C165 160 190 162 252 162"/>
+                          <path d="M108 250 C190 250 183 175 252 162"/>
+                          <path d="M270 162 C345 150 345 76 420 76"/>
+                          <path d="M270 162 C350 162 350 162 438 162"/>
+                          <path d="M270 162 C345 178 345 250 420 250"/>
+                        </svg>
+                        <div className="gc-v3-ai-count"><i/>{analysedCount.toLocaleString("it-IT")} idee confrontate</div>
+                        <div className="gc-v3-ai-clues" aria-hidden="true">
+                          <small>INDIZI</small>
+                          {ENGINE_TOKENS.slice(0, 3).map(token => <span key={token.label}>{token.label}</span>)}
                         </div>
-                        <div className="gc-v3-ai-map-flow" aria-hidden="true">
-                          <div className="gc-v3-ai-input">
-                            <small>INDIZI</small>
-                            {ENGINE_TOKENS.slice(0, 4).map(token => <span key={token.label}>{token.label}</span>)}
-                          </div>
-                          <div className="gc-v3-ai-beam gc-v3-ai-beam-in"><i/></div>
-                          <div className="gc-v3-ai-brain">
-                            <i/><i/><i/>
-                            <b>AI</b>
-                            <small>COLLEGA</small>
-                          </div>
-                          <div className="gc-v3-ai-beam gc-v3-ai-beam-out"><i/></div>
-                          <div className="gc-v3-ai-insights">
-                            <small>INSIGHT</small>
-                            {ENGINE_RESULTS.slice(0, 3).map(result => (
-                              <span key={result.label}><i/>{result.label}<b>{result.score}%</b></span>
-                            ))}
-                          </div>
+                        <div className="gc-v3-ai-orb" aria-hidden="true">
+                          <i/><i/><i/>
+                          <span>✦</span><b>Gifty AI</b><small>COLLEGA</small>
                         </div>
-                        <div className="gc-v3-ai-gifts" aria-hidden="true">
-                          <small>REGALI PIÙ AFFINI</small>
-                          <div>
-                            {RESULT_PREVIEW.map((item, index) => (
-                              <span key={item.title}><b>{String(index + 1).padStart(2, "0")}</b>{item.title}</span>
-                            ))}
-                          </div>
+                        <div className="gc-v3-ai-findings" aria-hidden="true">
+                          <small>CRITERI RILEVATI</small>
+                          {ENGINE_RESULTS.slice(0, 3).map(result => <span key={result.label}><i/>{result.label}<b>{result.score}%</b></span>)}
                         </div>
                       </div>
                       <button type="button" className="gc-v3-next" onClick={() => scrollLandingTo(".gc-v3-phase-three")}><strong>Scorri in basso per continuare <i>(2/3)</i></strong><span className="gc-v3-next-arrow">↓</span></button>
