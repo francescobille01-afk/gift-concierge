@@ -1976,6 +1976,11 @@ export default function Home() {
     if (sortBy === "priceHigh") return parsePriceLow(b.priceRange) - parsePriceLow(a.priceRange);
     return 0; // "match" = keep the order Claude proposed them in
   });
+  const desktopStage = screen === "clues" ? 0
+    : screen === "signals" ? 1
+    : screen === "loading" ? 2
+    : screen === "results" || screen === "refine" || screen === "favorites" || screen === "favorite-detail" ? 3
+    : 0;
 
   /* ── Time label ── */
   function whenLabel(isoStr: string) {
@@ -2119,6 +2124,34 @@ export default function Home() {
               ⌫ Scarta
             </button>
           </div>
+        </div>
+      </article>
+    );
+  }
+
+  function renderDesktopResultCard(gift: GiftSuggestion, index: number) {
+    const imgQ = gift.imageSearchQuery ?? gift.title;
+    const image = gift.imageUrl || `/api/product-image?q=${encodeURIComponent(imgQ)}`;
+    const fallbackLink = `https://www.amazon.it/s?k=${encodeURIComponent(gift.title)}`;
+    const amazonLink = addAffiliateTag(gift.amazonLink || fallbackLink);
+    const loved = favoriteGifts.some(item => item.id === gift.id);
+    return (
+      <article key={gift.id} className="gc-desktop-result-card">
+        <div className="gc-desktop-result-photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt={gift.title}/>
+          <span>{gift.category || "Scelta personale"}</span>
+          <button type="button" onClick={() => toggleFavorite(gift)} aria-label={loved ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}>{loved ? "♥" : "♡"}</button>
+        </div>
+        <div className="gc-desktop-result-body">
+          <small>IDEA {String(index + 1).padStart(2, "0")}</small>
+          <div className="gc-desktop-result-title"><h2>{gift.title}</h2><strong>{toPriceBand(gift.priceRange, sym)}</strong></div>
+          <p>{gift.reason || gift.description}</p>
+          <div className="gc-desktop-result-actions">
+            <a href={amazonLink} target="_blank" rel="noopener noreferrer">Acquista su Amazon</a>
+            <button type="button" onClick={() => openProductRefinement(gift)}>Rifinisci questa idea</button>
+          </div>
+          <button type="button" className="gc-desktop-discard" onClick={() => discardMobileGift(gift)}>Scarta</button>
         </div>
       </article>
     );
@@ -2304,6 +2337,30 @@ export default function Home() {
           .gc-bubble{margin-bottom:14px!important}
           .gc-intake-nav{margin-top:16px!important;padding-top:14px!important}
         }
+        .gc-desktop-rail,.gc-desktop-results-grid,.gc-desktop-favorites,.gc-desktop-kicker{display:none}
+        @media(min-width:901px){
+          .gc-shell:has(.gc-flow-screen){background:#102a36!important}
+          .gc-brand{width:294px!important;max-width:294px!important;padding:0!important;background:radial-gradient(circle at 16% 12%,rgba(239,115,95,.17),transparent 28%),linear-gradient(180deg,#102a36,#173846 58%,#102a36)!important}
+          .gc-brand>:not(.gc-desktop-rail){display:none!important}
+          .gc-desktop-rail{position:relative;z-index:3;height:100%;box-sizing:border-box;padding:28px 24px 24px;display:flex;flex-direction:column}
+          .gc-desktop-rail:before{content:"";position:absolute;left:43px;top:224px;bottom:130px;width:1px;background:linear-gradient(180deg,rgba(239,115,95,.72),rgba(126,214,203,.5),rgba(255,195,111,.28));box-shadow:0 0 18px rgba(126,214,203,.2)}
+          .gc-desktop-rail-brand{display:flex;align-items:center;gap:12px;padding:0;border:0;background:transparent;color:#fff4e8;cursor:pointer}.gc-desktop-rail-brand>span{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#ffc19f,#ef735f);box-shadow:0 12px 30px rgba(239,115,95,.2)}.gc-desktop-rail-brand>strong{font:800 29px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.045em}
+          .gc-desktop-rail-context{margin:46px 0 34px;padding:18px;border:1px solid rgba(255,244,232,.12);border-radius:18px;background:rgba(255,244,232,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.gc-desktop-rail-context small{color:#ef8a78;font:850 8px 'Hanken Grotesk',sans-serif;letter-spacing:.18em}.gc-desktop-rail-context h2{margin:7px 0 3px;color:#fff4e8;font:700 25px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}.gc-desktop-rail-context p{margin:0;color:#a9c2c1;font-size:11px}
+          .gc-desktop-rail-steps{position:relative;display:grid;gap:23px}.gc-desktop-rail-steps>div{position:relative;z-index:1;display:flex;align-items:center;gap:14px;color:#6f8c91}.gc-desktop-rail-steps i{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto;border:1px solid rgba(255,255,255,.14);border-radius:50%;background:#14313e;color:inherit;font:800 9px 'Hanken Grotesk',sans-serif;font-style:normal;letter-spacing:.05em}.gc-desktop-rail-steps span small{display:block;margin-bottom:2px;font:800 7px 'Hanken Grotesk',sans-serif;letter-spacing:.17em}.gc-desktop-rail-steps span strong{display:block;color:inherit;font:700 14px 'Hanken Grotesk',sans-serif}.gc-desktop-rail-steps>div[data-done=true]{color:#98b9b5}.gc-desktop-rail-steps>div[data-active=true]{color:#fff4e8}.gc-desktop-rail-steps>div[data-active=true] i{border-color:#7ed6cb;background:rgba(126,214,203,.16);color:#7ed6cb;box-shadow:0 0 0 6px rgba(126,214,203,.06),0 0 22px rgba(126,214,203,.24)}.gc-desktop-rail-steps>div[data-active=true] span small{color:#7ed6cb}
+          .gc-desktop-rail-foot{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px 11px;color:#7f9b9e;font-size:9.5px}.gc-desktop-rail-foot>span{width:100%;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);color:#b8ccca}.gc-desktop-rail-foot a,.gc-desktop-rail-foot button{padding:0;border:0;background:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
+          .gc-main:not(.gc-main--flush){padding:22px 34px 36px!important;background:radial-gradient(circle at 88% 4%,rgba(126,214,203,.12),transparent 24%),linear-gradient(150deg,#173846,#102a36 68%)!important}
+          .gc-topnav{min-height:44px;margin-bottom:14px!important}.gc-topnav>div>button{border-color:rgba(255,244,232,.2)!important;background:rgba(255,244,232,.07)!important;color:#fff4e8!important}.gc-desktop-favorites{height:38px;padding:0 13px;border:1px solid rgba(255,244,232,.2);border-radius:999px;background:rgba(255,244,232,.07);display:flex;align-items:center;gap:7px;color:#fff4e8;font:750 12px 'Hanken Grotesk',sans-serif;cursor:pointer}.gc-desktop-favorites>span{color:#ffc19f;font-size:18px}.gc-desktop-favorites>b{min-width:18px;height:18px;display:grid;place-items:center;border-radius:99px;background:#ef735f;color:#17303e;font-size:9px}
+          .gc-main[class*="gc-main--"] section.gc-flow-screen{width:100%!important;max-width:1180px!important;min-height:calc(100vh - 116px)!important;box-sizing:border-box;margin:0 auto!important;padding:34px 38px!important;border:1px solid rgba(255,255,255,.2);border-radius:30px;background:linear-gradient(150deg,#fff7ee,#f5e9dc)!important;box-shadow:0 30px 80px rgba(1,17,25,.34),inset 0 1px 0 rgba(255,255,255,.78)}
+          .gc-flow-header{margin:-34px -38px 30px!important;padding:18px 24px 15px!important;border-radius:30px 30px 0 0;box-shadow:none!important}.gc-flow-header>div:first-child{margin-bottom:13px!important}
+          .gc-flow-screen .gc-flow-title,.gc-flow-results>h1{margin:0 0 12px!important;color:#17303e!important;font:650 clamp(42px,4vw,58px)/.98 'Bricolage Grotesque',sans-serif!important;letter-spacing:-.055em!important}.gc-flow-screen .gc-flow-lede{max-width:480px;margin:0!important;color:#5f777c!important;font-size:16px!important;line-height:1.55!important}
+          .gc-flow-clues{display:grid!important;grid-template-columns:minmax(280px,.78fr) minmax(460px,1.22fr);grid-template-rows:auto auto 1fr auto auto auto;column-gap:54px;align-content:start}.gc-flow-clues .gc-flow-header{grid-column:1/-1}.gc-flow-clues .gc-flow-title{grid-column:1;grid-row:2}.gc-flow-clues .gc-flow-lede{grid-column:1;grid-row:3}.gc-clue-composer{grid-column:2;grid-row:2/4}.gc-clue-composer textarea{min-height:310px!important;padding:22px 22px 82px!important;border:1.5px solid rgba(239,115,95,.58)!important;border-radius:22px!important;background:#fffaf4!important;font-size:18px!important;box-shadow:0 18px 40px rgba(57,31,27,.09)!important}.gc-clue-composer .gc-voice-button{right:18px!important;bottom:18px!important}.gc-clue-voice-status{grid-column:2;grid-row:4;padding-top:9px!important}.gc-clue-prompts{grid-column:2;grid-row:5;padding:11px 0!important}.gc-clue-prompts button{padding:9px 13px!important}.gc-flow-clues .gc-flow-primary-action{grid-column:2;grid-row:6;width:360px;margin:14px 0 0 auto!important}.gc-flow-primary-action>button{min-height:54px!important;border-radius:15px!important;background:linear-gradient(145deg,#ef735f,#d85e4e)!important;box-shadow:0 12px 28px rgba(216,94,78,.22)!important}
+          .gc-flow-signals .gc-signals-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;margin-top:26px}.gc-flow-signals .gc-signals-grid>div{min-height:76px!important;padding:12px 14px!important;border-color:#d8c4b0!important;border-radius:16px!important;box-shadow:0 8px 20px rgba(40,29,25,.05)}.gc-flow-signals .gc-flow-primary-action{width:380px;margin:26px 0 0 auto!important}
+          .gc-flow-loading>div:last-child{min-height:560px}.gc-flow-loading .gc-loader-core{background:linear-gradient(145deg,#2b6871,#17303e)!important}.gc-flow-loading h2{font-size:40px!important;color:#17303e!important}
+          .gc-main .gc-flow-results{max-width:1320px!important}.gc-flow-results>h1{font-size:50px!important}.gc-flow-results>.gc-flow-header+div{margin-bottom:7px!important}.gc-mobile-kicker{display:none}.gc-desktop-kicker{display:inline}.gc-mobile-result-deck{display:none}.gc-desktop-results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px}
+          .gc-desktop-result-card{min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.11);border-radius:22px;background:#102b38;box-shadow:0 18px 40px rgba(7,28,36,.18);transition:transform .22s ease,box-shadow .22s ease}.gc-desktop-result-card:hover{transform:translateY(-5px);box-shadow:0 24px 52px rgba(7,28,36,.26)}.gc-desktop-result-photo{position:relative;height:205px;overflow:hidden}.gc-desktop-result-photo:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#102b38)}.gc-desktop-result-photo img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .5s ease}.gc-desktop-result-card:hover .gc-desktop-result-photo img{transform:scale(1.035)}.gc-desktop-result-photo>span{position:absolute;z-index:2;left:13px;top:13px;padding:5px 9px;border:1px solid rgba(255,255,255,.25);border-radius:99px;background:rgba(10,31,41,.56);backdrop-filter:blur(6px);color:#fff4e8;font-size:8px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.gc-desktop-result-photo>button{position:absolute;z-index:3;right:12px;top:12px;width:36px;height:36px;border:1px solid rgba(255,255,255,.36);border-radius:50%;background:rgba(10,31,41,.56);backdrop-filter:blur(6px);color:#ffc19f;font-size:20px;cursor:pointer}.gc-desktop-result-body{padding:4px 17px 17px;color:#fff4e8}.gc-desktop-result-body>small{color:#7ed6cb;font-size:8px;font-weight:850;letter-spacing:.16em}.gc-desktop-result-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:7px 0}.gc-desktop-result-title h2{margin:0;color:#fff4e8;font:700 19px/1.08 'Bricolage Grotesque',sans-serif;letter-spacing:-.035em}.gc-desktop-result-title strong{flex:0 0 auto;color:#ffc19f;font:700 16px 'Bricolage Grotesque',sans-serif}.gc-desktop-result-body>p{height:53px;margin:0 0 14px;overflow:hidden;color:#b8ccca;font-size:11.5px;line-height:1.5}.gc-desktop-result-actions{display:grid;grid-template-columns:1.15fr .85fr;gap:7px}.gc-desktop-result-actions a,.gc-desktop-result-actions button{min-height:40px;box-sizing:border-box;display:grid;place-items:center;padding:8px;border-radius:10px;font:750 10.5px 'Hanken Grotesk',sans-serif;text-align:center;text-decoration:none;cursor:pointer}.gc-desktop-result-actions a{border:0;background:#ef735f;color:#102a36}.gc-desktop-result-actions button{border:1px solid rgba(255,244,232,.25);background:rgba(255,244,232,.07);color:#fff4e8}.gc-desktop-discard{width:100%;margin-top:7px;padding:4px;border:0;background:transparent;color:#789499;font-size:9.5px;cursor:pointer}
+          .gc-main .gc-flow-refine{max-width:930px!important}.gc-flow-refine textarea{min-height:200px!important;padding:18px!important;border-radius:18px!important}.gc-main .gc-flow-favorites,.gc-main .gc-flow-favorite-detail{max-width:940px!important}
+        }
+        @media(min-width:901px) and (max-width:1250px){.gc-brand{width:254px!important;max-width:254px!important}.gc-desktop-results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gc-flow-clues{column-gap:32px;grid-template-columns:minmax(240px,.7fr) minmax(400px,1.3fr)}}
         @media(max-width:900px){.gc-brand{display:none!important}.gc-main{padding:24px 20px 40px!important}.gc-grid{grid-template-columns:1fr!important}
           input:not([type=range]),textarea,select{font-size:16px!important}
           .gc-mobile-header{display:flex!important}
@@ -2677,6 +2734,29 @@ export default function Home() {
 
         {/* ══ BRAND PANEL ══════════════════════════════════════ */}
         <aside className="gc-brand" style={{ width:"38%", maxWidth:520, background:C.brand, color:"#f3e7d8", padding:"52px 46px", display:"flex", flexDirection:"column", justifyContent:"space-between", position:"sticky", top:0, height:"100vh", overflow:"hidden", flexShrink:0 }}>
+          <div className="gc-desktop-rail">
+            <button type="button" className="gc-desktop-rail-brand" onClick={restart}>
+              <span><GiftSVG size={24} fill="#17303e"/></span><strong>Gifty AI</strong>
+            </button>
+            <div className="gc-desktop-rail-context">
+              <small>RICERCA IN CORSO</small>
+              <h2>{g.recipientName || "Nuovo regalo"}</h2>
+              <p>{[g.occasion, fmtBudget(g.budget, sym)].filter(Boolean).join(" · ")}</p>
+            </div>
+            <nav className="gc-desktop-rail-steps" aria-label="Fasi della ricerca">
+              {["Racconto", "Criteri", "Ricerca AI", "Risultati"].map((label, index) => (
+                <div key={label} data-active={desktopStage === index} data-done={desktopStage > index}>
+                  <i>{desktopStage > index ? "✓" : String(index + 1).padStart(2, "0")}</i>
+                  <span><small>FASE {index + 1}</small><strong>{label}</strong></span>
+                </div>
+              ))}
+            </nav>
+            <div className="gc-desktop-rail-foot">
+              <span>Gratis · Nessun account · 2 minuti</span>
+              <a href="https://www.iubenda.com/privacy-policy/48819018" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+              <button type="button" onClick={() => (window as any)._iub?.cs?.api?.openPreferences?.()}>Preferenze cookie</button>
+            </div>
+          </div>
           {/* Grain texture */}
           <div style={{ position:"absolute", inset:0, opacity:.5, mixBlendMode:"overlay", pointerEvents:"none", backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")" }}/>
           {/* Gold corner ornament */}
@@ -2760,7 +2840,7 @@ export default function Home() {
         </aside>
 
         {/* ══ MAIN COLUMN ══════════════════════════════════════ */}
-        <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : "gc-main"} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}>
+        <main ref={gcMainRef} className={screen === "landing" ? "gc-main gc-main--flush" : `gc-main gc-main--${screen}`} style={{ flex:1, padding:"40px 56px 56px", display:"flex", flexDirection:"column", minWidth:0, position:"relative", overflowY:"auto", overflowX:"hidden", height:"100vh", overscrollBehavior:"contain" }}>
 
           {/* Top nav */}
           {screen !== "landing" && !mobileFlow && (
@@ -2776,6 +2856,9 @@ export default function Home() {
                 <span style={{ fontFamily:DISPLAY, fontWeight:700, fontSize:19, color:C.ink, letterSpacing:"-.01em" }}>Gifty</span>
                 <span style={{ fontSize:10.5, fontWeight:600, letterSpacing:".04em", color:C.muted2, textTransform:"uppercase" as const }}>AI Gift Concierge</span>
               </div>
+            </button>
+            <button type="button" onClick={openFavorites} className="gc-desktop-favorites" aria-label={`Apri ${totalFavoriteCount} preferiti salvati`}>
+              <span aria-hidden="true">♡</span> Preferiti {totalFavoriteCount > 0 && <b>{totalFavoriteCount}</b>}
             </button>
             {/* Language menu */}
             <div ref={langMenuRef} style={{ position:"relative" }}>
@@ -3354,11 +3437,11 @@ export default function Home() {
           {/* ══ HOME / APP ══ */}
               {/* MOBILE FLOW — clues → signals → results → refinement */}
               {mobileFlow && screen === "clues" && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-clues" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(18)}
-                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
-                  <p style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
-                  <div style={{ position:"relative" }}>
+                  <h1 className="gc-flow-title" style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>Parlami di {g.recipientName}.</h1>
+                  <p className="gc-flow-lede" style={{ margin:"0 0 14px", color:C.muted4, fontSize:12.5, lineHeight:1.4 }}>Scrivi insieme interessi, abitudini, desideri, cose che possiede già e cose che evita.</p>
+                  <div className="gc-clue-composer" style={{ position:"relative" }}>
                     <textarea id="gc-clue-text" className="gc-mobile-textarea" value={clueText} onChange={event => setClueText(event.target.value)}
                       placeholder={`Esempio: ${g.recipientName || "Luca"} gioca a padel due volte a settimana, lavora spesso in viaggio e si lamenta che il borsone è sempre disordinato. Ha già racchetta e scarpe; preferisce cose pratiche e non ama i regali decorativi.`}
                       style={{ width:"100%", minHeight:210, resize:"none", boxSizing:"border-box", padding:"16px 15px 70px", border:"1.5px solid #d39d55", borderRadius:15, background:"#fffdf9", color:C.ink, fontFamily:BODY, fontSize:16, lineHeight:1.45, boxShadow:"0 0 0 3px rgba(201,162,107,.09)" }}/>
@@ -3368,14 +3451,14 @@ export default function Home() {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.9"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v4M9 21h6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"/></svg>{isListening ? "Ferma" : "Parla invece di scrivere"}
                     </button>
                   </div>
-                  <div style={{ minHeight:17, paddingTop:5, color:voiceError ? "#963f3d" : isListening ? C.maroon : C.muted2, fontSize:10.5 }}>{voiceError || (isListening ? "Ti ascolto… il testo apparirà qui sopra." : "Puoi anche parlare: l’AI riordina la trascrizione.")}</div>
-                  <div style={{ display:"flex", gap:6, overflowX:"auto", padding:"9px 0 4px", scrollbarWidth:"none" }}>
+                  <div className="gc-clue-voice-status" style={{ minHeight:17, paddingTop:5, color:voiceError ? "#963f3d" : isListening ? C.maroon : C.muted2, fontSize:10.5 }}>{voiceError || (isListening ? "Ti ascolto… il testo apparirà qui sopra." : "Puoi anche parlare: l’AI riordina la trascrizione.")}</div>
+                  <div className="gc-clue-prompts" style={{ display:"flex", gap:6, overflowX:"auto", padding:"9px 0 4px", scrollbarWidth:"none" }}>
                     {["Parla spesso di…","Ha già…","Non sopporta…"].map(prompt => (
                       <button key={prompt} type="button" onClick={() => setClueText(text => `${text}${text.trim() ? " " : ""}${prompt} `)}
                         style={{ flexShrink:0, padding:"7px 10px", border:"1px solid #ddc8b1", borderRadius:999, background:"#fff8ef", color:C.muted4, fontSize:11, cursor:"pointer" }}>{prompt}</button>
                     ))}
                   </div>
-                  <div style={{ marginTop:"auto", paddingTop:12 }}>
+                  <div className="gc-flow-primary-action" style={{ marginTop:"auto", paddingTop:12 }}>
                     <div style={{ textAlign:"center", color:C.muted2, fontSize:9.5, marginBottom:8 }}>Nessuna scheda separata per interesse.</div>
                     <button type="button" onClick={organizeClues} disabled={clueText.trim().length < 8 || signalsBusy}
                       style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:clueText.trim().length >= 8 ? C.maroon : "#ccb9a6", color:"#fff", fontSize:13.5, fontWeight:700, cursor:clueText.trim().length >= 8 ? "pointer" : "not-allowed", boxShadow:clueText.trim().length >= 8 ? "0 8px 20px rgba(124,63,63,.22)" : "none" }}>
@@ -3386,12 +3469,12 @@ export default function Home() {
               )}
 
               {mobileFlow && screen === "signals" && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-signals" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(42)}
-                  <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:26, lineHeight:1.08, letterSpacing:"-.03em" }}>Conferma i criteri rilevati.</h1>
-                  <p style={{ margin:"0 0 13px", color:C.muted4, fontSize:12, lineHeight:1.4 }}>Puoi correggerli prima che influenzino la ricerca.</p>
+                  <h1 className="gc-flow-title" style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:26, lineHeight:1.08, letterSpacing:"-.03em" }}>Conferma i criteri rilevati.</h1>
+                  <p className="gc-flow-lede" style={{ margin:"0 0 13px", color:C.muted4, fontSize:12, lineHeight:1.4 }}>Puoi correggerli prima che influenzino la ricerca.</p>
                   {errorMsg && <div style={{ marginBottom:10, padding:"9px 11px", borderRadius:10, background:"#f8dfd9", color:"#8d413e", fontSize:11.5 }}>{errorMsg}</div>}
-                  <div style={{ display:"grid", gap:7 }}>
+                  <div className="gc-signals-grid" style={{ display:"grid", gap:7 }}>
                     {signals.map((signal, index) => {
                       const isConstraint = /non |evita|odia|tropp|vincol|lament/i.test(`${signal.key} ${signal.value}`);
                       return (
@@ -3419,7 +3502,7 @@ export default function Home() {
                     })}
                   </div>
                   <button type="button" onClick={() => setEditingSignals(editing => !editing)} style={{ alignSelf:"flex-end", marginTop:9, border:0, background:"transparent", color:C.maroon, fontSize:12, fontWeight:700, cursor:"pointer" }}>{editingSignals ? "Fine" : "Correggi"}</button>
-                  <div style={{ marginTop:"auto", paddingTop:12 }}>
+                  <div className="gc-flow-primary-action" style={{ marginTop:"auto", paddingTop:12 }}>
                     <div style={{ textAlign:"center", color:C.muted2, fontSize:9.5, marginBottom:8 }}>L’AI può combinare i segnali oppure esplorare lati diversi di {g.recipientName}.</div>
                     <button type="button" onClick={generateMobileResults} disabled={!signals.length}
                       style={{ width:"100%", minHeight:48, border:0, borderRadius:13, background:signals.length ? C.maroon : "#ccb9a6", color:"#fff", fontSize:13.5, fontWeight:700, cursor:signals.length ? "pointer" : "not-allowed" }}>
@@ -3430,7 +3513,7 @@ export default function Home() {
               )}
 
               {screen === "favorites" && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-favorites" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(100)}
                   <button type="button" onClick={() => setScreen(favoritesReturnScreen)} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Torna indietro</button>
                   <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:27, lineHeight:1.05, letterSpacing:"-.03em" }}>I tuoi preferiti.</h1>
@@ -3467,7 +3550,7 @@ export default function Home() {
               )}
 
               {screen === "favorite-detail" && selectedFavoriteGroup && selectedFavoriteGift && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-favorite-detail" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(100)}
                   <button type="button" onClick={() => setScreen("favorites")} style={{ alignSelf:"flex-start", marginBottom:8, padding:0, border:0, background:"transparent", color:C.maroon, fontSize:11.5, fontWeight:700, cursor:"pointer" }}>← Tutti i preferiti</button>
                   <div style={{ marginBottom:8, color:"#a45e5b", fontSize:8.5, fontWeight:800, letterSpacing:".1em", textTransform:"uppercase" }}>{selectedFavoriteGroup.name} · {selectedFavoriteGroup.occasion} · max {fmtBudget(selectedFavoriteGroup.budget, selectedFavoriteGroup.currencySymbol)}</div>
@@ -3485,7 +3568,7 @@ export default function Home() {
               )}
 
               {mobileFlow && screen === "loading" && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-loading" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(64)}
                   <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", paddingBottom:42 }}>
                     <div style={{ position:"relative", width:194, height:194, marginBottom:26 }}>
@@ -3515,10 +3598,10 @@ export default function Home() {
               )}
 
               {mobileFlow && screen === "results" && gifts.length > 0 && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-results" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(refinementRound ? 100 : 82)}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:5 }}>
-                    <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase" }}>{refinementRound ? "Ricerca rifinita" : `Idea ${resultIndex + 1} di ${gifts.length}`}</div>
+                  <div className="gc-results-kicker" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, marginBottom:5 }}>
+                    <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase" }}><span className="gc-mobile-kicker">{refinementRound ? "Ricerca rifinita" : `Idea ${resultIndex + 1} di ${gifts.length}`}</span><span className="gc-desktop-kicker">{refinementRound ? "Ricerca rifinita" : `${gifts.length} idee selezionate`}</span></div>
                   </div>
                   <h1 style={{ margin:"0 0 8px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.08, letterSpacing:"-.03em" }}>{refinementRound ? `Nuove scelte per ${g.recipientName}` : `Scelte per ${g.recipientName}`}</h1>
                   {refinementRound > 0 && favoriteGifts.length > 0 && (
@@ -3526,12 +3609,15 @@ export default function Home() {
                       <span style={{ color:C.maroon }}>♥</span><div><small style={{ display:"block", color:"#a45e5b", fontSize:8, fontWeight:800, letterSpacing:".08em", textTransform:"uppercase" }}>Preferito conservato</small><strong style={{ color:C.ink, fontSize:10.5 }}>{favoriteGifts[0].title}</strong></div>
                     </div>
                   )}
-                  {renderMobileResultCard(gifts[resultIndex])}
-                  <div aria-label={`Risultato ${resultIndex + 1} di ${gifts.length}`} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:13, padding:"10px 0 7px" }}>
-                    <button type="button" onClick={() => setResultIndex(index => (index - 1 + gifts.length) % gifts.length)} aria-label="Idea precedente" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>‹</button>
-                    <div style={{ display:"flex", gap:7 }}>{gifts.map((gift, index) => <button key={gift.id} type="button" onClick={() => setResultIndex(index)} aria-label={`Mostra risultato ${index + 1}`} style={{ width:index === resultIndex ? 22 : 8, height:8, padding:0, border:0, borderRadius:99, background:index === resultIndex ? "#a25b5b" : "#cdb9a5", boxShadow:index === resultIndex ? "0 0 0 3px rgba(162,91,91,.12)" : "none", transition:"all .2s", cursor:"pointer" }}/>)}</div>
-                    <button type="button" onClick={() => setResultIndex(index => (index + 1) % gifts.length)} aria-label="Idea successiva" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>›</button>
+                  <div className="gc-mobile-result-deck">
+                    {renderMobileResultCard(gifts[resultIndex])}
+                    <div aria-label={`Risultato ${resultIndex + 1} di ${gifts.length}`} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:13, padding:"10px 0 7px" }}>
+                      <button type="button" onClick={() => setResultIndex(index => (index - 1 + gifts.length) % gifts.length)} aria-label="Idea precedente" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>‹</button>
+                      <div style={{ display:"flex", gap:7 }}>{gifts.map((gift, index) => <button key={gift.id} type="button" onClick={() => setResultIndex(index)} aria-label={`Mostra risultato ${index + 1}`} style={{ width:index === resultIndex ? 22 : 8, height:8, padding:0, border:0, borderRadius:99, background:index === resultIndex ? "#a25b5b" : "#cdb9a5", boxShadow:index === resultIndex ? "0 0 0 3px rgba(162,91,91,.12)" : "none", transition:"all .2s", cursor:"pointer" }}/>)}</div>
+                      <button type="button" onClick={() => setResultIndex(index => (index + 1) % gifts.length)} aria-label="Idea successiva" style={{ width:29, height:29, borderRadius:"50%", border:"1px solid #ddc7b0", background:"#fffaf4", color:C.maroon, cursor:"pointer" }}>›</button>
+                    </div>
                   </div>
+                  <div className="gc-desktop-results-grid">{gifts.map((gift, index) => renderDesktopResultCard(gift, index))}</div>
                   <div style={{ marginTop:"auto", paddingTop:6 }}>
                     <button type="button" onClick={restart} style={{ width:"100%", minHeight:40, border:0, background:"transparent", color:C.muted4, fontSize:11.5, textDecoration:"underline", cursor:"pointer" }}>Ricomincia da capo</button>
                   </div>
@@ -3539,7 +3625,7 @@ export default function Home() {
               )}
 
               {mobileFlow && screen === "refine" && (
-                <section className="gc-fade" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
+                <section className="gc-fade gc-flow-screen gc-flow-refine" style={{ width:"100%", maxWidth:430, margin:"0 auto", flex:1, minHeight:0, display:"flex", flexDirection:"column" }}>
                   {renderMobileFlowHeader(92)}
                   <div style={{ color:"#a45e5b", fontSize:9.5, fontWeight:800, letterSpacing:".12em", textTransform:"uppercase", marginBottom:7 }}>Parto da questa idea</div>
                   <h1 style={{ margin:"0 0 5px", color:C.ink, fontFamily:DISPLAY, fontSize:25, lineHeight:1.06, letterSpacing:"-.03em" }}>Troviamo la versione giusta.</h1>
