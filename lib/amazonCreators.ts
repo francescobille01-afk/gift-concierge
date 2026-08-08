@@ -102,8 +102,10 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function callApi(operation: string, body: Record<string, unknown>): Promise<any> {
   let lastError = "";
+  let attempted = 0;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    attempted = attempt;
     const token = await getAccessToken();
     const res = await fetch(`${API_HOST}/catalog/v1/${operation}`, {
       method: "POST",
@@ -138,7 +140,12 @@ async function callApi(operation: string, body: Record<string, unknown>): Promis
     await wait(backoff);
   }
 
-  throw new Error(`Amazon ${operation} failed after ${MAX_ATTEMPTS} attempts (${lastError})`);
+  // Report what actually happened, not the ceiling: a 403 breaks out on the
+  // first try, and claiming three attempts sends whoever reads this log
+  // hunting for a throttling problem that was never there.
+  throw new Error(
+    `Amazon ${operation} failed after ${attempted} attempt${attempted === 1 ? "" : "s"} (${lastError})`,
+  );
 }
 
 /* Resolving a set of gifts means several lookups at once, which is exactly how

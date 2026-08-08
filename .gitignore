@@ -12,3 +12,7 @@ node_modules/
 AMAZON_ASSOCIATES_NOTES.md
 LEGAL_COMPLIANCE.md
 TESTING_PHASE_NOTES.md
+
+# Backups of the env file (contain secrets)
+.env.local.bak
+.env*.bak
