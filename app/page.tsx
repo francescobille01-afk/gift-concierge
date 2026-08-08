@@ -2365,11 +2365,7 @@ export default function Home() {
            the end, so the run covers the full height of the phase. */
         @keyframes gcTorchDown{0%{opacity:0;transform:translateY(-132px)}5%{opacity:1}92%{opacity:1}100%{opacity:0;transform:translateY(100dvh)}}
         @keyframes gcTorchFlicker{0%,100%{scale:1 1}50%{scale:1.18 .92}}
-        .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(280px,.78fr) minmax(440px,1.22fr);align-items:center;gap:clamp(48px,8vw,120px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
-        /* Mirrored phases put the art in column 1, so mirror the track sizes
-           too — otherwise the artwork lands in the narrow column meant for
-           the copy and gets squeezed to ~2/3 of the space it has elsewhere. */
-        .gc-v3-phase-inner.gc-v3-reverse{grid-template-columns:minmax(440px,1.22fr) minmax(280px,.78fr)}
+        .gc-v3-phase-inner{position:relative;top:0;min-height:100%;box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(72px,22vw,300px);max-width:1180px;margin:0 auto;padding:112px 50px 112px}.gc-v3-reverse .gc-v3-copy{order:2}.gc-v3-reverse .gc-v3-art{order:1}
         .gc-v3-copy{position:relative;z-index:5;transition:transform .12s linear,opacity .12s linear}.gc-v3-copy small{display:inline-flex;align-items:center;gap:8px;color:var(--phase-color);font-size:10px;font-weight:900;letter-spacing:.2em}.gc-v3-copy small:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--phase-color);box-shadow:0 0 0 5px color-mix(in srgb,var(--phase-color) 13%,transparent),0 0 18px var(--phase-color)}.gc-v3-copy h2{margin:12px 0 14px;color:#fff4e8;font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,5vw,70px);line-height:.98;letter-spacing:-.05em}.gc-v3-copy p{max-width:470px;margin:0;color:#bfd0ce;font-size:clamp(16px,1.45vw,20px);line-height:1.55}
         .gc-v3-art{position:relative;z-index:3;min-height:410px;transition:transform .12s linear,opacity .12s linear;will-change:transform,opacity}.gc-v3-message-art{display:grid;place-items:center}.gc-v3-message-card{position:relative;width:min(470px,88%);min-height:210px;box-sizing:border-box;padding:34px;border:1px solid rgba(255,193,159,.35);border-radius:30px;background:linear-gradient(145deg,rgba(255,244,232,.98),rgba(239,225,213,.95));box-shadow:0 35px 80px rgba(3,18,27,.36);color:#203746;font-family:Georgia,serif;font-size:clamp(21px,2.3vw,31px);line-height:1.25}.gc-v3-message-card i{position:absolute;bottom:22px;width:7px;height:7px;border-radius:50%;background:#ef735f}.gc-v3-message-card i:nth-child(2){left:34px}.gc-v3-message-card i:nth-child(3){left:48px;opacity:.6}.gc-v3-message-card i:nth-child(4){left:62px;opacity:.3}
         .gc-v3-typed-copy{display:block}
@@ -2388,37 +2384,40 @@ export default function Home() {
         .gc-v3-rail-stop:hover{color:#fff4e8}.gc-v3-rail-stop:hover i{border-color:rgba(255,255,255,.55)}
         @keyframes gcRailPulse{0%,100%{transform:scale(1);opacity:.42}50%{transform:scale(1.22);opacity:0}}
 
-        /* ── Phase 2: the analytics readout ──
-           Chips carrying what phase 1 said, a plot that builds column by
-           column, a sweep crossing it, and a live tally. Transform and
-           opacity only. */
-        .gc-v3-scope{width:min(540px,100%);box-sizing:border-box;padding:16px 18px 14px;border:1px solid rgba(126,214,203,.22);border-radius:20px;background:linear-gradient(155deg,rgba(17,48,60,.96),rgba(11,33,44,.94));box-shadow:0 22px 46px rgba(2,18,27,.36)}
-        .gc-v3-scope-head{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.07)}
-        .gc-v3-scope-head>i{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;animation:gcScopeLive 1.4s ease-in-out infinite}
-        .gc-v3-scope-head>b{color:#dff3ef;font:800 11px 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase}
-        .gc-v3-scope-head>em{margin-left:auto;color:#7ed6cb;font:800 12px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
-        .gc-v3-scope-chips{display:flex;flex-wrap:wrap;gap:5px;padding:12px 0 16px}
-        .gc-v3-scope-chips span{display:inline-flex;align-items:center;gap:5px;padding:5px 9px 5px 5px;border-radius:999px;background:rgba(126,214,203,.1);color:#dff3ef;font:700 11px 'Hanken Grotesk',sans-serif;opacity:0}
-        .gc-v3-scope-chips b{padding:3px 6px;border-radius:999px;background:rgba(126,214,203,.2);color:#7ed6cb;font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
-        .gc-v3-scope-plot{position:relative;height:148px;display:grid;grid-template-columns:repeat(6,1fr);align-items:end;gap:8px;overflow:hidden;border-radius:10px}
-        .gc-v3-scope-plot>div{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
-        .gc-v3-scope-plot em{color:#8fa9a8;font:800 10.5px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums;opacity:0}
-        .gc-v3-scope-plot b{width:100%;height:calc(var(--h,.5) * 96px);border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#7ed6cb,rgba(126,214,203,.28));transform-origin:50% 100%;transform:scaleY(0)}
-        .gc-v3-scope-plot [data-top=true] b{background:linear-gradient(180deg,#ffd9bd,#ef735f)}
-        .gc-v3-scope-plot [data-top=true] em{color:#ffc19f}
-        .gc-v3-scope-plot small{color:#7e999a;font:750 9px 'Hanken Grotesk',sans-serif;letter-spacing:.02em;white-space:nowrap}
-        .gc-v3-scope-sweep{position:absolute;z-index:2;top:0;bottom:0;left:0;width:80px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(126,214,203,.26),transparent);opacity:0}
-        @keyframes gcScopeLive{0%,100%{opacity:.35;scale:.8}50%{opacity:1;scale:1.15}}
+        /* ── Phase 2: the sift ──
+           Candidates pour down out of the profile, the filter turns most of
+           them away, three come through. Says the same thing the counter says
+           — thousands weighed, a handful kept — without drawing a chart.
+           Transform and opacity only. */
+        .gc-v3-sift{width:min(460px,100%);box-sizing:border-box;padding:15px 17px 14px;border:1px solid rgba(126,214,203,.2);border-radius:20px;background:linear-gradient(155deg,rgba(17,48,60,.96),rgba(11,33,44,.94));box-shadow:0 22px 46px rgba(2,18,27,.36)}
+        .gc-v3-sift-head{display:flex;align-items:center;gap:8px;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.07)}
+        .gc-v3-sift-head>i{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#7ed6cb;animation:gcSiftLive 1.4s ease-in-out infinite}
+        .gc-v3-sift-head>b{color:#dff3ef;font:800 10.5px 'Hanken Grotesk',sans-serif;letter-spacing:.13em;text-transform:uppercase}
+        .gc-v3-sift-head>em{margin-left:auto;color:#7ed6cb;font:800 12px 'Hanken Grotesk',sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
+        .gc-v3-sift-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:11px 0 4px}
+        .gc-v3-sift-tags span{padding:4px 9px;border-radius:999px;background:rgba(126,214,203,.12);color:#cfe8e3;font:700 10.5px 'Hanken Grotesk',sans-serif;opacity:0}
+
+        .gc-v3-sift-stage{position:relative;height:132px;overflow:hidden}
+        .gc-v3-sift-rain{position:absolute;inset:0}
+        .gc-v3-sift-rain i{position:absolute;top:-10px;left:var(--lane);width:7px;height:9px;margin-left:-3.5px;border-radius:2px;background:rgba(126,214,203,.55);opacity:0}
+        /* The filter: two edges closing to a neck, with the light at the gap. */
+        .gc-v3-sift-funnel{position:absolute;left:0;right:0;bottom:16px;height:2px;pointer-events:none}
+        .gc-v3-sift-funnel>i{position:absolute;bottom:0;width:44%;height:1.5px;background:linear-gradient(90deg,transparent,rgba(126,214,203,.75));transform-origin:100% 50%;transform:rotate(-15deg)}
+        .gc-v3-sift-funnel>i:first-child{left:0}
+        .gc-v3-sift-funnel>i:last-of-type{right:0;background:linear-gradient(90deg,rgba(126,214,203,.75),transparent);transform-origin:0 50%;transform:rotate(15deg)}
+        .gc-v3-sift-funnel>b{position:absolute;left:50%;bottom:-4px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle,#fff4e8 22%,#7ed6cb 60%,transparent 74%);animation:gcSiftNeck 1.1s ease-in-out infinite}
+
+        .gc-v3-sift-out{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding-top:12px}
+        .gc-v3-sift-out span{display:inline-flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;border:1px solid rgba(255,193,159,.34);border-radius:999px;background:rgba(255,193,159,.14);color:#ffe2cd;font:750 11.5px 'Hanken Grotesk',sans-serif;opacity:0}
+        .gc-v3-sift-out b{padding:3px 7px;border-radius:999px;background:rgba(239,115,95,.9);color:#17303e;font-size:10px;font-weight:900;font-variant-numeric:tabular-nums}
+        @keyframes gcSiftLive{0%,100%{opacity:.35;scale:.8}50%{opacity:1;scale:1.15}}
+        @keyframes gcSiftNeck{0%,100%{opacity:.5;scale:.75}50%{opacity:1;scale:1.3}}
         @media(max-width:900px){
-          .gc-v3-scope{padding:13px 13px 12px;border-radius:17px}
-          .gc-v3-scope-head>b{font-size:10px}.gc-v3-scope-head>em{font-size:11px}
-          .gc-v3-scope-chips{gap:4px;padding:10px 0 13px}
-          .gc-v3-scope-chips span{font-size:10px;padding:4px 8px 4px 4px}
-          .gc-v3-scope-chips b{font-size:7px;padding:3px 5px}
-          .gc-v3-scope-plot{height:126px;gap:6px}
-          .gc-v3-scope-plot b{height:calc(var(--h,.5) * 80px)}
-          .gc-v3-scope-plot small{font-size:8px}
-          .gc-v3-scope-plot em{font-size:9.5px}
+          .gc-v3-sift{padding:13px 13px 12px;border-radius:17px}
+          .gc-v3-sift-head>b{font-size:9.5px}.gc-v3-sift-head>em{font-size:11px}
+          .gc-v3-sift-stage{height:112px}
+          .gc-v3-sift-out span{padding:6px 7px 6px 10px;font-size:10.5px}
+          .gc-v3-sift-tags span{font-size:9.5px;padding:4px 8px}
         }
         @media(max-width:900px){
           .gc-v3-rail{margin-bottom:15px}.gc-v3-rail-stop{padding-right:13px;font-size:10px;gap:7px}.gc-v3-rail-stop i{width:23px;height:23px}
@@ -2574,35 +2573,36 @@ export default function Home() {
         /* Phase 2 — the analysis. A beam sweeps the sentence, the three words
            that matter light up in turn, drop into the core as signals, the core
            absorbs each one, then the directions rise out of it. */
-        /* Phase 2 sequence: panel lands → chips drop in (0.2-0.7s) → sweep
-           crosses the plot (0.75s) → columns build left to right (0.85s+) with
-           their values appearing as each one tops out. */
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span{animation:gcChipDrop .38s cubic-bezier(.16,.86,.24,1.14) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(1){animation-delay:.2s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(2){animation-delay:.3s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(3){animation-delay:.4s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(4){animation-delay:.5s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-chips span:nth-child(5){animation-delay:.6s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-sweep{animation:gcScopeSweep 1.5s .75s cubic-bezier(.4,0,.5,1) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot b{animation:gcColumnRise .58s cubic-bezier(.18,.84,.24,1.06) both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot em{animation:gcValueIn .3s ease-out both}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(2) b{animation-delay:.85s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(3) b{animation-delay:.95s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(4) b{animation-delay:1.05s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(5) b{animation-delay:1.15s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(6) b{animation-delay:1.25s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(7) b{animation-delay:1.35s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(2) em{animation-delay:1.35s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(3) em{animation-delay:1.45s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(4) em{animation-delay:1.55s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(5) em{animation-delay:1.65s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(6) em{animation-delay:1.75s}
-        .gc-v3-phase-two[data-active=true] .gc-v3-scope-plot>div:nth-child(7) em{animation-delay:1.85s}
+        /* Phase 2 sequence: panel lands → the profile's details settle in as
+           tags (0.2-0.7s) → candidates start pouring (0.7s) and keep pouring →
+           the three that survive the filter come out (1.6s+). */
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift{animation:gcCardLand .5s 0s cubic-bezier(.16,.86,.22,1.04) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span{animation:gcChipDrop .38s cubic-bezier(.16,.86,.24,1.14) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(1){animation-delay:.2s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(2){animation-delay:.3s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(3){animation-delay:.4s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(4){animation-delay:.5s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-tags span:nth-child(5){animation-delay:.6s}
+        /* Each candidate has its own lane, clock and sideways drift, so the
+           fall reads as a shower rather than a marching row. Most fade against
+           the filter; the run is endless because the weighing never stops. */
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-rain i{
+          animation:gcSiftFall var(--dur,2.4s) linear infinite;
+          animation-delay:calc(.7s + var(--delay,0s));
+        }
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span{animation:gcDirectionRise .5s cubic-bezier(.14,.86,.22,1.14) both}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(1){animation-delay:1.6s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(2){animation-delay:1.74s}
+        .gc-v3-phase-two[data-active=true] .gc-v3-sift-out span:nth-child(3){animation-delay:1.88s}
+        @keyframes gcSiftFall{
+          0%{opacity:0;transform:translate(0,0) rotate(0)}
+          12%{opacity:1}
+          /* Turned away at the filter, not through it. */
+          78%{opacity:.85;transform:translate(var(--drift,0px),96px) rotate(24deg)}
+          100%{opacity:0;transform:translate(calc(var(--drift,0px) * 2.4),126px) rotate(52deg)}
+        }
         @keyframes gcChipDrop{0%{opacity:0;transform:translateY(-14px) scale(.8)}70%{opacity:1;transform:translateY(2px) scale(1.04)}100%{opacity:1;transform:none}}
-        @keyframes gcScopeSweep{0%{opacity:0;transform:translateX(-90px)}14%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translateX(560px)}}
-        @keyframes gcColumnRise{0%{transform:scaleY(0)}72%{transform:scaleY(1.07)}100%{transform:scaleY(1)}}
-        @keyframes gcValueIn{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}
+        @keyframes gcDirectionRise{0%{opacity:0;transform:translateY(20px) scale(.8)}70%{opacity:1;transform:translateY(-3px) scale(1.04)}100%{opacity:1;transform:none}}
         /* Phase 3 — dealing a hand. The three cards arrive as one stack from
            below, then fan out centre, left, right, one after another. */
         .gc-v3-phase-three .gc-v3-result-art article:nth-child(1){--result-x:-145px;--result-r:-12deg}
@@ -2848,25 +2848,35 @@ export default function Home() {
                     
                     <div className="gc-v3-phase-inner gc-v3-reverse">
                       <div className="gc-v3-copy"><StepRail active={2} onGo={scrollLandingTo} /><h2>Gifty legge fra le righe.</h2><p>Classifica le informazioni e le utilizza per costruire una rigorosa analisi.</p></div>
-                      {/* A readout you can watch work: the details lifted from
-                          phase 1 drop in as chips, a sweep crosses the plot,
-                          and the categories build up as columns while the count
-                          of ideas weighed runs. */}
-                      <div className="gc-v3-art gc-v3-scope">
-                        <div className="gc-v3-scope-head" aria-hidden="true">
+                      {/* The sift: candidates pour in from the profile, most
+                          fall away against the filter, three come through. It
+                          is what the counter is actually saying — thousands
+                          weighed, a handful kept. */}
+                      <div className="gc-v3-art gc-v3-sift">
+                        <div className="gc-v3-sift-head" aria-hidden="true">
                           <i/><b>Analisi del profilo</b><em>{analysedCount.toLocaleString("it-IT")} idee valutate</em>
                         </div>
-                        <div className="gc-v3-scope-chips" aria-hidden="true">
-                          {ENGINE_TOKENS.map(token => (
-                            <span key={token.label}><b>{token.kind}</b>{token.label}</span>
-                          ))}
+                        <div className="gc-v3-sift-tags" aria-hidden="true">
+                          {ENGINE_TOKENS.map(token => <span key={token.label}>{token.label}</span>)}
                         </div>
-                        <div className="gc-v3-scope-plot" aria-hidden="true">
-                          <i className="gc-v3-scope-sweep"/>
-                          {ENGINE_RESULTS.map((result, i) => (
-                            <div key={result.label} data-top={i === 0} style={{ ["--h" as string]: result.score / 100 }}>
-                              <em>{result.score}</em><b/><small>{result.label}</small>
-                            </div>
+                        <div className="gc-v3-sift-stage" aria-hidden="true">
+                          <div className="gc-v3-sift-rain">
+                            {Array.from({ length: 22 }, (_, n) => (
+                              /* Spread across the width, each on its own clock so
+                                 the fall never looks like a marching row. */
+                              <i key={n} style={{
+                                ["--lane" as string]: `${4 + (n * 37) % 92}%`,
+                                ["--delay" as string]: `${(n * 0.29) % 3.2}s`,
+                                ["--dur" as string]: `${2.1 + (n % 5) * 0.32}s`,
+                                ["--drift" as string]: `${((n % 7) - 3) * 9}px`,
+                              }} />
+                            ))}
+                          </div>
+                          <span className="gc-v3-sift-funnel"><i/><i/><b/></span>
+                        </div>
+                        <div className="gc-v3-sift-out" aria-hidden="true">
+                          {ENGINE_RESULTS.slice(0, 3).map(result => (
+                            <span key={result.label}>{result.label}<b>{result.score}</b></span>
                           ))}
                         </div>
                       </div>
